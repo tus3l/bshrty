@@ -16,14 +16,21 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 function readEnvFile() {
   try { return parseEnv(readFileSync(path.join(here, ".env"), "utf8")); } catch { return {}; }
 }
+// Key lookup: .env file (local) first, then the host's environment variables (Vercel, etc.).
 function getApiKey() {
   const env = readEnvFile();
-  // GROQ_API_KEY is the expected name; a Groq key (gsk_…) left under ANTHROPIC_API_KEY is accepted too.
-  const key = (env.GROQ_API_KEY || (env.ANTHROPIC_API_KEY?.trim().startsWith("gsk_") ? env.ANTHROPIC_API_KEY : "") || "").trim();
+  // GROQ_API_KEY is the expected name; a Groq key (gsk_…) left under ANTHROPIC_API_KEY in .env is accepted too.
+  const fromFile = env.GROQ_API_KEY || (env.ANTHROPIC_API_KEY?.trim().startsWith("gsk_") ? env.ANTHROPIC_API_KEY : "");
+  const key = (fromFile || process.env.GROQ_API_KEY || "").trim();
   return key && !key.includes("ضع") ? key : null;
 }
+function getModel() {
+  return (readEnvFile().GROQ_MODEL || process.env.GROQ_MODEL || "").trim() || undefined;
+}
 
-const PORT = 3000;
+// Locally: http://localhost:3000 on this machine only. On a host (Vercel etc.) use the port it provides.
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.PORT ? undefined : "127.0.0.1";
 const PUBLIC_DIR = path.join(here, "public");
 const MAX_BODY = 8 * 1024 * 1024;
 const TYPES = {
@@ -48,8 +55,8 @@ const server = http.createServer(async (req, res) => {
 async function handleAnalyze(req, res) {
   if (req.method !== "POST") return sendJson(res, 405, { error: "Method not allowed" });
   const apiKey = getApiKey();
-  if (!apiKey) return sendJson(res, 500, { error: "لم يتم ضبط المفتاح: ضع في ملف ‎.env السطر GROQ_API_KEY=مفتاحك." });
-  const model = readEnvFile().GROQ_MODEL?.trim() || undefined;
+  if (!apiKey) return sendJson(res, 500, { error: "لم يتم ضبط المفتاح: أضف GROQ_API_KEY في ملف ‎.env أو في متغيرات البيئة على الاستضافة." });
+  const model = getModel();
 
   let raw = "";
   for await (const chunk of req) {
@@ -92,7 +99,7 @@ function sendJson(res, status, obj) {
   res.end(JSON.stringify(obj));
 }
 
-server.listen(PORT, "127.0.0.1", () => {
+server.listen(PORT, HOST, () => {
   console.log(`بشرتي يعمل على http://localhost:${PORT}`);
-  console.log(getApiKey() ? "✓ تم العثور على المفتاح في .env" : "⚠ لا يوجد مفتاح — أنشئ ملف .env من .env.example (لا حاجة لإعادة التشغيل).");
+  console.log(getApiKey() ? "✓ تم العثور على المفتاح" : "⚠ لا يوجد مفتاح — أضف GROQ_API_KEY في .env أو في متغيرات البيئة.");
 });

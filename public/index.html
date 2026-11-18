@@ -917,7 +917,7 @@ function showAnalyzing(url, ratio){
       <h3>جارٍ تحليل البشرة</h3>
       <p class="ai-caption" id="aiCaption">${AI_CAPTIONS[0]}</p>
       <div class="bar" style="margin:12px 0 10px"><i id="aiFill" style="width:4%"></i></div>
-      <ul class="ai-steps" id="aiSteps">${AI_STEPS.map((s, i) => `<li data-i="${i}" class="${i < 3 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('')}</ul>
+      <ul class="ai-steps" id="aiSteps"></ul>
       <p class="ai-err" id="aiErr" hidden></p>
       <button class="btn btn-outline" data-act="cancelAI" id="aiCancel" style="margin-top:12px">إلغاء</button>
     </div>`;
@@ -943,11 +943,19 @@ function showAnalyzing(url, ratio){
     setTimeout(() => { cap.textContent = AI_CAPTIONS[ci]; cap.classList.remove('fade'); }, 250);
   }, 2600);
   ai.pct = 4;
+  setupAiSteps(1); // single analysis by default; the server's "start" event switches to 3 if configured
 }
 // Single-request mode has no intermediate events: show two steps and let the bar creep toward 90%.
 function setupAiSteps(runs){
-  if(runs !== 1) return;
   const ul = $('#aiSteps'); if(!ul) return;
+  clearInterval(ai.creep);
+  if(runs !== 1){
+    ul.dataset.mode = 'multi';
+    ul.innerHTML = AI_STEPS.map((s, i) => `<li data-i="${i}" class="${i < 3 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('');
+    return;
+  }
+  if(ul.dataset.mode === 'single') return; // already set up
+  ul.dataset.mode = 'single';
   ul.innerHTML = ['فحص الصورة وتحليل المسام', 'كتابة التقرير'].map((s, i) =>
     `<li data-i="${i}" class="${i === 0 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('');
   let ticks = 0;
