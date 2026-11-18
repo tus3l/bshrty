@@ -1,0 +1,1604 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF3EC">
+<title>بشرتي — رفيقك اليومي للعناية بالبشرة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF3EC; --cream-deep:#F1E2D3; --card:#FFFDFB;
+  --rose:#C97B84; --rose-deep:#A85C68; --rose-pale:#F0D8DA;
+  --brown:#5A3A32; --brown-deep:#3D2620; --ink:#402A24; --muted:#8C6E64;
+  --gold:#C9A15A;
+  --good:#5E8F58; --good-bg:#E7EFE3;
+  --warn:#B86A2A; --warn-bg:#F6E6D6;
+  --bad:#B5544A; --bad-bg:#F5DEDA;
+  --line:#E7D6C9; --r:18px; --shadow:0 10px 30px -12px rgba(61,38,32,.25);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:Cairo,system-ui,sans-serif; color:var(--ink);
+  background:linear-gradient(180deg,var(--cream),#F6E8DC) fixed; min-height:100vh;
+  -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+.app{max-width:480px;margin:0 auto;padding:16px 16px 110px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0 14px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:grid;place-items:center;color:#fff;box-shadow:var(--shadow)}
+.brand h1{margin:0;font-size:22px;font-weight:800;color:var(--brown-deep);line-height:1.2}
+.brand p{margin:0;font-size:12px;color:var(--muted)}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;color:var(--rose-deep)}
+.icon-btn.active{background:var(--rose);color:#fff;border-color:var(--rose)}
+
+/* stage rail */
+.rail{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail-item{flex:none;display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.rail-item .dot{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.rail-item.done .dot{background:var(--good)}
+.rail-item.active{background:var(--brown);color:#fff;border-color:var(--brown)}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h2{margin:2px 0 6px;font-size:18px;font-weight:800;color:var(--brown-deep)}
+.card h3{margin:0 0 8px;font-size:15px;font-weight:700;color:var(--brown-deep)}
+.eyebrow{display:block;font-size:11.5px;font-weight:700;color:var(--rose-deep);margin-bottom:2px}
+.sub{margin:0;color:var(--muted);font-size:13.5px;line-height:1.75}
+.small{font-size:12px;color:var(--muted);line-height:1.7}
+
+.weather{background:linear-gradient(145deg,#5A3A32,#3D2620);color:#F6E9DE;border:none}
+.weather .eyebrow{color:var(--gold)}
+.weather .sub{color:#E8D5C8}
+.uv-row{display:flex;align-items:flex-end;gap:16px;margin:8px 0 4px}
+.uv-big{font-size:46px;font-weight:800;line-height:1;color:#fff}
+.uv-meta{font-size:13px;line-height:1.6}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.muted{background:var(--cream-deep);color:var(--muted)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:12px 18px;font-weight:700;font-size:14.5px;border:1px solid transparent;width:100%}
+.btn-primary{background:var(--rose);color:#fff}
+.btn-primary:hover{background:var(--rose-deep)}
+.btn-dark{background:var(--brown);color:#fff}
+.btn-outline{background:transparent;border-color:var(--line);color:var(--brown)}
+.btn-ghost{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.btn-row{display:flex;gap:10px;margin-top:12px}
+.btn-row .btn{flex:1}
+
+/* stages list */
+.stage{display:flex;align-items:center;gap:12px;width:100%;text-align:right;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:8px}
+.stage-num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--rose-pale);color:var(--rose-deep);font-weight:800;flex:none}
+.stage.done .stage-num{background:var(--good-bg);color:var(--good)}
+.stage-body{flex:1;min-width:0}
+.stage-body b{display:block;font-size:14.5px}
+.stage-body span{font-size:12.5px;color:var(--muted)}
+
+/* forms */
+.field{margin-top:14px}
+.field>label,.field-label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px;color:var(--brown)}
+.input{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--line);background:#fff;outline:none}
+.input:focus{border-color:var(--rose)}
+textarea.input{min-height:110px;resize:vertical;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600}
+.chip.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.err{color:var(--bad);font-size:13px;margin-top:10px;min-height:1em}
+
+/* quiz */
+.opt{display:block;width:100%;text-align:right;padding:11px 14px;margin-top:8px;border-radius:13px;border:1px solid var(--line);background:#fff}
+.opt b{display:block;font-size:14px;font-weight:600}
+.opt span{font-size:12px;color:var(--muted)}
+.opt.on{border-color:var(--rose);background:var(--rose-pale)}
+
+/* camera */
+.cam{position:relative;aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:#2C1C17;margin-top:6px}
+.cam.wide{aspect-ratio:4/3}
+.cam video,.cam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.cam.mirror video,.cam.mirror canvas{transform:scaleX(-1)}
+.cam.live video,.cam.live canvas{display:block}
+.cam-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:#E8D5C8;font-size:13.5px;line-height:1.7}
+.cam.live .cam-ph{display:none}
+.cam-hint{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(61,38,32,.78);color:#fff;border-radius:12px;padding:8px 12px;font-size:13px;text-align:center;display:none}
+.cam.live .cam-hint:not(:empty){display:block}
+.progress{margin-top:12px;display:none}
+.progress.show{display:block}
+.bar{height:8px;border-radius:99px;background:var(--cream-deep);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--gold));transition:width .2s}
+.progress span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+
+/* results */
+.zone{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.zone:first-of-type{border-top:none}
+.zone .sw{width:12px;height:12px;border-radius:50%;flex:none}
+.zone div{flex:1}
+.zone b{font-size:14px}
+.zone p{margin:0;font-size:12.5px;color:var(--muted)}
+.score{display:flex;align-items:center;gap:14px;margin:6px 0 10px}
+.ring{--p:0;--c:var(--good);width:74px;height:74px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--p)*1%),var(--cream-deep) 0)}
+.ring b{width:58px;height:58px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:20px;font-weight:800}
+.verdict{padding:10px 12px;border-radius:12px;font-size:13.5px;font-weight:600;line-height:1.7}
+.verdict.good{background:var(--good-bg);color:var(--good)}
+.verdict.warn{background:var(--warn-bg);color:var(--warn)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad)}
+.flag{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.flag p{margin:2px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.product{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:10px}
+.product img{width:48px;height:48px;object-fit:contain;border-radius:8px;background:var(--cream)}
+.product b{display:block;font-size:14px}
+.product span{font-size:12px;color:var(--muted)}
+.result-item{display:block;width:100%;text-align:right;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px}
+.result-item b{display:block;font-size:13.5px}
+.result-item span{font-size:12px;color:var(--muted)}
+ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
+.routine{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.routine>div{background:var(--cream);border-radius:12px;padding:10px 12px}
+.routine h4{margin:0 0 4px;font-size:13px;color:var(--rose-deep)}
+.routine ol{margin:0;padding-right:18px;font-size:12.5px;line-height:1.8}
+@media (max-width:380px){.routine{grid-template-columns:1fr}}
+.notice{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;margin-top:10px}
+.disclaimer{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.8;margin:18px 6px 0}
+.link-btn{background:none;border:none;color:var(--rose-deep);font-weight:700;font-size:13px;padding:6px 0;text-decoration:underline}
+
+/* بشرتي AI — analysing overlay */
+.ai-overlay{position:fixed;inset:0;z-index:70;background:linear-gradient(180deg,var(--cream),#F6E8DC);display:grid;place-items:center;padding:16px;color:var(--ink);overflow:auto}
+.ai-box{width:100%;max-width:380px;text-align:center}
+.ai-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--rose-pale);color:var(--rose-deep);font-size:12px;font-weight:800;margin-bottom:14px}
+.ai-stage{position:relative;margin:0 auto;border-radius:22px;overflow:hidden;background-size:cover;background-position:center;border:4px solid #fff;box-shadow:var(--shadow)}
+.ai-stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(42,25,20,.05),rgba(42,25,20,.2))}
+.ai-scan{position:absolute;left:0;right:0;height:70px;z-index:2;background:linear-gradient(180deg,transparent,rgba(201,123,132,.35),transparent);border-bottom:2px solid rgba(240,216,218,.8);animation:aiScan 2.4s ease-in-out infinite alternate}
+@keyframes aiScan{from{top:-70px}to{top:100%}}
+.ai-lens{position:absolute;left:0;top:0;width:96px;height:96px;border-radius:50%;z-index:3;background-repeat:no-repeat;border:3px solid #fff;box-shadow:0 0 0 4px rgba(201,123,132,.55),0 10px 24px rgba(0,0,0,.45);will-change:transform}
+.ai-lens::after{content:"";position:absolute;width:34px;height:8px;border-radius:4px;background:#fff;right:-26px;bottom:-12px;transform:rotate(45deg)}
+.ai-dot{position:absolute;z-index:2;width:10px;height:10px;margin:-5px;border-radius:50%;border:2px solid var(--rose-pale);opacity:0;animation:aiDot 6.3s ease-out infinite}
+@keyframes aiDot{0%{opacity:0;transform:scale(.4)}8%{opacity:1;transform:scale(1.2)}30%{opacity:.9;transform:scale(1)}45%,100%{opacity:0}}
+.ai-box h3{margin:18px 0 2px;font-size:20px;font-weight:800;color:var(--brown-deep)}
+.ai-caption{margin:0;min-height:1.8em;font-size:14px;color:var(--muted);transition:opacity .25s}
+.ai-caption.fade{opacity:0}
+.ai-box .bar i{transition:width .6s ease}
+.ai-steps{list-style:none;margin:0;padding:12px 14px;text-align:right;font-size:13px;display:grid;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.ai-steps li{display:flex;align-items:center;gap:10px;color:var(--muted);opacity:.6}
+.ai-steps li .st{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);flex:none}
+.ai-steps li.active{color:var(--brown);opacity:1}
+.ai-steps li.active .st{border-color:var(--rose);border-top-color:transparent;animation:spin .8s linear infinite}
+.ai-steps li.done{color:var(--brown);opacity:1}
+.ai-steps li.done .st{background:var(--good);border-color:var(--good)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-err{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;margin:12px 0 0}
+@media (prefers-reduced-motion:reduce){.ai-scan,.ai-dot{animation:none}}
+
+/* بشرتي AI — result card */
+.ai-card{border-color:var(--rose-pale);background:linear-gradient(180deg,#FFF8F5,var(--card) 140px)}
+.ai-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ai-logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--rose),var(--gold))}
+.ai-head b{display:block;font-size:17px;font-weight:800;color:var(--brown-deep)}
+.ai-head span{font-size:12px;color:var(--muted)}
+.ai-head>div:nth-child(2){flex:1}
+.ai-thumb{width:46px;height:46px;border-radius:12px;object-fit:cover;border:2px solid #fff;box-shadow:var(--shadow)}
+.ai-intro{margin:0 0 6px;font-size:13.5px;font-weight:700;color:var(--rose-deep)}
+.ai-summary{margin:0;font-size:14.5px;line-height:1.85}
+.ai-type{background:var(--cream);border-radius:14px;padding:12px;margin:12px 0}
+.ai-type b{display:block;font-size:15.5px;color:var(--brown-deep);margin:2px 0}
+.ai-type p{margin:0 0 6px;font-size:13px;color:var(--muted);line-height:1.7}
+.ai-h{margin:16px 0 4px !important;font-size:14.5px !important}
+.ai-routine{margin:6px 0 0;padding-right:20px;font-size:13.5px;line-height:1.7}
+.ai-routine li{margin-bottom:6px}
+.ai-routine b{display:block;font-weight:600}
+.ai-routine span{font-size:12px;color:var(--muted)}
+.ai-ings{display:grid;gap:10px;margin-top:14px}
+.ai-ings .chips{gap:6px}
+
+/* bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:rgba(255,253,251,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.bnav-in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+.bn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 1px;font-size:10px;font-weight:600;color:var(--muted);min-width:0}
+.bn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bn.active{color:var(--rose-deep)}
+
+/* modal + toast */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(61,38,32,.45);display:grid;place-items:center;padding:16px}
+.modal{background:var(--card);border-radius:20px;padding:20px;max-width:420px;width:100%;box-shadow:var(--shadow)}
+.modal h3{margin:2px 0 8px;font-size:17px;color:var(--brown-deep)}
+.modal p{margin:0;font-size:13.5px;line-height:1.8;color:var(--muted)}
+.modal .btn{margin-top:10px}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:60;background:var(--brown-deep);color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;max-width:calc(100% - 32px);box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M12 3c3.5 3 5.5 6.2 5.5 9.5A5.5 5.5 0 0 1 12 18a5.5 5.5 0 0 1-5.5-5.5C6.5 9.2 8.5 6 12 3Z"/></svg></div>
+      <div><h1>بشرتي</h1><p>رفيقك اليومي للعناية بالبشرة</p></div>
+    </div>
+    <button class="icon-btn" id="homeBtn" data-act="go" data-v="home" aria-label="الرئيسية"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/></svg></button>
+  </header>
+  <nav class="rail" id="rail"></nav>
+  <main id="main"></main>
+  <p class="disclaimer">بشرتي أداة إرشادية للتوعية بالعناية اليومية بالبشرة ولا تُغني عن استشارة طبيب جلدية، خاصة عند وجود حالات صحية مزمنة. نتائج التحليل بالكاميرا تقريبية وتتأثر بالإضاءة.</p>
+</div>
+<nav class="bnav"><div class="bnav-in" id="bnav"></div></nav>
+<div id="modalRoot"></div>
+
+<script>
+/* =========================================================
+   CONFIG
+========================================================= */
+const STORE_KEY = 'bshrty:v1';
+const FM_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/';
+const ZXING_URL = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js';
+const OBF = 'https://world.openbeautyfacts.org';
+
+/* =========================================================
+   STATE (persisted in localStorage)
+========================================================= */
+const DEFAULT_STATE = {gender:null, medical:null, skinType:null, pore:null, ingredient:null, spf:null, reminder:null};
+let state = Object.assign({}, DEFAULT_STATE, loadState());
+let view = 'home';
+const ui = {
+  medical:null, skin:null, spf:null,
+  ing:{product:null, results:[]},
+  weather:{status:'idle'}
+};
+const session = {streams:[], raf:0, token:0, zx:null};
+
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; } }
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+
+/* =========================================================
+   HELPERS
+========================================================= */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// feminine / masculine phrasing — defaults to feminine until a gender is chosen
+const t = (f, m) => state.gender === 'male' ? m : f;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+const ICONS = {
+  home:'<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/>',
+  medical:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM12 11v6M9 14h6"/>',
+  skintype:'<circle cx="12" cy="12" r="8.5"/><path d="M9 10h.01M15 10h.01M8.5 14.5a4.5 4.5 0 0 0 7 0"/>',
+  pore:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><circle cx="12" cy="12" r="3"/>',
+  ingredient:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 15h9"/>',
+  spf:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  pin:'<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  barcode:'<path d="M4 6v12M7 6v12M10 6v12M14 6v12M16 6v12M20 6v12"/>',
+  check:'<path d="m5 12 4.5 4.5L19 7"/>',
+  chevron:'<path d="m14 6-6 6 6 6"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/>',
+  upload:'<path d="M12 16V4M7 9l5-5 5 5M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/>',
+  sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>'
+};
+const ic = (n, style='') => `<svg class="ic" viewBox="0 0 24 24" style="${style}">${ICONS[n]}</svg>`;
+
+function loadScript(src){
+  return new Promise((res, rej) => {
+    if(document.querySelector(`script[src="${src}"]`)) return res();
+    const s = document.createElement('script');
+    s.src = src; s.crossOrigin = 'anonymous';
+    s.onload = res; s.onerror = () => rej(new Error('script ' + src));
+    document.head.appendChild(s);
+  });
+}
+function withTimeout(p, ms){ return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]); }
+
+let toastTimer = 0;
+function toast(msg){
+  let el = $('#toast');
+  if(!el){ el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; document.body.appendChild(el); }
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, 3500);
+}
+function modal(html){ $('#modalRoot').innerHTML = `<div class="overlay"><div class="modal">${html}</div></div>`; }
+function closeModal(){ $('#modalRoot').innerHTML = ''; }
+
+/* =========================================================
+   STAGES / NAV
+========================================================= */
+const STAGES = [
+  {key:'medical',    label:'الملف الطبي',       short:'الملف الطبي'},
+  {key:'skintype',   label:'نوع البشرة',        short:'نوع البشرة'},
+  {key:'pore',       label:'مسح المسام',        short:'مسح المسام'},
+  {key:'ingredient', label:'فحص مكونات الكريم', short:'فحص الكريم'},
+  {key:'spf',        label:'واقي الشمس',        short:'واقي الشمس'},
+];
+function isDone(key){
+  const poreDone = state.pore || (state.poreAI && state.poreAI.report.image_ok);
+  return !!({medical:state.medical, skintype:state.skinType, pore:poreDone, ingredient:state.ingredient, spf:state.spf})[key];
+}
+
+function goTo(v){
+  stopCamera();
+  closeModal();
+  view = v;
+  render();
+  window.scrollTo({top:0, behavior:'instant'});
+}
+function render(){
+  $('#main').innerHTML = VIEWS[view]();
+  renderChrome();
+}
+function renderChrome(){
+  $('#homeBtn').classList.toggle('active', view === 'home');
+  $('#rail').innerHTML = STAGES.map((s, i) =>
+    `<button class="rail-item${isDone(s.key) ? ' done' : ''}${view === s.key ? ' active' : ''}" data-act="go" data-v="${s.key}"><span class="dot"></span>${i + 1}. ${s.label}</button>`).join('');
+  const navItems = [{key:'home', short:'الرئيسية'}, ...STAGES];
+  $('#bnav').innerHTML = navItems.map(s =>
+    `<button class="bn${view === s.key ? ' active' : ''}" data-act="go" data-v="${s.key}">${ic(s.key)}<span>${s.short}</span></button>`).join('');
+  const active = $('#rail .active');
+  if(active) active.scrollIntoView({block:'nearest', inline:'center'});
+}
+
+/* =========================================================
+   WEATHER / UV
+========================================================= */
+function uvLevel(uv){
+  if(uv < 3)  return {label:'منخفض', cls:'good', advice:'الخطر منخفض، لكن الواقي يبقى مفيدًا إذا ستبقى في الخارج طويلًا.'};
+  if(uv < 6)  return {label:'متوسط', cls:'warn', advice:`${t('ضعي','ضع')} واقي شمس SPF 30+ قبل الخروج بربع ساعة.`};
+  if(uv < 8)  return {label:'مرتفع', cls:'bad', advice:`واقي SPF 50 و${t('جدّديه','جدّده')} كل ساعتين، مع قبعة ونظارة شمسية.`};
+  if(uv < 11) return {label:'مرتفع جدًا', cls:'bad', advice:`${t('تجنّبي','تجنّب')} الشمس المباشرة من 11 صباحًا حتى 3 عصرًا قدر الإمكان.`};
+  return {label:'شديد', cls:'bad', advice:`${t('ابقي','ابقَ')} في الظل قدر الإمكان، فالبشرة قد تحترق خلال دقائق.`};
+}
+
+function fetchWeather(){
+  if(!navigator.geolocation){ ui.weather = {status:'error', msg:'المتصفح لا يدعم تحديد الموقع.'}; return refreshWeather(); }
+  ui.weather = {status:'loading'}; refreshWeather();
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try{
+      const {latitude:la, longitude:lo} = pos.coords;
+      const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,uv_index&hourly=uv_index&daily=uv_index_max&timezone=auto&forecast_days=1`;
+      const gUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=ar`;
+      const [w, g] = await Promise.all([
+        fetch(wUrl).then(r => { if(!r.ok) throw new Error('weather'); return r.json(); }),
+        fetch(gUrl).then(r => r.ok ? r.json() : null).catch(() => null)
+      ]);
+      let uv = w.current && w.current.uv_index;
+      if(uv == null && w.hourly){
+        const hour = (w.current.time || '').slice(0, 13);
+        const i = w.hourly.time.findIndex(x => x.startsWith(hour));
+        uv = i >= 0 ? w.hourly.uv_index[i] : 0;
+      }
+      ui.weather = {
+        status:'ready',
+        uv: Math.round((uv || 0) * 10) / 10,
+        temp: Math.round(w.current.temperature_2m),
+        max: w.daily && w.daily.uv_index_max ? Math.round(w.daily.uv_index_max[0] * 10) / 10 : null,
+        place: g ? (g.city || g.locality || g.principalSubdivision || '') : ''
+      };
+    }catch(e){
+      ui.weather = {status:'error', msg:'تعذّر جلب بيانات الطقس، حاول مرة أخرى.'};
+    }
+    refreshWeather();
+  }, err => {
+    ui.weather = {status:'error', msg: err.code === 1 ? 'لم يتم منح إذن الوصول للموقع.' : 'تعذّر تحديد موقعك الحالي.'};
+    refreshWeather();
+  }, {timeout:15000, maximumAge:600000});
+}
+function refreshWeather(){
+  const el = $('#weatherCard');
+  if(el) el.outerHTML = weatherCard();
+}
+function weatherCard(){
+  const w = ui.weather;
+  let body = '<span class="eyebrow">أشعة الشمس الآن</span>';
+  if(w.status === 'ready'){
+    const lvl = uvLevel(w.uv);
+    body += `
+      <div class="uv-row">
+        <div class="uv-big">${w.uv}</div>
+        <div class="uv-meta"><span class="pill ${lvl.cls}">${lvl.label}</span><br>
+          ${w.temp}° ${w.place ? '· ' + esc(w.place) : ''}${w.max != null ? ` · أعلى اليوم ${w.max}` : ''}</div>
+      </div>
+      <p class="sub">${lvl.advice}</p>
+      <div class="btn-row"><button class="btn btn-ghost" data-act="locate">${ic('pin', 'width:16px;height:16px')} تحديث</button></div>`;
+  } else {
+    const msg = w.status === 'loading' ? 'جارٍ تحديد موقعك وجلب مؤشر الأشعة…'
+      : w.status === 'error' ? esc(w.msg)
+      : `${t('فعّلي','فعّل')} الموقع لعرض مؤشر الأشعة فوق البنفسجية ودرجة الحرارة في مكانك الحالي.`;
+    body += `<p class="sub" style="margin:6px 0 4px">${msg}</p>
+      <div class="btn-row"><button class="btn btn-ghost" data-act="locate" ${w.status === 'loading' ? 'disabled' : ''}>${ic('pin', 'width:16px;height:16px')} استخدام موقعي الحالي</button></div>`;
+  }
+  return `<div class="card weather" id="weatherCard">${body}</div>`;
+}
+
+/* =========================================================
+   SUNSCREEN REMINDER (works while the page is open)
+========================================================= */
+let reminderTimer = 0;
+function armReminder(){
+  clearTimeout(reminderTimer);
+  const r = state.reminder;
+  if(!r || r.fired) return;
+  const ms = r.dueAt - Date.now();
+  if(ms <= 0) return fireReminder();
+  reminderTimer = setTimeout(fireReminder, Math.min(ms, 2147483000));
+}
+function fireReminder(){
+  if(!state.reminder) return;
+  state.reminder.fired = true; save();
+  const body = `${t('جدّدي','جدّد')} واقي الشمس الآن، خاصة على الأنف والأذنين والرقبة.`;
+  try{ if('Notification' in window && Notification.permission === 'granted') new Notification('حان وقت تجديد واقي الشمس', {body}); }catch(e){}
+  toast('⏰ ' + body);
+  if(view === 'home' || view === 'spf') refreshReminder();
+}
+async function setReminder(mins){
+  let perm = 'unsupported';
+  if('Notification' in window){
+    try{ perm = Notification.permission === 'default' ? await Notification.requestPermission() : Notification.permission; }catch(e){}
+  }
+  state.reminder = {dueAt: Date.now() + mins * 60000, fired:false, perm};
+  save(); armReminder(); refreshReminder();
+  toast(`سيتم تذكيرك بعد ${mins >= 60 ? (mins / 60) + ' ساعة' : mins + ' دقيقة'}`);
+}
+function cancelReminder(){ state.reminder = null; save(); clearTimeout(reminderTimer); refreshReminder(); }
+function fmtRemaining(ms){
+  const m = Math.max(0, Math.round(ms / 60000));
+  const h = Math.floor(m / 60), mm = m % 60;
+  return h ? `${h} س ${mm} د` : `${mm} دقيقة`;
+}
+function reminderCard(){
+  const r = state.reminder;
+  if(!r) return '<div id="reminderBox"></div>';
+  const inner = r.fired
+    ? `<p class="sub">انتهى الوقت — ${t('جدّدي','جدّد')} واقي الشمس الآن.</p>
+       <div class="btn-row"><button class="btn btn-primary" data-act="remind" data-v="120">${t('جدّدته','جدّدته')}، ذكّرني بعد ساعتين</button><button class="btn btn-outline" data-act="cancelReminder">إيقاف</button></div>`
+    : `<p class="sub">التجديد القادم بعد <b data-countdown>${fmtRemaining(r.dueAt - Date.now())}</b>.
+       ${r.perm !== 'granted' ? 'الإشعارات غير مفعّلة، لذلك سيظهر التذكير داخل الصفحة فقط.' : ''} التذكير يعمل ما دامت الصفحة مفتوحة.</p>
+       <div class="btn-row"><button class="btn btn-outline" data-act="cancelReminder">إلغاء التذكير</button></div>`;
+  return `<div class="card" id="reminderBox"><span class="eyebrow">${ic('bell', 'width:14px;height:14px;vertical-align:-2px')} تذكير واقي الشمس</span>${inner}</div>`;
+}
+function refreshReminder(){ const el = $('#reminderBox'); if(el) el.outerHTML = reminderCard(); }
+setInterval(() => {
+  const r = state.reminder;
+  document.querySelectorAll('[data-countdown]').forEach(el => { if(r) el.textContent = fmtRemaining(r.dueAt - Date.now()); });
+}, 30000);
+
+/* =========================================================
+   HOME
+========================================================= */
+const TYPE_INFO = {
+  oily:       {label:'دهنية',  desc:'إفراز زيوت مرتفع ولمعان، خاصة في منطقة T، ومسام أوضح.'},
+  dry:        {label:'جافة',   desc:'إحساس بالشد وقد يظهر تقشر، تحتاج ترطيبًا غنيًا وحماية للحاجز الجلدي.'},
+  combination:{label:'مختلطة', desc:'دهنية في الجبهة والأنف والذقن، وعادية أو جافة على الخدين.'},
+  sensitive:  {label:'حساسة',  desc:'تتهيج أو تحمرّ بسهولة، والأفضل منتجات قليلة المكونات وخالية من العطور.'},
+  normal:     {label:'عادية',  desc:'متوازنة بدون دهنية أو جفاف ملحوظ، تحتاج روتينًا بسيطًا ثابتًا.'},
+};
+function routineFor(type){
+  const preg = state.medical && state.medical.conditions.includes('الحمل أو الرضاعة');
+  const R = {
+    oily:{am:['غسول جل لطيف','سيروم نياسيناميد','مرطب خفيف خالٍ من الزيوت','واقي شمس SPF 30+ بقوام خفيف'],
+          pm:['غسول جل','حمض الساليسيليك 2–3 مرات أسبوعيًا','مرطب خفيف']},
+    dry:{am:['غسول كريمي بدون سلفات','هيالورونيك على بشرة رطبة','مرطب غني بالسيراميد','واقي شمس SPF 30+ مرطب'],
+         pm:['غسول كريمي','مرطب غني أو بلسم ليلي','ماء فاتر بدل الساخن']},
+    combination:{am:['غسول لطيف','نياسيناميد','مرطب خفيف للمنطقة الوسطى','واقي شمس SPF 30+'],
+                 pm:['غسول لطيف','ساليسيليك لمنطقة T مرتين أسبوعيًا','مرطب أغنى للخدين']},
+    sensitive:{am:['غسول خالٍ من العطور','مرطب بمكونات قليلة (سيراميد، بانثينول)','واقي شمس معدني (أكسيد الزنك)'],
+               pm:['غسول لطيف','مرطب مهدئ',`${t('جرّبي','جرّب')} أي منتج جديد على منطقة صغيرة 48 ساعة`]},
+    normal:{am:['غسول لطيف','مضاد أكسدة مثل فيتامين C','مرطب خفيف','واقي شمس SPF 30+'],
+            pm:['غسول لطيف','مرطب', preg ? 'تجنّب الريتينول خلال الحمل والرضاعة' : 'ريتينول بتركيز منخفض (اختياري)']},
+  };
+  return R[type];
+}
+
+function stageStatus(key){
+  if(key === 'medical' && state.medical) return `العمر ${state.medical.age} · ${state.medical.conditions.join('، ') || 'لا يوجد'}`;
+  if(key === 'skintype' && state.skinType) return `بشرة ${state.skinType.label}`;
+  if(key === 'pore' && state.poreAI && state.poreAI.report.image_ok) return 'بشرتي AI · ' + esc(state.poreAI.report.pore_type);
+  if(key === 'pore' && state.pore) return poreOverall(state.pore).text;
+  if(key === 'ingredient' && state.ingredient) return `${state.ingredient.productName ? esc(state.ingredient.productName) + ' · ' : ''}${state.ingredient.flags.length ? state.ingredient.score + '/100' : 'غير محدد'}`;
+  if(key === 'spf' && state.spf) return `تغطية ${state.spf.coverage}%`;
+  return 'لم تبدأ بعد';
+}
+
+function summaryLines(){
+  const L = [];
+  const m = state.medical;
+  if(m && m.risky && m.risky.length && m.supervised === false)
+    L.push(`<li>لديك ${esc(m.risky.join('، '))} بدون متابعة طبية حالية — ننصح بمراجعة طبيب جلدية قبل استخدام منتجات علاجية.</li>`);
+  if(m && m.conditions.includes('الحمل أو الرضاعة'))
+    L.push('<li>بسبب الحمل أو الرضاعة: تجنّب الريتينويدات والهيدروكينون.</li>');
+  if(state.skinType) L.push(`<li>بشرتك <b>${state.skinType.label}</b>: ${TYPE_INFO[state.skinType.raw].desc}</li>`);
+  if(state.poreAI && state.poreAI.report.image_ok){
+    const r = state.poreAI.report;
+    L.push(`<li><b>بشرتي AI:</b> ${esc(r.pore_type)}${r.key_findings[0] ? ' — ' + esc(r.key_findings[0]) : ''}</li>`);
+    if(r.see_doctor) L.push(`<li>ننصح بمراجعة طبيب جلدية: ${esc(r.doctor_reason)}</li>`);
+  } else if(state.pore){
+    const bad = state.pore.zones.filter(z => z.cls === 'bad').map(z => z.name);
+    L.push(`<li>${bad.length ? `لمعان واضح في: ${bad.join('، ')} — ركّز عليها بالغسول ومنتجات تنظيم الزيوت.` : 'المسح لم يُظهر لمعانًا زيتيًا مرتفعًا.'}</li>`);
+  }
+  if(state.ingredient) L.push(`<li>آخر منتج فحصته: ${state.ingredient.productName ? esc(state.ingredient.productName) + ' — ' : ''}${esc(state.ingredient.verdict.text)}</li>`);
+  if(state.spf){
+    const miss = state.spf.missed;
+    L.push(`<li>تغطية الواقي ${state.spf.coverage}%${miss.length ? ` — لا ${t('تنسي','تنسَ')}: ${miss.join('، ')}` : ''}.</li>`);
+  }
+  return L;
+}
+
+function viewHome(){
+  const done = STAGES.filter(s => isDone(s.key)).length;
+  const lines = summaryLines();
+  const routine = state.skinType ? routineFor(state.skinType.raw) : null;
+  return `
+    ${weatherCard()}
+    ${reminderCard()}
+    <div class="card">
+      <span class="eyebrow">ملخص بشرتك</span>
+      <h2>نظرة سريعة</h2>
+      ${lines.length ? `<ul class="list">${lines.join('')}</ul>`
+        : `<p class="sub">لم يتم إكمال الملف الطبي ولا اختبار نوع البشرة بعد. ${t('ابدئي','ابدأ')} بالمرحلة الأولى للحصول على توصيات دقيقة.</p>`}
+    </div>
+    ${routine ? `
+    <div class="card">
+      <span class="eyebrow">روتينك المقترح</span>
+      <h2>روتين بشرة ${state.skinType.label}</h2>
+      <div class="routine">
+        <div><h4>الصباح</h4><ol>${routine.am.map(x => `<li>${x}</li>`).join('')}</ol></div>
+        <div><h4>المساء</h4><ol>${routine.pm.map(x => `<li>${x}</li>`).join('')}</ol></div>
+      </div>
+    </div>` : ''}
+    <div class="card">
+      <span class="eyebrow">المراحل الخمس · ${done} من 5</span>
+      <h2>رحلتك مع بشرتك</h2>
+      <p class="sub">${t('أكملي','أكمل')} كل مرحلة للحصول على تحليل شامل ومخصص لبشرتك.</p>
+      ${STAGES.map((s, i) => `
+        <button class="stage${isDone(s.key) ? ' done' : ''}" data-act="go" data-v="${s.key}">
+          <span class="stage-num">${isDone(s.key) ? ic('check', 'width:16px;height:16px') : i + 1}</span>
+          <span class="stage-body"><b>${s.label}</b><span>${stageStatus(s.key)}</span></span>
+          ${ic('chevron', 'color:var(--muted)')}
+        </button>`).join('')}
+      ${done ? `<button class="link-btn" data-act="reset">مسح كل بياناتي</button>` : ''}
+    </div>`;
+}
+
+/* =========================================================
+   STAGE 1 — MEDICAL PROFILE
+========================================================= */
+const CONDITIONS = ['السكري','ارتفاع ضغط الدم','حساسية جلدية معروفة','الأكزيما','الصدفية','الوردية','حب الشباب الهرموني','الحمل أو الرضاعة','لا يوجد'];
+const RISKY = ['الأكزيما','الصدفية','الوردية','حب الشباب الهرموني'];
+const SUN = [{v:'low', t:'قليل (معظم الوقت داخل المباني)'}, {v:'mid', t:'متوسط (ساعة إلى ساعتين يوميًا)'}, {v:'high', t:'كثير (عمل أو رياضة في الخارج)'}];
+
+function viewMedical(){
+  if(!ui.medical) ui.medical = state.medical
+    ? JSON.parse(JSON.stringify(state.medical))
+    : {gender:state.gender, age:'', conditions:[], meds:'', allergies:'', sun:null};
+  const m = ui.medical;
+  const conds = CONDITIONS.filter(c => !(c === 'الحمل أو الرضاعة' && m.gender === 'male'));
+  return `
+    <div class="card">
+      <span class="eyebrow">المرحلة 1 من 5</span>
+      <h2>الملف الطبي</h2>
+      <p class="sub">معلوماتك تبقى على جهازك فقط، وتساعدنا على تخصيص التوصيات وتنبيهك للمكونات غير المناسبة.</p>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-top:0">
+        <span class="field-label">الجنس</span>
+        <div class="chips">
+          <button class="chip${m.gender === 'female' ? ' on' : ''}" data-act="gender" data-v="female">أنثى</button>
+          <button class="chip${m.gender === 'male' ? ' on' : ''}" data-act="gender" data-v="male">ذكر</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="age">العمر</label>
+        <input class="input" id="age" type="number" inputmode="numeric" min="10" max="100" placeholder="مثال: 26" value="${esc(m.age)}" data-field="age">
+      </div>
+      <div class="field">
+        <span class="field-label">هل لديك أي من الحالات التالية؟</span>
+        <div class="chips">${conds.map(c => `<button class="chip${m.conditions.includes(c) ? ' on' : ''}" data-act="cond" data-v="${c}">${c}</button>`).join('')}</div>
+      </div>
+      <div class="field">
+        <label for="meds">أدوية تستخدمها حاليًا (اختياري)</label>
+        <input class="input" id="meds" placeholder="مثال: إيزوتريتينوين، مضاد حيوي…" value="${esc(m.meds)}" data-field="meds">
+      </div>
+      <div class="field">
+        <label for="allergies">حساسية من مكونات معيّنة (اختياري)</label>
+        <input class="input" id="allergies" placeholder="مثال: العطور، اللانولين…" value="${esc(m.allergies)}" data-field="allergies">
+      </div>
+      <div class="field">
+        <span class="field-label">كم تتعرض للشمس عادة؟</span>
+        <div class="chips">${SUN.map(s => `<button class="chip${m.sun === s.v ? ' on' : ''}" data-act="sun" data-v="${s.v}">${s.t}</button>`).join('')}</div>
+      </div>
+      <div class="err" id="medErr"></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="saveMedical">حفظ والمتابعة</button></div>
+    </div>`;
+}
+function rerenderKeepScroll(){ const y = window.scrollY; render(); window.scrollTo(0, y); }
+
+function saveMedical(){
+  const m = ui.medical;
+  const age = parseInt(m.age, 10);
+  const err = $('#medErr');
+  if(!m.gender){ err.textContent = 'اختر الجنس أولًا.'; return; }
+  if(!(age >= 10 && age <= 100)){ err.textContent = 'أدخل عمرًا صحيحًا بين 10 و100.'; return; }
+  if(!m.conditions.length){ err.textContent = 'اختر حالة واحدة على الأقل، أو "لا يوجد".'; return; }
+  const risky = m.conditions.filter(c => RISKY.includes(c));
+  if(risky.length){
+    modal(`
+      <span class="eyebrow" style="color:var(--bad)">تنبيه قبل المتابعة</span>
+      <h3>حالة تحتاج إشراف طبي</h3>
+      <p>${t('اخترتِ','اخترتَ')} "${risky.join('، ')}". توصيات بشرتي عامة وقد لا تناسب هذه الحالة دون متابعة طبية. هل ${t('أنتِ','أنتَ')} حاليًا تحت إشراف طبيب مختص بخصوصها؟</p>
+      <button class="btn btn-primary" data-act="gate" data-v="yes">نعم، لدي إشراف طبي</button>
+      <button class="btn btn-outline" data-act="gate" data-v="no">لا، ليس لدي إشراف حاليًا</button>`);
+    return;
+  }
+  commitMedical(null);
+}
+function commitMedical(supervised){
+  const m = ui.medical;
+  state.medical = {...m, age: parseInt(m.age, 10), risky: m.conditions.filter(c => RISKY.includes(c)), supervised};
+  state.gender = m.gender;
+  ui.medical = null;
+  save(); closeModal();
+  if(supervised === false) toast('ننصح بمراجعة طبيب جلدية — سنكمل بتوصيات عامة.');
+  goTo('skintype');
+}
+
+/* =========================================================
+   STAGE 2 — SKIN TYPE QUIZ
+========================================================= */
+const SKIN_Q = [
+  {id:'q1', text:'كيف تشعر بشرتك بعد الغسل بساعتين دون وضع أي منتج؟', opts:[
+    {v:'oily', t:'لامعة ودهنية خاصة في الجبهة والأنف', s:'إفراز زيوت ملحوظ'},
+    {v:'dry', t:'مشدودة وتميل للجفاف', s:'إحساس بالضيق أو التقشر'},
+    {v:'combination', t:'دهنية في المنطقة الوسطى وجافة عند الخدين', s:'اختلاف بين مناطق الوجه'},
+    {v:'normal', t:'متوازنة ومرتاحة', s:'لا دهنية ولا جفاف ملحوظ'}]},
+  {id:'q2', text:'هل تظهر لديك حبوب أو مسام واسعة بشكل متكرر؟', opts:[
+    {v:'oily', t:'نعم، بشكل متكرر'},
+    {v:'combination', t:'أحيانًا في منطقة T فقط'},
+    {v:'sensitive', t:'نادرًا، لكن بشرتي تتهيج بسهولة'},
+    {v:'normal', t:'نادرًا جدًا'}]},
+  {id:'q3', text:'كيف تتفاعل بشرتك مع منتجات جديدة؟', opts:[
+    {v:'sensitive', t:'تحمرّ أو تتهيج بسرعة', s:'حساسية واضحة تجاه المكونات'},
+    {v:'dry', t:'تتقشر أحيانًا مع بعض المنتجات'},
+    {v:'normal', t:'تتقبل معظم المنتجات دون مشاكل'},
+    {v:'oily', t:'لا تتأثر كثيرًا لكنها تلمع بسرعة'}]},
+  {id:'q4', text:'كيف تبدو بشرتك في نهاية اليوم؟', opts:[
+    {v:'oily', t:'لامعة في كامل الوجه'},
+    {v:'combination', t:'لامعة في الجبهة والأنف فقط'},
+    {v:'dry', t:'باهتة أو متقشرة'},
+    {v:'normal', t:'كما هي في الصباح تقريبًا'}]},
+  {id:'q5', text:'ماذا يحدث لبشرتك مع الحرارة أو الشمس؟', opts:[
+    {v:'sensitive', t:'احمرار أو حكة أو حرقان'},
+    {v:'dry', t:'تزداد جفافًا وشدًّا'},
+    {v:'oily', t:'تزداد اللمعة والدهون'},
+    {v:'normal', t:'لا تتغير كثيرًا'}]},
+];
+function computeSkinType(ans){
+  const tally = {};
+  Object.values(ans).forEach(v => tally[v] = (tally[v] || 0) + 1);
+  // tie-break priority: the more care-demanding type wins
+  return ['sensitive','combination','oily','dry','normal'].reduce((best, k) => (tally[k] || 0) > (tally[best] || 0) ? k : best, 'sensitive');
+}
+function viewSkin(){
+  if(!ui.skin) ui.skin = state.skinType ? {...state.skinType.answers} : {};
+  const a = ui.skin;
+  const answered = SKIN_Q.filter(q => a[q.id]).length;
+  return `
+    <div class="card">
+      <span class="eyebrow">المرحلة 2 من 5</span>
+      <h2>اختبار نوع البشرة</h2>
+      <p class="sub">${t('أجيبي','أجب')} عن ${SKIN_Q.length} أسئلة قصيرة لتحديد نوع بشرتك.</p>
+      ${state.skinType ? `<div class="verdict good" style="margin-top:10px">نتيجتك الحالية: بشرة ${state.skinType.label}</div>` : ''}
+    </div>
+    ${SKIN_Q.map((q, i) => `
+      <div class="card">
+        <span class="eyebrow">سؤال ${i + 1}</span>
+        <h3>${q.text}</h3>
+        ${q.opts.map(o => `<button class="opt${a[q.id] === o.v ? ' on' : ''}" data-act="answer" data-q="${q.id}" data-v="${o.v}"><b>${o.t}</b>${o.s ? `<span>${o.s}</span>` : ''}</button>`).join('')}
+      </div>`).join('')}
+    <button class="btn btn-primary" data-act="saveSkin" ${answered < SKIN_Q.length ? 'disabled' : ''}>${answered < SKIN_Q.length ? `أجبت ${answered} من ${SKIN_Q.length}` : 'اعرض النتيجة والمتابعة'}</button>`;
+}
+function saveSkin(){
+  const raw = computeSkinType(ui.skin);
+  state.skinType = {raw, label: TYPE_INFO[raw].label, answers:{...ui.skin}};
+  ui.skin = null; save();
+  toast(`نوع بشرتك: ${TYPE_INFO[raw].label}`);
+  goTo('pore');
+}
+
+/* =========================================================
+   CAMERA HELPERS
+========================================================= */
+async function startCamera(video, facingMode){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw Object.assign(new Error('unsupported'), {name:'NotSupportedError'});
+  const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode, width:{ideal:1280}, height:{ideal:960}}, audio:false});
+  session.streams.push(stream);
+  video.muted = true; video.playsInline = true; video.srcObject = stream;
+  await video.play();
+  if(!video.videoWidth) await new Promise(r => video.addEventListener('loadedmetadata', r, {once:true}));
+  return stream;
+}
+function stopCamera(){
+  session.token++;
+  cancelAnimationFrame(session.raf);
+  session.streams.forEach(s => s.getTracks().forEach(tr => tr.stop()));
+  session.streams = [];
+  if(session.zx){ try{ session.zx.reset(); }catch(e){} session.zx = null; }
+  document.querySelectorAll('.cam.live').forEach(c => c.classList.remove('live'));
+  // put any half-run controls back to their idle state
+  const pb = $('#poreBtn'); if(pb){ pb.disabled = false; }
+  const pa = $('#poreActions'); if(pa) pa.innerHTML = poreActionsHtml('idle');
+  const ph = $('#poreHint'); if(ph) ph.textContent = '';
+  const pp = $('#poreProg'); if(pp) pp.classList.remove('show');
+  const bb = $('#bcBtn'); if(bb) bb.textContent = 'تشغيل الماسح';
+  const mb = $('#mirrorBtn'); if(mb) mb.textContent = 'فتح المرآة';
+}
+function camErrorText(e){
+  if(e && e.name === 'NotAllowedError') return `تم رفض إذن الكاميرا. ${t('اسمحي','اسمح')} بالوصول من إعدادات المتصفح ثم ${t('أعيدي','أعد')} المحاولة.`;
+  if(e && (e.name === 'NotFoundError' || e.name === 'OverconstrainedError')) return 'لم يتم العثور على كاميرا مناسبة في هذا الجهاز.';
+  if(e && e.name === 'NotSupportedError') return 'المتصفح لا يدعم الكاميرا. افتح الموقع عبر https في متصفح حديث.';
+  return 'تعذّر تشغيل الكاميرا. أغلق أي تطبيق آخر يستخدمها ثم حاول مجددًا.';
+}
+
+/* =========================================================
+   STAGE 3 — PORE / SHINE SCAN (MediaPipe Face Mesh + pixel sampling)
+========================================================= */
+const PORE_ZONES = [
+  {key:'forehead', name:'الجبهة',       lm:151, hint:() => `${t('ابقي','ابقَ')} ثابتًا ${t('وانظري','وانظر')} للكاميرا — جارٍ فحص الجبهة`},
+  {key:'nose',     name:'الأنف',        lm:5,   hint:() => 'جارٍ فحص الأنف'},
+  {key:'cheekR',   name:'الخدّ الأيمن', lm:50,  hint:() => `${t('لفّي','لفّ')} رأسك قليلًا نحو اليسار — جارٍ فحص الخدّ الأيمن`},
+  {key:'cheekL',   name:'الخدّ الأيسر', lm:280, hint:() => `${t('لفّي','لفّ')} رأسك قليلًا نحو اليمين — جارٍ فحص الخدّ الأيسر`},
+  {key:'chin',     name:'الذقن',        lm:199, hint:() => `${t('ارفعي','ارفع')} ذقنك قليلًا — جارٍ فحص الذقن`},
+];
+// used when the face-tracking model cannot load: fixed spots inside the on-screen oval (unmirrored image coords)
+const FALLBACK_POINTS = {forehead:{x:.5,y:.3}, nose:{x:.5,y:.5}, cheekR:{x:.37,y:.56}, cheekL:{x:.63,y:.56}, chin:{x:.5,y:.74}, r:.035};
+const ZONE_MS = 3000;
+
+let faceMeshPromise = null;
+function getFaceMesh(){
+  if(!faceMeshPromise){
+    faceMeshPromise = withTimeout((async () => {
+      await loadScript(FM_BASE + 'face_mesh.js');
+      const fm = new FaceMesh({locateFile: f => FM_BASE + f});
+      fm.setOptions({maxNumFaces:1, refineLandmarks:false, minDetectionConfidence:.5, minTrackingConfidence:.5});
+      await fm.initialize();
+      return fm;
+    })(), 25000).catch(e => { faceMeshPromise = null; throw e; });
+  }
+  return faceMeshPromise;
+}
+
+function landmarkPoints(lm){
+  const pts = {r: Math.abs(lm[454].x - lm[234].x) * 0.07};
+  PORE_ZONES.forEach(z => pts[z.key] = lm[z.lm]);
+  return pts;
+}
+
+// Shine estimate: share of bright, low-saturation pixels (specular highlights from oil) in a patch.
+function samplePatch(ctx, cx, cy, rad){
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  const x0 = clamp(Math.round(cx - rad), 0, W - 1), y0 = clamp(Math.round(cy - rad), 0, H - 1);
+  const w = clamp(Math.round(rad * 2), 2, W - x0), h = clamp(Math.round(rad * 2), 2, H - y0);
+  const d = ctx.getImageData(x0, y0, w, h).data;
+  const n = d.length / 4;
+  let sum = 0;
+  const L = new Float32Array(n), S = new Float32Array(n);
+  for(let i = 0, j = 0; i < d.length; i += 4, j++){
+    const r = d[i], g = d[i + 1], b = d[i + 2];
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    L[j] = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    S[j] = mx ? (mx - mn) / mx : 0;
+    sum += L[j];
+  }
+  const mean = sum / n;
+  const thr = Math.max(0.72, mean + 0.18);
+  let hi = 0;
+  for(let j = 0; j < n; j++) if(L[j] > thr && S[j] < 0.28) hi++;
+  return {mean, shine: hi / n};
+}
+function classifyShine(s){
+  if(s > 0.09)  return {cls:'bad',  color:'#B5544A', note:'لمعان زيتي واضح'};
+  if(s > 0.03)  return {cls:'warn', color:'#C9773B', note:'لمعان متوسط، تحتاج عناية'};
+  return {cls:'good', color:'#5E8F58', note:'سطح متوازن بدون لمعان زائد'};
+}
+function poreOverall(p){
+  const bad = p.zones.filter(z => z.cls === 'bad').length, warn = p.zones.filter(z => z.cls === 'warn').length;
+  if(bad >= 2) return {cls:'bad', text:'نشاط زيوت مرتفع'};
+  if(bad || warn >= 2) return {cls:'warn', text:'لمعان متوسط في بعض المناطق'};
+  return {cls:'good', text:'بشرة متوازنة'};
+}
+
+function viewPore(){
+  return `
+    <div class="card">
+      <span class="eyebrow">المرحلة 3 من 5</span>
+      <h2>تحليل المسام بالذكاء الاصطناعي</h2>
+      <p class="sub">${t('التقطي','التقط')} صورة لوجهك أو ${t('ارفعيها','ارفعها')}، وسيحللها بشرتي AI مع ملفك الطبي ونوع بشرتك ويكتب لك تقريرًا مفصّلًا.</p>
+      <ul class="list small" style="margin-top:6px">
+        <li>بدون مكياج أو فلتر، وبعد غسل الوجه بساعة على الأقل.</li>
+        <li>ضوء نهار من الأمام، بدون فلاش.</li>
+        <li>الوجه قريب ويملأ الإطار، والكاميرا ثابتة.</li>
+      </ul>
+      ${!state.medical || !state.skinType ? `<div class="notice">لتحليل أدق ${t('أكملي','أكمل')} الملف الطبي ونوع البشرة أولًا — سيتم إرسالهما مع الصورة.</div>` : ''}
+    </div>
+    <div class="card">
+      <div class="cam mirror" id="poreCam">
+        <video id="poreVideo" playsinline muted></video>
+        <canvas id="poreCanvas"></canvas>
+        <div class="cam-ph" id="porePh">${ic('camera', 'width:34px;height:34px')}<span>${t('افتحي','افتح')} الكاميرا ${t('والتقطي','والتقط')} صورة، أو ${t('ارفعي','ارفع')} صورة من جهازك.</span></div>
+        <div class="cam-hint" id="poreHint"></div>
+      </div>
+      <div class="progress" id="poreProg"><div class="bar"><i id="poreFill"></i></div><span id="poreTxt"></span></div>
+      <div id="poreActions">${poreActionsHtml('idle')}</div>
+      <input type="file" id="poreFile" accept="image/*" hidden>
+      <button class="link-btn" id="poreBtn" data-act="startPore">أو جرّب مسح اللمعان المباشر (بدون AI)</button>
+    </div>
+    <div id="poreResult">${state.poreAI ? aiResultHtml() : ''}${state.pore ? poreResultHtml() : ''}</div>`;
+}
+function poreActionsHtml(mode){
+  if(mode === 'live') return `<div class="btn-row">
+      <button class="btn btn-primary" data-act="snap">${ic('camera', 'width:18px;height:18px')} التقاط الآن</button>
+      <button class="btn btn-outline" data-act="cancelCam" style="flex:.5">إلغاء</button></div>`;
+  return `<div class="btn-row">
+      <button class="btn btn-primary" data-act="openCam">${ic('camera', 'width:18px;height:18px')} التقط صورة</button>
+      <button class="btn btn-dark" data-act="upload">${ic('upload', 'width:18px;height:18px')} ارفع صورة</button></div>`;
+}
+
+/* ---------------- بشرتي AI: capture / upload ---------------- */
+async function openCaptureCam(){
+  stopCamera();
+  const token = session.token;
+  const ph = $('#porePh span');
+  ph.textContent = 'جارٍ تشغيل الكاميرا…';
+  try{ await startCamera($('#poreVideo'), 'user'); }
+  catch(e){ ph.textContent = camErrorText(e); return; }
+  if(token !== session.token) return;
+  $('#poreCam').classList.add('live');
+  $('#poreHint').textContent = `${t('قرّبي','قرّب')} وجهك حتى يملأ الإطار ${t('واضغطي','واضغط')} "التقاط الآن"`;
+  $('#poreActions').innerHTML = poreActionsHtml('live');
+}
+function snapPhoto(){
+  const video = $('#poreVideo');
+  if(!video.videoWidth) return;
+  const c = document.createElement('canvas');
+  c.width = video.videoWidth; c.height = video.videoHeight;
+  c.getContext('2d').drawImage(video, 0, 0);
+  stopCamera();
+  runAI(c, c.width, c.height);
+}
+function onPoreFile(file){
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ toast('اختر ملف صورة.'); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => { runAI(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); };
+  img.onerror = () => { toast('تعذّر قراءة الصورة. جرّب صيغة JPG أو PNG.'); URL.revokeObjectURL(url); };
+  img.src = url;
+}
+// Downscale to what the vision model actually uses (long edge ≤ 1568px) and re-encode as JPEG.
+function encodeImage(src, w, h, maxEdge, quality){
+  const s = Math.min(1, maxEdge / Math.max(w, h));
+  const c = document.createElement('canvas');
+  c.width = Math.round(w * s); c.height = Math.round(h * s);
+  c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', quality);
+}
+
+/* ---------------- بشرتي AI: analysing screen ---------------- */
+const AI_CAPTIONS = [
+  'جارٍ النظر إلى المسام…', 'جارٍ فحص الجبهة والأنف…', 'جارٍ قياس حجم المسام…',
+  'جارٍ البحث عن الرؤوس السوداء والانسدادات…', 'جارٍ تحليل البشرة…', 'جارٍ تحديد نوع المسام…',
+  'جارٍ مقارنة النتائج بملفك الطبي…'
+];
+const AI_STEPS = ['التحليل الأول', 'التحليل الثاني', 'التحليل الثالث', 'دمج النتائج وكتابة التقرير'];
+const ai = {ctl:null, raf:0, capTimer:0, creep:0, pct:0};
+
+function showAnalyzing(url, ratio){
+  closeAnalyzing();
+  let W = Math.min(280, window.innerWidth - 72), H = Math.round(W / ratio);
+  if(H > 340){ H = 340; W = Math.round(H * ratio); }
+  const dots = Array.from({length:7}, (_, i) => {
+    const x = 22 + Math.random() * 56, y = 25 + Math.random() * 50;
+    return `<i class="ai-dot" style="left:${x}%;top:${y}%;animation-delay:${(i * 0.9).toFixed(1)}s"></i>`;
+  }).join('');
+  const el = document.createElement('div');
+  el.id = 'aiOverlay'; el.className = 'ai-overlay';
+  el.innerHTML = `
+    <div class="ai-box">
+      <div class="ai-badge">${ic('sparkle', 'width:14px;height:14px')} بشرتي AI</div>
+      <div class="ai-stage" id="aiStage" style="width:${W}px;height:${H}px;background-image:url(${url})">
+        ${dots}
+        <div class="ai-scan"></div>
+        <div class="ai-lens" id="aiLens" style="background-image:url(${url});background-size:${W * 2.4}px ${H * 2.4}px"></div>
+      </div>
+      <h3>جارٍ تحليل البشرة</h3>
+      <p class="ai-caption" id="aiCaption">${AI_CAPTIONS[0]}</p>
+      <div class="bar" style="margin:12px 0 10px"><i id="aiFill" style="width:4%"></i></div>
+      <ul class="ai-steps" id="aiSteps">${AI_STEPS.map((s, i) => `<li data-i="${i}" class="${i < 3 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('')}</ul>
+      <p class="ai-err" id="aiErr" hidden></p>
+      <button class="btn btn-outline" data-act="cancelAI" id="aiCancel" style="margin-top:12px">إلغاء</button>
+    </div>`;
+  document.body.appendChild(el);
+  document.body.style.overflow = 'hidden';
+
+  // magnifier glides over the photo, showing a 2.4× zoomed view of what's under it
+  const lens = $('#aiLens'), R = 48, Z = 2.4, t0 = performance.now();
+  const move = now => {
+    const tt = now - t0;
+    const cx = W / 2 + W * 0.3 * Math.sin(tt / 900), cy = H / 2 + H * 0.28 * Math.sin(tt / 1400 + 1);
+    lens.style.transform = `translate(${cx - R}px, ${cy - R}px)`;
+    lens.style.backgroundPosition = `${-(cx * Z - R)}px ${-(cy * Z - R)}px`;
+    ai.raf = requestAnimationFrame(move);
+  };
+  ai.raf = requestAnimationFrame(move);
+
+  let ci = 0;
+  ai.capTimer = setInterval(() => {
+    const cap = $('#aiCaption'); if(!cap) return;
+    ci = (ci + 1) % AI_CAPTIONS.length;
+    cap.classList.add('fade');
+    setTimeout(() => { cap.textContent = AI_CAPTIONS[ci]; cap.classList.remove('fade'); }, 250);
+  }, 2600);
+  ai.pct = 4;
+}
+// Single-request mode has no intermediate events: show two steps and let the bar creep toward 90%.
+function setupAiSteps(runs){
+  if(runs !== 1) return;
+  const ul = $('#aiSteps'); if(!ul) return;
+  ul.innerHTML = ['فحص الصورة وتحليل المسام', 'كتابة التقرير'].map((s, i) =>
+    `<li data-i="${i}" class="${i === 0 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('');
+  let ticks = 0;
+  ai.creep = setInterval(() => {
+    if(!$('#aiFill')) return clearInterval(ai.creep);
+    aiProgress(ai.pct + (90 - ai.pct) * 0.05);
+    if(++ticks === 16){ aiStep(0, 'done'); aiStep(1, 'active'); }
+  }, 500);
+}
+function aiProgress(p){ ai.pct = Math.max(ai.pct, p); const f = $('#aiFill'); if(f) f.style.width = ai.pct + '%'; }
+function aiStep(i, status){ const li = document.querySelector(`#aiSteps li[data-i="${i}"]`); if(li) li.className = status; }
+function closeAnalyzing(){
+  cancelAnimationFrame(ai.raf); clearInterval(ai.capTimer); clearInterval(ai.creep);
+  const el = $('#aiOverlay'); if(el) el.remove();
+  document.body.style.overflow = '';
+}
+function aiFail(msg){
+  cancelAnimationFrame(ai.raf); clearInterval(ai.capTimer); clearInterval(ai.creep);
+  const err = $('#aiErr'); if(!err) return;
+  err.textContent = msg; err.hidden = false;
+  $('#aiCaption').textContent = 'توقف التحليل';
+  $('#aiCancel').textContent = 'حسنًا';
+  $('#aiCancel').dataset.act = 'closeAI';
+}
+
+async function runAI(src, w, h){
+  const full = encodeImage(src, w, h, 1568, 0.88);
+  const thumb = encodeImage(src, w, h, 220, 0.7);
+  showAnalyzing(full, w / h);
+  ai.ctl = new AbortController();
+  try{
+    const res = await fetch('/api/analyze-skin', {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body: JSON.stringify({image: full.split(',')[1], mediaType:'image/jpeg', profile:{medical:state.medical, skinType:state.skinType}}),
+      signal: ai.ctl.signal
+    });
+    if(!res.ok || !res.body){
+      let msg = '';
+      try{ msg = (await res.json()).error; }catch(e){}
+      if(!msg) msg = [404, 405, 501].includes(res.status)
+        ? 'خدمة التحليل غير متاحة هنا — شغّل الموقع بالأمر "npm start" وافتح http://localhost:3000.'
+        : 'تعذّر الاتصال بخدمة التحليل.';
+      throw new Error(msg);
+    }
+    aiProgress(10);
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = '', result = null;
+    for(;;){
+      const {value, done} = await reader.read();
+      if(done) break;
+      buf += dec.decode(value, {stream:true});
+      let nl;
+      while((nl = buf.indexOf('\n')) >= 0){
+        const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+        if(!line) continue;
+        const ev = JSON.parse(line);
+        if(ev.type === 'start'){ setupAiSteps(ev.runs); }
+        else if(ev.type === 'analysis'){ aiStep(ev.n - 1, 'done'); aiProgress(10 + ev.n * 22); }
+        else if(ev.type === 'synthesizing'){ [0, 1, 2].forEach(i => aiStep(i, 'done')); aiStep(3, 'active'); aiProgress(78); }
+        else if(ev.type === 'result'){ result = ev; }
+        else if(ev.type === 'error'){ throw new Error(ev.message); }
+      }
+    }
+    if(!result) throw new Error('انقطع الاتصال قبل اكتمال التحليل، حاول مجددًا.');
+    document.querySelectorAll('#aiSteps li').forEach(li => li.className = 'done');
+    aiProgress(100);
+    await new Promise(r => setTimeout(r, 600));
+    state.poreAI = {report: result.report, runs: result.runs, thumb, at: Date.now()};
+    save(); closeAnalyzing(); renderChrome();
+    const box = $('#poreResult');
+    if(box){ box.innerHTML = aiResultHtml() + (state.pore ? poreResultHtml() : ''); box.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }catch(e){
+    if(e.name === 'AbortError'){ closeAnalyzing(); return; }
+    aiFail(e.message || 'حدث خطأ غير متوقع.');
+  }finally{
+    ai.ctl = null;
+  }
+}
+
+/* ---------------- بشرتي AI: result ---------------- */
+const ZONE_AR = {forehead:'الجبهة', nose:'الأنف', cheeks:'الخدّان', chin:'الذقن'};
+const ZONE_STATUS = {good:{cls:'good', label:'جيدة', color:'#5E8F58'}, watch:{cls:'warn', label:'تحتاج متابعة', color:'#C9773B'}, concern:{cls:'bad', label:'تحتاج عناية', color:'#B5544A'}};
+const LEVEL_AR = {low:'منخفض', moderate:'متوسط', high:'مرتفع'};
+const AGREE_AR = {high:'اتفاق عالٍ بين التحليلات', medium:'اتفاق متوسط بين التحليلات', low:'اختلاف بين التحليلات'};
+const CONF_AR = {high:'ثقة عالية في التحليل', medium:'ثقة متوسطة في التحليل', low:'ثقة منخفضة في التحليل'};
+
+function aiResultHtml(){
+  const a = state.poreAI, r = a.report;
+  const head = `
+    <div class="ai-head">
+      <div class="ai-logo">${ic('sparkle', 'width:20px;height:20px')}</div>
+      <div><b>بشرتي AI</b><span>${new Date(a.at).toLocaleDateString('ar', {day:'numeric', month:'long'})} · ${a.runs > 1 ? a.runs + ' تحليلات مستقلة' : 'تحليل بالذكاء الاصطناعي'}</span></div>
+      ${a.thumb ? `<img class="ai-thumb" src="${a.thumb}" alt="">` : ''}
+    </div>`;
+  if(!r.image_ok){
+    return `<div class="card ai-card">${head}
+      <p class="ai-intro">بصفتي مساعدًا شخصيًا لك من موقع بشرتي، لم أتمكّن من تحليل هذه الصورة بدقة:</p>
+      <div class="verdict warn">${esc(r.image_issue || 'الصورة غير واضحة بما يكفي.')}</div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="openCam">التقط صورة جديدة</button><button class="btn btn-outline" data-act="upload">ارفع صورة</button></div>
+    </div>`;
+  }
+  return `
+    <div class="card ai-card">${head}
+      <p class="ai-intro">بصفتي مساعدًا شخصيًا لك من موقع بشرتي، هذا هو التحليل:</p>
+      <p class="ai-summary">${esc(r.summary)}</p>
+
+      <div class="ai-type">
+        <span class="eyebrow">نوع المسام</span>
+        <b>${esc(r.pore_type)}</b>
+        <p>${esc(r.pore_type_explainer)}</p>
+        <span class="pill muted">إفراز الزيوت: ${LEVEL_AR[r.oiliness] || ''}</span>
+      </div>
+
+      <h3 class="ai-h">مناطق الوجه</h3>
+      ${r.zones.map(z => { const s = ZONE_STATUS[z.status] || ZONE_STATUS.watch; return `
+        <div class="zone"><span class="sw" style="background:${s.color}"></span>
+          <div><b>${ZONE_AR[z.zone] || esc(z.zone)}</b> <span class="pill ${s.cls}">${s.label}</span><p>${esc(z.note)}</p></div></div>`; }).join('')}
+
+      ${r.key_findings.length ? `<h3 class="ai-h">أبرز الملاحظات</h3><ul class="list">${r.key_findings.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
+
+      <h3 class="ai-h">روتينك المقترح</h3>
+      <ol class="ai-routine">${r.routine.map(s => `<li><b>${esc(s.step)}</b><span>${esc(s.why)}</span></li>`).join('')}</ol>
+
+      <div class="ai-ings">
+        ${r.ingredients_seek.length ? `<div><span class="field-label">مكونات ${t('ابحثي','ابحث')} عنها</span><div class="chips">${r.ingredients_seek.map(x => `<span class="pill good">${esc(x)}</span>`).join('')}</div></div>` : ''}
+        ${r.ingredients_avoid.length ? `<div><span class="field-label">مكونات ${t('تجنّبيها','تجنّبها')}</span><div class="chips">${r.ingredients_avoid.map(x => `<span class="pill bad">${esc(x)}</span>`).join('')}</div></div>` : ''}
+      </div>
+
+      ${r.see_doctor ? `<div class="verdict bad" style="margin-top:12px">🩺 ننصح بمراجعة طبيب جلدية: ${esc(r.doctor_reason)}</div>` : ''}
+
+      <p class="small" style="margin-top:12px">${(a.runs > 1 ? AGREE_AR : CONF_AR)[r.agreement] || ''} · ${esc(r.confidence_note)}<br>تحليل إرشادي بالذكاء الاصطناعي ولا يُعد تشخيصًا طبيًا.</p>
+      <div class="btn-row">
+        <button class="btn btn-dark" data-act="go" data-v="ingredient">التالي: فحص مكونات الكريم</button>
+        <button class="btn btn-outline" data-act="openCam" style="flex:.6">تحليل جديد</button>
+      </div>
+    </div>`;
+}
+function poreResultHtml(){
+  const p = state.pore, o = poreOverall(p);
+  return `
+    <div class="card">
+      <span class="eyebrow">النتيجة</span>
+      <h2>${o.text} <span class="pill ${o.cls}">${p.zones.filter(z => z.cls === 'good').length}/5 متوازنة</span></h2>
+      ${p.zones.map(z => `<div class="zone"><span class="sw" style="background:${classifyShine(z.shine).color}"></span><div><b>${z.name}</b><p>${classifyShine(z.shine).note}</p></div></div>`).join('')}
+      <p class="small" style="margin-top:8px">${p.approx ? 'تم المسح بدون تتبّع الوجه (تعذّر تحميل النموذج)، لذا النتيجة أقل دقة. ' : ''}النتيجة تقديرية وتتأثر بالإضاءة والكاميرا.</p>
+      <div class="btn-row"><button class="btn btn-dark" data-act="go" data-v="ingredient">التالي: فحص مكونات الكريم</button></div>
+    </div>`;
+}
+
+async function startPore(){
+  stopCamera();
+  const token = session.token;
+  const cam = $('#poreCam'), video = $('#poreVideo'), canvas = $('#poreCanvas');
+  const ph = $('#porePh'), hint = $('#poreHint'), btn = $('#poreBtn');
+  const prog = $('#poreProg'), fill = $('#poreFill'), txt = $('#poreTxt');
+  btn.disabled = true;
+  ph.querySelector('span').textContent = 'جارٍ تشغيل الكاميرا…';
+  try{ await startCamera(video, 'user'); }
+  catch(e){ ph.querySelector('span').textContent = camErrorText(e); btn.disabled = false; return; }
+  if(token !== session.token) return;
+  cam.classList.add('live');
+  hint.textContent = 'جارٍ تحميل نموذج تتبّع الوجه…';
+
+  let fm = null;
+  try{ fm = await getFaceMesh(); }catch(e){ fm = null; }
+  if(token !== session.token) return;
+
+  const W = video.videoWidth, H = video.videoHeight;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const off = document.createElement('canvas');
+  const sc = Math.min(1, 480 / W);
+  off.width = Math.round(W * sc); off.height = Math.round(H * sc);
+  const octx = off.getContext('2d', {willReadFrequently:true});
+
+  let landmarks = null, busy = false;
+  if(fm) fm.onResults(r => { landmarks = (r.multiFaceLandmarks && r.multiFaceLandmarks[0]) || null; });
+
+  const zones = PORE_ZONES.map(z => ({key:z.key, name:z.name, hint:z.hint, sum:0, n:0, ms:0}));
+  let zi = 0, last = performance.now();
+  prog.classList.add('show');
+
+  const frame = now => {
+    if(token !== session.token) return;
+    const dt = Math.min(100, now - last); last = now;
+    if(fm && !busy){ busy = true; fm.send({image:video}).catch(() => {}).finally(() => { busy = false; }); }
+    octx.drawImage(video, 0, 0, off.width, off.height);
+    ctx.clearRect(0, 0, W, H);
+
+    const pts = fm ? (landmarks ? landmarkPoints(landmarks) : null) : FALLBACK_POINTS;
+    if(!fm || !pts) drawOval(ctx, W, H);
+    const z = zones[zi];
+    if(!pts){
+      hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`;
+    } else {
+      const p = pts[z.key];
+      const s = samplePatch(octx, p.x * off.width, p.y * off.height, Math.max(6, pts.r * off.width));
+      if(s.mean < 0.2){
+        hint.textContent = `الإضاءة ضعيفة — ${t('انتقلي','انتقل')} لمكان أكثر إضاءة`;
+      } else {
+        z.sum += s.shine; z.n++; z.ms += dt;
+        hint.textContent = z.hint() + (fm ? '' : ' (بدون تتبّع)');
+      }
+      zones.slice(0, zi).forEach(d => drawDot(ctx, pts[d.key].x * W, pts[d.key].y * H, classifyShine(d.shine).color));
+      drawPulse(ctx, p.x * W, p.y * H, Math.max(14, pts.r * W * 1.6), now);
+    }
+    const pct = (zi + Math.min(1, z.ms / ZONE_MS)) / zones.length;
+    fill.style.width = (pct * 100).toFixed(1) + '%';
+    txt.textContent = `${Math.round(pct * 100)}% · المنطقة ${zi + 1} من ${zones.length}: ${z.name}`;
+
+    if(z.ms >= ZONE_MS){
+      z.shine = z.n ? z.sum / z.n : 0;
+      zi++;
+      if(zi >= zones.length) return finishPore(zones, !fm);
+    }
+    session.raf = requestAnimationFrame(frame);
+  };
+  session.raf = requestAnimationFrame(frame);
+}
+function finishPore(zones, approx){
+  stopCamera();
+  state.pore = {zones: zones.map(z => ({key:z.key, name:z.name, shine:+z.shine.toFixed(4), cls:classifyShine(z.shine).cls})), approx, at:Date.now()};
+  save(); renderChrome();
+  $('#poreProg').classList.remove('show');
+  $('#poreBtn').disabled = false;
+  $('#porePh span').textContent = 'اكتمل المسح ✓';
+  $('#poreResult').innerHTML = poreResultHtml() + (state.poreAI ? aiResultHtml() : '');
+  $('#poreResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function drawOval(ctx, W, H){
+  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = Math.max(2, W / 200); ctx.setLineDash([10, 8]);
+  ctx.beginPath(); ctx.ellipse(W / 2, H * .5, W * .26, H * .34, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+}
+function drawDot(ctx, x, y, color){
+  ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+}
+function drawPulse(ctx, x, y, r, now){
+  const k = (Math.sin(now / 220) + 1) / 2;
+  ctx.beginPath(); ctx.arc(x, y, r * (0.85 + 0.25 * k), 0, Math.PI * 2);
+  ctx.lineWidth = 3; ctx.strokeStyle = `rgba(201,123,132,${0.6 + 0.4 * k})`; ctx.stroke();
+}
+
+/* =========================================================
+   STAGE 4 — INGREDIENT CHECK
+========================================================= */
+// level: irritant | comedogenic | caution | pregnancy | good_oily | good_dry | good
+const ING_DB = [
+  {label:'العطر', level:'irritant', names:['fragrance','parfum','perfume','عطر'], reason:'من أكثر المكونات المسببة للحساسية والتهيج.'},
+  {label:'الكحول المجفّف', level:'irritant', names:['alcohol denat','denatured alcohol','sd alcohol','كحول إيثيلي'], reason:'قد يسبب جفافًا وتهيجًا للبشرة الحساسة أو الجافة.'},
+  {label:'زيوت عطرية', level:'irritant', names:['essential oil','limonene','linalool','citral','eugenol','geraniol','زيت عطري','زيوت عطرية'], reason:'مركبات عطرية طبيعية قد تسبب حساسية تلامسية.'},
+  {label:'السلفات (SLS/SLES)', level:'irritant', names:['sodium lauryl sulfate','sodium laureth sulfate','سلفات'], reason:'منظف قوي قد يضعف حاجز البشرة.'},
+  {label:'زيت جوز الهند', level:'comedogenic', names:['coconut oil','cocos nucifera','زيت جوز الهند'], reason:'احتمالية مرتفعة لانسداد المسام.'},
+  {label:'إيزوبروبيل ميريستات', level:'comedogenic', names:['isopropyl myristate','isopropyl palmitate'], reason:'قد يسد المسام لدى البشرة الدهنية.'},
+  {label:'الزيت المعدني', level:'comedogenic', names:['mineral oil','paraffinum liquidum','زيت معدني'], reason:'قد يُثقل البشرة الدهنية أو المختلطة.'},
+  {label:'زبدة الكاكاو', level:'comedogenic', names:['cocoa butter','theobroma cacao','زبدة الكاكاو'], reason:'قوام ثقيل قد يسبب انسداد المسام.'},
+  {label:'الريتينويدات', level:'pregnancy', names:['retinol','retinyl','retinal','retinoic','tretinoin','ريتينول'], reason:'فعّالة لكنها قد تسبب جفافًا وحساسية للشمس، ولا يُنصح بها خلال الحمل أو الرضاعة.'},
+  {label:'الهيدروكينون', level:'pregnancy', names:['hydroquinone','هيدروكينون'], reason:'مفتّح قوي يُستخدم تحت إشراف طبي فقط.'},
+  {label:'أحماض AHA', level:'caution', names:['glycolic acid','lactic acid','mandelic acid','حمض الجليكوليك','حمض اللاكتيك'], reason:'مقشرات تزيد حساسية البشرة للشمس — استخدمها مساءً مع واقٍ نهارًا.'},
+  {label:'بنزويل بيروكسايد', level:'caution', names:['benzoyl peroxide','بنزويل'], reason:'فعّال ضد حب الشباب لكنه قد يسبب جفافًا وتهيجًا.'},
+  {label:'البارابين', level:'caution', names:['paraben','بارابين'], reason:'مادة حافظة قد تسبب حساسية لدى بعض الأشخاص.'},
+  {label:'حمض الساليسيليك', level:'good_oily', names:['salicylic acid','حمض الساليسيليك','ساليسيليك'], reason:'ينظف المسام ويناسب البشرة الدهنية، وقد يجفف البشرة الجافة.'},
+  {label:'النياسيناميد', level:'good', names:['niacinamide','نياسيناميد'], reason:'يهدئ البشرة وينظم إفراز الزيوت.'},
+  {label:'حمض الهيالورونيك', level:'good_dry', names:['hyaluronic','sodium hyaluronate','هيالورونيك'], reason:'مرطب خفيف يجذب الماء للبشرة.'},
+  {label:'السيراميدات', level:'good_dry', names:['ceramide','سيراميد'], reason:'تقوي حاجز البشرة وتقلل فقدان الرطوبة.'},
+  {label:'الجلسرين', level:'good', names:['glycerin','glycerol','جلسرين','جليسرين'], reason:'مرطب لطيف يناسب كل الأنواع.'},
+  {label:'البانثينول', level:'good', names:['panthenol','بانثينول'], reason:'مهدئ ومرمم للبشرة المتهيجة.'},
+  {label:'أكسيد الزنك', level:'good', names:['zinc oxide','أكسيد الزنك'], reason:'فلتر شمسي معدني لطيف يناسب البشرة الحساسة.'},
+  {label:'فيتامين C', level:'good', names:['ascorbic acid','ascorbyl','vitamin c','فيتامين سي'], reason:'مضاد أكسدة يدعم إشراقة البشرة.'},
+  {label:'الصبار', level:'good', names:['aloe','الصبار','ألوفيرا'], reason:'مهدئ ومرطب خفيف.'},
+];
+
+function analyzeIngredients(raw, productName){
+  const text = raw.toLowerCase();
+  const m = state.medical || {conditions:[], allergies:''};
+  const skin = state.skinType ? state.skinType.raw : null;
+  const sensitive = skin === 'sensitive' || ['حساسية جلدية معروفة','الأكزيما','الوردية'].some(c => m.conditions.includes(c));
+  const preg = m.conditions.includes('الحمل أو الرضاعة');
+  const oilyish = skin === 'oily' || skin === 'combination';
+  const dryish = skin === 'dry' || sensitive;
+
+  let score = 100;
+  const flags = [];
+  ING_DB.forEach(it => {
+    if(!it.names.some(n => text.includes(n.toLowerCase()))) return;
+    let sev = 'ok', d = 0;
+    switch(it.level){
+      case 'irritant':    sev = sensitive ? 'avoid' : 'caution'; d = sensitive ? -22 : -8; break;
+      case 'comedogenic': sev = oilyish ? 'caution' : 'ok';      d = oilyish ? -12 : -2;  break;
+      case 'caution':     sev = 'caution'; d = sensitive ? -12 : -7; break;
+      case 'pregnancy':   sev = preg ? 'avoid' : 'caution';      d = preg ? -35 : -6;    break;
+      case 'good_oily':   sev = dryish ? 'caution' : 'ok';       d = oilyish ? 5 : dryish ? -4 : 1; break;
+      case 'good_dry':    sev = 'ok'; d = dryish ? 5 : 2; break;
+      case 'good':        sev = 'ok'; d = 3; break;
+    }
+    score += d;
+    flags.push({name:it.label, reason:it.reason, sev});
+  });
+
+  // personal allergies typed in the medical profile
+  (m.allergies || '').split(/[،,;\n]/).map(s => s.trim()).filter(s => s.length >= 3).forEach(a => {
+    if(text.includes(a.toLowerCase())){ score -= 40; flags.unshift({name:a, reason:'ذكرته ضمن الحساسية في ملفك الطبي.', sev:'avoid'}); }
+  });
+
+  score = clamp(Math.round(score), 10, 100);
+  const order = {avoid:0, caution:1, ok:2};
+  flags.sort((a, b) => order[a.sev] - order[b.sev]);
+  const hasAvoid = flags.some(f => f.sev === 'avoid');
+  let verdict;
+  if(!flags.length) verdict = {cls:'warn', text:'لم نتعرّف على أي مكوّن من قائمتنا — لا يمكننا الحكم على هذا المنتج.'};
+  else if(hasAvoid || score < 60) verdict = {cls:'bad', text:'غير موصى به لك — يحتوي مكونات تتعارض مع بشرتك أو حالتك.'};
+  else if(score < 80) verdict = {cls:'warn', text:`مناسب بحذر — ${t('جرّبيه','جرّبه')} على منطقة صغيرة 48 ساعة أولًا.`};
+  else verdict = {cls:'good', text:'مناسب لبشرتك بحسب المكونات التي نعرفها.'};
+  return {productName: productName || null, score, verdict, flags, matched: flags.length, at:Date.now()};
+}
+
+function viewIngredient(){
+  const p = ui.ing.product;
+  return `
+    <div class="card">
+      <span class="eyebrow">المرحلة 4 من 5</span>
+      <h2>فحص مكونات الكريم</h2>
+      <p class="sub">${t('امسحي','امسح')} الباركود، أو ${t('ابحثي','ابحث')} باسم المنتج، أو ${t('الصقي','الصق')} قائمة المكونات من العبوة. نقارنها بنوع بشرتك وملفك الطبي.</p>
+      ${!state.skinType || !state.medical ? `<div class="notice">لنتيجة أدق ${t('أكملي','أكمل')} الملف الطبي واختبار نوع البشرة أولًا.</div>` : ''}
+    </div>
+    <div class="card">
+      <h3>${ic('barcode', 'width:16px;height:16px;vertical-align:-3px')} مسح الباركود</h3>
+      <div class="cam wide" id="bcCam">
+        <video id="bcVideo" playsinline muted></video>
+        <div class="cam-ph" id="bcPh">${ic('barcode', 'width:34px;height:34px')}<span>وجّه الكاميرا الخلفية إلى باركود العبوة.</span></div>
+      </div>
+      <p class="small" id="bcStatus"></p>
+      <div class="btn-row"><button class="btn btn-dark" id="bcBtn" data-act="barcode">تشغيل الماسح</button></div>
+    </div>
+    <div class="card">
+      <h3>البحث باسم المنتج</h3>
+      <div style="display:flex;gap:8px">
+        <input class="input" id="searchQ" placeholder="مثال: CeraVe moisturizing cream" enterkeyhint="search">
+        <button class="btn btn-outline" style="width:auto" data-act="search">بحث</button>
+      </div>
+      <div id="searchResults"></div>
+    </div>
+    <div class="card">
+      <h3>قائمة المكونات</h3>
+      <div id="productBox">${p ? productHtml(p) : ''}</div>
+      <textarea class="input" id="ingText" style="margin-top:10px" placeholder="Aqua, Glycerin, Niacinamide, Parfum…">${esc(ui.ing.text || '')}</textarea>
+      <div class="btn-row"><button class="btn btn-primary" data-act="analyze">حلّل المكونات</button></div>
+    </div>
+    <div id="ingResult">${state.ingredient ? ingResultHtml(state.ingredient) : ''}</div>`;
+}
+function productHtml(p){
+  return `<div class="product">${p.img ? `<img src="${esc(p.img)}" alt="">` : ''}<div><b>${esc(p.name || 'منتج بدون اسم')}</b><span>${esc(p.brand || '')}</span></div></div>`;
+}
+function ingResultHtml(r){
+  const color = {good:'var(--good)', warn:'var(--warn)', bad:'var(--bad)'}[r.verdict.cls];
+  const sevPill = {avoid:'<span class="pill bad">تجنّب</span>', caution:'<span class="pill warn">بحذر</span>', ok:'<span class="pill good">مناسب</span>'};
+  return `
+    <div class="card">
+      <span class="eyebrow">النتيجة${r.productName ? ' · ' + esc(r.productName) : ''}</span>
+      <div class="score">
+        <div class="ring" style="--p:${r.flags.length ? r.score : 0};--c:${color}"><b>${r.flags.length ? r.score : '؟'}</b></div>
+        <div class="verdict ${r.verdict.cls}" style="flex:1">${esc(r.verdict.text)}</div>
+      </div>
+      ${r.flags.length ? r.flags.map(f => `<div class="flag">${sevPill[f.sev]}<div><b>${esc(f.name)}</b><p>${esc(f.reason)}</p></div></div>`).join('')
+        : '<p class="sub">لم نجد مكونات من قائمتنا المعروفة في هذا المنتج.</p>'}
+      <p class="small" style="margin-top:8px">نفحص ${ING_DB.length} مكونًا شائعًا فقط، والتركيز الفعلي غير معروف لنا.</p>
+      <div class="btn-row"><button class="btn btn-dark" data-act="go" data-v="spf">التالي: واقي الشمس</button></div>
+    </div>`;
+}
+
+function setIngStatus(msg){ const el = $('#bcStatus'); if(el) el.textContent = msg; }
+function useProduct(p, code){
+  // our ingredient DB knows Arabic + English (INCI) names, so prefer those over the product's default language
+  const ingredients = p.ingredients_text_ar || p.ingredients_text_en || p.ingredients_text || p.ingredients_text_fr || '';
+  ui.ing.product = {name:p.product_name || p.product_name_en || p.product_name_ar || '', brand:p.brands || '', img:p.image_front_small_url || '', code};
+  ui.ing.text = ingredients;
+  $('#productBox').innerHTML = productHtml(ui.ing.product);
+  $('#ingText').value = ingredients;
+  $('#searchResults').innerHTML = '';
+  if(ingredients){ runAnalyze(); }
+  else{
+    toast('لا تتوفر مكونات لهذا المنتج في قاعدة البيانات — الصقها من العبوة.');
+    $('#ingText').focus();
+  }
+}
+async function lookupBarcode(code){
+  setIngStatus(`الباركود ${code} — جارٍ البحث…`);
+  try{
+    const r = await fetch(`${OBF}/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_en,product_name_ar,brands,ingredients_text,ingredients_text_en,ingredients_text_ar,ingredients_text_fr,image_front_small_url`);
+    const d = await r.json();
+    if(d.status === 1 && d.product){ setIngStatus(`تم العثور على المنتج (${code}).`); useProduct(d.product, code); }
+    else setIngStatus(`لم نجد المنتج ${code} في قاعدة Open Beauty Facts. ${t('جرّبي','جرّب')} البحث بالاسم أو ${t('الصقي','الصق')} المكونات.`);
+  }catch(e){ setIngStatus('تعذّر الاتصال بقاعدة بيانات المنتجات.'); }
+}
+async function startBarcode(){
+  const btn = $('#bcBtn');
+  if(session.streams.length || session.zx){ stopCamera(); btn.textContent = 'تشغيل الماسح'; setIngStatus(''); return; }
+  stopCamera();
+  const token = session.token;
+  const cam = $('#bcCam'), video = $('#bcVideo');
+  btn.textContent = 'إيقاف الماسح';
+  setIngStatus('جارٍ تشغيل الكاميرا…');
+  const onCode = code => {
+    if(token !== session.token) return;
+    stopCamera(); btn.textContent = 'تشغيل الماسح';
+    if(navigator.vibrate) navigator.vibrate(80);
+    lookupBarcode(code);
+  };
+  try{
+    let formats = ['ean_13','ean_8','upc_a','upc_e','code_128'];
+    if('BarcodeDetector' in window){
+      const supported = await BarcodeDetector.getSupportedFormats();
+      formats = formats.filter(f => supported.includes(f));
+    }
+    if('BarcodeDetector' in window && formats.length){
+      await startCamera(video, 'environment');
+      if(token !== session.token) return;
+      cam.classList.add('live');
+      setIngStatus('وجّه الكاميرا إلى الباركود…');
+      const det = new BarcodeDetector({formats});
+      let lastT = 0;
+      const loop = async now => {
+        if(token !== session.token) return;
+        if(now - lastT > 250){
+          lastT = now;
+          try{ const c = await det.detect(video); if(c.length) return onCode(c[0].rawValue); }catch(e){}
+        }
+        session.raf = requestAnimationFrame(loop);
+      };
+      session.raf = requestAnimationFrame(loop);
+    } else {
+      await loadScript(ZXING_URL);
+      if(token !== session.token) return;
+      const reader = new ZXing.BrowserMultiFormatReader();
+      session.zx = reader;
+      cam.classList.add('live');
+      setIngStatus('وجّه الكاميرا إلى الباركود…');
+      await reader.decodeFromConstraints({video:{facingMode:'environment'}}, video, res => { if(res) onCode(res.getText()); });
+    }
+  }catch(e){
+    stopCamera(); btn.textContent = 'تشغيل الماسح';
+    setIngStatus(camErrorText(e));
+  }
+}
+async function searchProducts(){
+  const q = $('#searchQ').value.trim();
+  const box = $('#searchResults');
+  if(q.length < 2){ box.innerHTML = '<p class="err">اكتب اسم المنتج أولًا.</p>'; return; }
+  box.innerHTML = '<p class="small">جارٍ البحث…</p>';
+  try{
+    const r = await fetch(`${OBF}/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=12&fields=code,product_name,product_name_en,product_name_ar,brands,ingredients_text,ingredients_text_en,ingredients_text_ar,ingredients_text_fr,image_front_small_url`);
+    const d = await r.json();
+    const hasIng = p => !!(p.ingredients_text || p.ingredients_text_en || p.ingredients_text_ar || p.ingredients_text_fr);
+    // products that come with an ingredient list first
+    ui.ing.results = (d.products || []).filter(p => p.product_name || p.product_name_en).sort((a, b) => hasIng(b) - hasIng(a));
+    box.innerHTML = ui.ing.results.length
+      ? ui.ing.results.map((p, i) => `<button class="result-item" data-act="pick" data-i="${i}"><b>${esc(p.product_name || p.product_name_en)}</b><span>${esc(p.brands || '')}${hasIng(p) ? '' : ' · بدون قائمة مكونات'}</span></button>`).join('')
+      : '<p class="small">لا توجد نتائج. جرّب اسمًا بالإنجليزية أو الصق المكونات مباشرة.</p>';
+  }catch(e){ box.innerHTML = '<p class="err">تعذّر البحث حاليًا.</p>'; }
+}
+function runAnalyze(){
+  const raw = $('#ingText').value.trim();
+  ui.ing.text = raw;
+  if(raw.length < 3){ toast('الصق قائمة المكونات أولًا.'); return; }
+  state.ingredient = analyzeIngredients(raw, ui.ing.product && ui.ing.product.name);
+  save(); renderChrome();
+  $('#ingResult').innerHTML = ingResultHtml(state.ingredient);
+  $('#ingResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* =========================================================
+   STAGE 5 — SUNSCREEN SELF-CHECK
+========================================================= */
+const SPF_ZONES = ['الجبهة','الأنف','الخدّان','الذقن','حول العينين','الأذنان','الرقبة','خلف الرقبة','الشفاه'];
+const SPF_TIPS = {
+  'الأذنان':'الأذنان من أكثر الأماكن المنسية والمعرضة للحروق.',
+  'الرقبة':'الرقبة تتعرض للشمس طوال اليوم وتظهر عليها علامات التقدم بسرعة.',
+  'خلف الرقبة':'خلف الرقبة يتعرض مباشرة للشمس عند المشي.',
+  'الشفاه':'استخدم مرطب شفاه يحتوي SPF.',
+  'حول العينين':'ضع طبقة خفيفة بعيدًا عن حافة العين، أو استخدم نظارة شمسية.',
+};
+function viewSpf(){
+  if(!ui.spf) ui.spf = state.spf ? {zones:[...state.spf.zones], spf:state.spf.spf, amount:state.spf.amount} : {zones:[], spf:null, amount:null};
+  const s = ui.spf;
+  const w = ui.weather;
+  return `
+    <div class="card">
+      <span class="eyebrow">المرحلة 5 من 5</span>
+      <h2>واقي الشمس</h2>
+      <p class="sub">بعد وضع الواقي ${t('افتحي','افتح')} المرآة ${t('وتأكدي','وتأكد')} من كل منطقة، ثم ${t('حدّدي','حدّد')} المناطق التي ${t('غطّيتِها','غطّيتَها')}. سنحسب نسبة التغطية ونذكّرك بالتجديد.</p>
+      ${w.status === 'ready' ? `<div class="notice" style="background:var(--cream-deep);color:var(--brown)">مؤشر الأشعة الآن ${w.uv} (${uvLevel(w.uv).label}).</div>` : ''}
+    </div>
+    <div class="card">
+      <div class="cam mirror" id="spfCam">
+        <video id="spfVideo" playsinline muted></video>
+        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>مرآة اختيارية لمراجعة التغطية — لا يتم حفظ أو رفع أي صورة.</span></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-outline" id="mirrorBtn" data-act="mirror">فتح المرآة</button></div>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-top:0">
+        <span class="field-label">المناطق التي ${t('غطّيتِها','غطّيتَها')}</span>
+        <div class="chips">${SPF_ZONES.map(z => `<button class="chip${s.zones.includes(z) ? ' on' : ''}" data-act="spfZone" data-v="${z}">${s.zones.includes(z) ? '✓ ' : ''}${z}</button>`).join('')}</div>
+      </div>
+      <div class="field">
+        <span class="field-label">عامل الحماية في منتجك</span>
+        <div class="chips">${['15','30','50+','لا أعرف'].map(v => `<button class="chip${s.spf === v ? ' on' : ''}" data-act="spfVal" data-v="${v}">${v === 'لا أعرف' ? v : 'SPF ' + v}</button>`).join('')}</div>
+      </div>
+      <div class="field">
+        <span class="field-label">هل ${t('استخدمتِ','استخدمتَ')} كمية كافية؟ (طول إصبعين للوجه والرقبة)</span>
+        <div class="chips">
+          <button class="chip${s.amount === 'yes' ? ' on' : ''}" data-act="spfAmount" data-v="yes">نعم</button>
+          <button class="chip${s.amount === 'no' ? ' on' : ''}" data-act="spfAmount" data-v="no">أقل من ذلك</button>
+        </div>
+      </div>
+      <div class="err" id="spfErr"></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="saveSpf">احسب التغطية</button></div>
+    </div>
+    <div id="spfResult">${state.spf ? spfResultHtml() : ''}</div>
+    ${reminderCard()}`;
+}
+function spfResultHtml(){
+  const r = state.spf;
+  const cls = r.coverage >= 90 ? 'good' : r.coverage >= 60 ? 'warn' : 'bad';
+  const color = {good:'var(--good)', warn:'var(--warn)', bad:'var(--bad)'}[cls];
+  const tips = [];
+  r.missed.forEach(z => tips.push(`<li><b>${z}:</b> ${SPF_TIPS[z] || `${t('أضيفي','أضف')} طبقة على هذه المنطقة.`}</li>`));
+  if(r.spf === '15') tips.push('<li>SPF 15 غير كافٍ للتعرض اليومي — ننصح بـ SPF 30 على الأقل.</li>');
+  if(r.spf === 'لا أعرف') tips.push('<li>تحقّق من العبوة: اختر "واسع الطيف" بعامل SPF 30 أو أعلى.</li>');
+  if(r.amount === 'no') tips.push('<li>الكمية القليلة تخفض الحماية الفعلية كثيرًا — استخدم طول إصبعين كاملين.</li>');
+  return `
+    <div class="card">
+      <span class="eyebrow">النتيجة</span>
+      <div class="score">
+        <div class="ring" style="--p:${r.coverage};--c:${color}"><b>${r.coverage}%</b></div>
+        <div class="verdict ${cls}" style="flex:1">${cls === 'good' ? 'تغطية ممتازة!' : cls === 'warn' ? 'تغطية جيدة مع بعض المناطق المنسية.' : 'التغطية غير كافية — أكمل المناطق الناقصة.'}</div>
+      </div>
+      ${tips.length ? `<ul class="list">${tips.join('')}</ul>` : ''}
+      <div class="btn-row">
+        <button class="btn btn-dark" data-act="remind" data-v="120">ذكّرني بالتجديد بعد ساعتين</button>
+      </div>
+      <button class="link-btn" data-act="remind" data-v="80">سأسبح أو أتعرّق — ذكّرني بعد 80 دقيقة</button>
+    </div>`;
+}
+function saveSpf(){
+  const s = ui.spf;
+  if(!s.zones.length){ $('#spfErr').textContent = 'حدّد المناطق التي غطّيتها.'; return; }
+  const coverage = Math.round(s.zones.length / SPF_ZONES.length * 100);
+  state.spf = {zones:[...s.zones], missed: SPF_ZONES.filter(z => !s.zones.includes(z)), spf:s.spf, amount:s.amount, coverage, at:Date.now()};
+  save(); renderChrome();
+  $('#spfErr').textContent = '';
+  $('#spfResult').innerHTML = spfResultHtml();
+  $('#spfResult').scrollIntoView({behavior:'smooth', block:'start'});
+}
+async function toggleMirror(){
+  const btn = $('#mirrorBtn');
+  if(session.streams.length){ stopCamera(); btn.textContent = 'فتح المرآة'; return; }
+  stopCamera();
+  const token = session.token;
+  try{
+    await startCamera($('#spfVideo'), 'user');
+    if(token !== session.token) return;
+    $('#spfCam').classList.add('live'); btn.textContent = 'إغلاق المرآة';
+  }catch(e){ $('#spfPh span').textContent = camErrorText(e); }
+}
+
+/* =========================================================
+   VIEWS + EVENTS
+========================================================= */
+const VIEWS = {home:viewHome, medical:viewMedical, skintype:viewSkin, pore:viewPore, ingredient:viewIngredient, spf:viewSpf};
+
+const ACTIONS = {
+  go: d => goTo(d.v),
+  locate: () => fetchWeather(),
+  reset: () => {
+    if(!confirm('سيتم حذف كل بياناتك المحفوظة على هذا الجهاز. متابعة؟')) return;
+    state = {...DEFAULT_STATE}; ui.medical = ui.skin = ui.spf = null; ui.ing = {product:null, results:[]};
+    clearTimeout(reminderTimer); save(); goTo('home');
+  },
+  // medical
+  gender: d => {
+    ui.medical.gender = d.v; state.gender = d.v; save();
+    if(d.v === 'male') ui.medical.conditions = ui.medical.conditions.filter(c => c !== 'الحمل أو الرضاعة');
+    rerenderKeepScroll();
+  },
+  cond: d => {
+    const m = ui.medical;
+    if(d.v === 'لا يوجد') m.conditions = m.conditions.includes('لا يوجد') ? [] : ['لا يوجد'];
+    else{
+      m.conditions = m.conditions.filter(c => c !== 'لا يوجد');
+      m.conditions = m.conditions.includes(d.v) ? m.conditions.filter(c => c !== d.v) : [...m.conditions, d.v];
+    }
+    rerenderKeepScroll();
+  },
+  sun: d => { ui.medical.sun = d.v; rerenderKeepScroll(); },
+  saveMedical,
+  gate: d => commitMedical(d.v === 'yes'),
+  // skin
+  answer: d => { ui.skin[d.q] = d.v; rerenderKeepScroll(); },
+  saveSkin,
+  // pore
+  startPore,
+  openCam: () => { if(view !== 'pore') goTo('pore'); window.scrollTo({top:0, behavior:'smooth'}); openCaptureCam(); },
+  cancelCam: () => stopCamera(),
+  snap: snapPhoto,
+  upload: () => { const f = $('#poreFile'); if(f){ f.value = ''; f.click(); } },
+  cancelAI: () => { if(ai.ctl) ai.ctl.abort(); closeAnalyzing(); },
+  closeAI: () => closeAnalyzing(),
+  // ingredient
+  barcode: startBarcode,
+  search: searchProducts,
+  pick: d => { const p = ui.ing.results[+d.i]; if(p) useProduct(p, p.code); },
+  analyze: runAnalyze,
+  // spf
+  mirror: toggleMirror,
+  spfZone: d => { const z = ui.spf.zones; ui.spf.zones = z.includes(d.v) ? z.filter(x => x !== d.v) : [...z, d.v]; refreshSpfForm(); },
+  spfVal: d => { ui.spf.spf = d.v; refreshSpfForm(); },
+  spfAmount: d => { ui.spf.amount = d.v; refreshSpfForm(); },
+  saveSpf,
+  remind: d => setReminder(+d.v),
+  cancelReminder,
+};
+// re-render the SPF form chips without touching the (possibly live) mirror camera
+function refreshSpfForm(){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = viewSpf();
+  const fresh = tmp.querySelectorAll('.card')[2], cur = $('#main').querySelectorAll('.card')[2];
+  if(fresh && cur) cur.replaceWith(fresh);
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if(!b || b.disabled) return;
+  const fn = ACTIONS[b.dataset.act];
+  if(fn){ e.preventDefault(); fn(b.dataset, b); }
+});
+document.addEventListener('input', e => {
+  const f = e.target.dataset.field;
+  if(f && ui.medical) ui.medical[f] = e.target.value;
+});
+document.addEventListener('change', e => {
+  if(e.target.id === 'poreFile') onPoreFile(e.target.files && e.target.files[0]);
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.id === 'searchQ'){ e.preventDefault(); searchProducts(); }
+});
+document.addEventListener('visibilitychange', () => { if(document.hidden && view !== 'home') stopCamera(); });
+
+render();
+armReminder();
+</script>
+</body>
+</html>

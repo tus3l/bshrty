@@ -1,0 +1,8 @@
+[build]
+  # only this folder is published — keeps .env and node_modules off the public site
+  publish = "public"
+  command = ""
+
+[dev]
+  # `npx netlify dev` serves index.html and the /api/analyze-skin edge function together
+  port = 8888
