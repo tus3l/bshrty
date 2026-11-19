@@ -1673,14 +1673,32 @@ function avgPose(list){
   return o;
 }
 function poseDiff(a, b){ return {yaw:b.yaw - a.yaw, pitch:b.pitch - a.pitch, roll:b.roll - a.roll, scale:b.fw / a.fw}; }
-function poseOk(d){ return Math.abs(d.yaw) < .06 && Math.abs(d.pitch) < .06 && Math.abs(d.roll) < .09 && d.scale > .88 && d.scale < 1.12; }
+// Tolerances are wide enough for a hand-held phone: the measured points ride on the face landmarks,
+// so pose only matters for lighting geometry. `loose` (hysteresis) keeps an OK pose OK through small jitter.
+const POSE_TOL = {yaw:.1, pitch:.1, roll:.15, near:.82, far:1.2};
+function poseOk(d, loose){
+  const k = loose ? 1.4 : 1;
+  return Math.abs(d.yaw) < POSE_TOL.yaw * k && Math.abs(d.pitch) < POSE_TOL.pitch * k && Math.abs(d.roll) < POSE_TOL.roll * k
+    && d.scale > 1 - (1 - POSE_TOL.near) * k && d.scale < 1 + (POSE_TOL.far - 1) * k;
+}
 function poseHint(d){
-  if(d.scale <= .88) return `${t('اقتربي','اقترب')} قليلًا من الكاميرا (نفس مسافة اللقطة الأولى)`;
-  if(d.scale >= 1.12) return `${t('ابتعدي','ابتعد')} قليلًا عن الكاميرا (نفس مسافة اللقطة الأولى)`;
-  if(Math.abs(d.roll) >= .09) return `${t('عدّلي','عدّل')} ميلان رأسك ليكون مستقيمًا`;
-  if(Math.abs(d.pitch) >= .06) return d.pitch > 0 ? `${t('ارفعي','ارفع')} ذقنك قليلًا` : `${t('أنزلي','أنزل')} ذقنك قليلًا`;
+  if(d.scale <= POSE_TOL.near) return `${t('قرّبي','قرّب')} الجوال قليلًا (نفس مسافة اللقطة الأولى)`;
+  if(d.scale >= POSE_TOL.far) return `${t('بعّدي','بعّد')} الجوال قليلًا (نفس مسافة اللقطة الأولى)`;
+  if(Math.abs(d.roll) >= POSE_TOL.roll) return `${t('عدّلي','عدّل')} ميلان رأسك ليكون مستقيمًا`;
+  if(Math.abs(d.pitch) >= POSE_TOL.pitch) return d.pitch > 0 ? `${t('ارفعي','ارفع')} ذقنك قليلًا` : `${t('أنزلي','أنزل')} ذقنك قليلًا`;
   return `${t('رجّعي','رجّع')} وجهك ${t('وانظري','وانظر')} للكاميرا مباشرة كاللقطة الأولى`;
 }
+// pose gate with hysteresis + a short buzz when the pose locks in, so the user can feel it without reading
+function poseGate(d){
+  const was = smart.poseGood;
+  const ok = poseOk(d, was);
+  const now = performance.now();
+  if(ok && !was && now - (smart.poseBuzzAt || 0) > 900){ buzz(35); smart.poseBuzzAt = now; }
+  smart.poseGood = ok;
+  return ok;
+}
+// haptics (Android Chrome; iOS Safari ignores navigator.vibrate)
+function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
 
 // ---- colour science: sRGB -> linear -> CIE L*a*b* (D65) ----
 const SRGB_LIN = new Float32Array(256).map((_, i) => { const c = i / 255; return c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); });
@@ -1926,7 +1944,7 @@ function qualHtml(fr){
   const item = (ok, label) => `<span class="${ok == null ? '' : ok ? 'ok' : 'no'}">${ok == null ? '•' : ok ? '✓' : '✗'} ${label}</span>`;
   const q = fr && fr.q;
   return item(q ? q.light : null, 'الإضاءة') + item(q ? q.dist : null, 'المسافة') + item(q ? q.still : null, 'الثبات')
-    + (smart.basePose && fr && fr.pose ? item(poseOk(poseDiff(smart.basePose, fr.pose)), 'الوضعية') : '')
+    + (smart.basePose && fr && fr.pose ? item(smart.poseGood, 'الوضعية') : '')
     + item(smart.tracked, 'تتبّع الوجه') + item(smart.hands, 'تتبّع اليد')
     + `<span class="${smart.locked ? 'ok' : ''}">${smart.locked ? '✓ قفل التعريض' : '• تعويض التعريض'}</span>`;
 }
@@ -1999,7 +2017,7 @@ async function runSpfCam(mode){
     const meas = measureFrame(F.img, pts, rad, gain);
     const motion = {};
     SPF_AR_ZONES.forEach(z => motion[z.key] = prevMeas ? cellMotion(meas[z.key], prevMeas[z.key]) : 0);
-    const still = pose && prevPose ? Math.hypot(pose.cx - prevPose.cx, pose.cy - prevPose.cy) / pose.fw < .012 : true;
+    const still = pose && prevPose ? Math.hypot(pose.cx - prevPose.cx, pose.cy - prevPose.cy) / pose.fw < .025 : true;
     prevMeas = meas; prevPose = pose;
     // hands: which zones a hand point is over, and whether any hand is still near the face
     const hp = performance.now() - F.handT < 500 ? F.hands.flat() : [];
@@ -2115,6 +2133,7 @@ function checkStepper(){
           };
         });
         smart.basePose = poses.length ? avgPose(poses) : null;
+        smart.poseGood = true; buzz([60, 50, 60]);
         smart.zi = 0; renderSmartSteps(); setSmartCtl('check');
       }
       return;
@@ -2148,7 +2167,7 @@ function checkStepper(){
         phase = 'measure';
         const d = fr && fr.pose && smart.basePose ? poseDiff(smart.basePose, fr.pose) : null;
         if(!face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; }
-        else if(d && !poseOk(d)){ hint.textContent = poseHint(d); z.after = []; }
+        else if(d && !poseGate(d)){ hint.textContent = poseHint(d); }   // pause, keep frames already taken
         else if(!fr.q.still){ hint.textContent = `${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} لحظة…`; }
         else {
           hint.textContent = 'جارٍ مقارنة اللون واللمعة مع لقطة "قبل"…';
@@ -2161,9 +2180,11 @@ function checkStepper(){
                 z.retried = true; z.prevCov = res.cov; z.res = res; resetRub(z);
                 const miss = res.cov.filter(v => !v).length;
                 toast(`${miss} نقطة في ${z.name} ما وصلها الواقي — ${t('كمّلي','كمّل')} عليها`);
+                buzz([70, 60, 70]);
               } else { z.status = 'verified'; z.res = res; }
             } else if(res.shiny){ z.status = 'glossy'; z.res = res; }
             else if(z.batches >= 3){ z.status = 'motion'; z.res = res; }
+            if(z.status) buzz(z.status === 'verified' ? 140 : 90);
             else z.after = [];   // the film may still be settling — measure again
           }
         }
@@ -2221,6 +2242,7 @@ function finishSmart(zones){
   save(); refreshSpfForm(); refreshLive();
   $('#spfProg').classList.remove('show');
   toast('✅ تم القياس — هذه خريطة حمايتك الحيّة');
+  buzz([100, 60, 100, 60, 220]);
   return arStepper();
 }
 
@@ -2246,7 +2268,7 @@ function arStepper(){
         if(touchMs[z.key] > 700 && !(cool[z.key] > now)){
           cool[z.key] = now + 4000; touchMs[z.key] = 0;
           L.zones[z.key].rubs = (L.zones[z.key].rubs || 0) + 1; save(); cache = null; refreshLive();
-          toast(`لمست ${z.name} — اللمس يزيل جزءًا من الواقي`);
+          toast(`لمست ${z.name} — اللمس يزيل جزءًا من الواقي`); buzz([40, 40, 40]);
         }
       });
     }
