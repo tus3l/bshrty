@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FBF3EC">
-<title>بشرتي — رفيقك اليومي للعناية بالبشرة</title>
+<title>My skin — your daily skincare companion</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -80,7 +80,7 @@ input,textarea{font:inherit;color:inherit}
 .btn-row .btn{flex:1}
 
 /* stages list */
-.stage{display:flex;align-items:center;gap:12px;width:100%;text-align:right;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:8px}
+.stage{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:8px}
 .stage-num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--rose-pale);color:var(--rose-deep);font-weight:800;flex:none}
 .stage.done .stage-num{background:var(--good-bg);color:var(--good)}
 .stage-body{flex:1;min-width:0}
@@ -99,7 +99,7 @@ textarea.input{min-height:110px;resize:vertical;line-height:1.7}
 .err{color:var(--bad);font-size:13px;margin-top:10px;min-height:1em}
 
 /* quiz */
-.opt{display:block;width:100%;text-align:right;padding:11px 14px;margin-top:8px;border-radius:13px;border:1px solid var(--line);background:#fff}
+.opt{display:block;width:100%;text-align:left;padding:11px 14px;margin-top:8px;border-radius:13px;border:1px solid var(--line);background:#fff}
 .opt b{display:block;font-size:14px;font-weight:600}
 .opt span{font-size:12px;color:var(--muted)}
 .opt.on{border-color:var(--rose);background:var(--rose-pale)}
@@ -140,14 +140,14 @@ textarea.input{min-height:110px;resize:vertical;line-height:1.7}
 .product img{width:48px;height:48px;object-fit:contain;border-radius:8px;background:var(--cream)}
 .product b{display:block;font-size:14px}
 .product span{font-size:12px;color:var(--muted)}
-.result-item{display:block;width:100%;text-align:right;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px}
+.result-item{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px}
 .result-item b{display:block;font-size:13.5px}
 .result-item span{font-size:12px;color:var(--muted)}
-ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
+ul.list{margin:6px 0 0;padding:0 0 0 18px;font-size:13.5px;line-height:1.9}
 .routine{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
 .routine>div{background:var(--cream);border-radius:12px;padding:10px 12px}
 .routine h4{margin:0 0 4px;font-size:13px;color:var(--rose-deep)}
-.routine ol{margin:0;padding-right:18px;font-size:12.5px;line-height:1.8}
+.routine ol{margin:0;padding-left:18px;font-size:12.5px;line-height:1.8}
 @media (max-width:380px){.routine{grid-template-columns:1fr}}
 .zsteps{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
 .zsteps li{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:7px 10px;border-radius:12px;background:var(--cream-deep)}
@@ -157,7 +157,7 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .zsteps .m{margin-inline-start:auto;font-size:12px;color:var(--muted)}
 .prot{display:grid;gap:9px;margin-top:12px}
 .prot-row{display:grid;grid-template-columns:88px 1fr 44px;align-items:center;gap:10px;font-size:13.5px}
-.prot-row b{text-align:left}
+.prot-row b{text-align:right}
 .prot-bar{height:10px;border-radius:999px;background:var(--cream-deep);overflow:hidden}
 .prot-bar i{display:block;height:100%;border-radius:inherit;transition:width .4s}
 .qual{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -169,7 +169,7 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .disclaimer{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.8;margin:18px 6px 0}
 .link-btn{background:none;border:none;color:var(--rose-deep);font-weight:700;font-size:13px;padding:6px 0;text-decoration:underline}
 
-/* بشرتي AI — analysing overlay */
+/* My skin — analysing overlay */
 .ai-overlay{position:fixed;inset:0;z-index:70;background:linear-gradient(180deg,var(--cream),#F6E8DC);display:grid;place-items:center;padding:16px;color:var(--ink);overflow:auto}
 .ai-box{width:100%;max-width:380px;text-align:center}
 .ai-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--rose-pale);color:var(--rose-deep);font-size:12px;font-weight:800;margin-bottom:14px}
@@ -185,7 +185,7 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .ai-caption{margin:0;min-height:1.8em;font-size:14px;color:var(--muted);transition:opacity .25s}
 .ai-caption.fade{opacity:0}
 .ai-box .bar i{transition:width .6s ease}
-.ai-steps{list-style:none;margin:0;padding:12px 14px;text-align:right;font-size:13px;display:grid;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.ai-steps{list-style:none;margin:0;padding:12px 14px;text-align:left;font-size:13px;display:grid;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
 .ai-steps li{display:flex;align-items:center;gap:10px;color:var(--muted);opacity:.6}
 .ai-steps li .st{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);flex:none}
 .ai-steps li.active{color:var(--brown);opacity:1}
@@ -196,7 +196,7 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .ai-err{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;margin:12px 0 0}
 @media (prefers-reduced-motion:reduce){.ai-scan,.ai-dot{animation:none}}
 
-/* بشرتي AI — result card */
+/* My skin — result card */
 .ai-card{border-color:var(--rose-pale);background:linear-gradient(180deg,#FFF8F5,var(--card) 140px)}
 .ai-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .ai-logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--rose),var(--gold))}
@@ -210,7 +210,7 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .ai-type b{display:block;font-size:15.5px;color:var(--brown-deep);margin:2px 0}
 .ai-type p{margin:0 0 6px;font-size:13px;color:var(--muted);line-height:1.7}
 .ai-h{margin:16px 0 4px !important;font-size:14.5px !important}
-.ai-routine{margin:6px 0 0;padding-right:20px;font-size:13.5px;line-height:1.7}
+.ai-routine{margin:6px 0 0;padding-left:20px;font-size:13.5px;line-height:1.7}
 .ai-routine li{margin-bottom:6px}
 .ai-routine b{display:block;font-weight:600}
 .ai-routine span{font-size:12px;color:var(--muted)}
@@ -226,7 +226,16 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 
 /* modal + toast */
 .overlay{position:fixed;inset:0;z-index:50;background:rgba(61,38,32,.45);display:grid;place-items:center;padding:16px}
-.modal{background:var(--card);border-radius:20px;padding:20px;max-width:420px;width:100%;box-shadow:var(--shadow)}
+.modal{background:var(--card);border-radius:20px;padding:20px;max-width:420px;width:100%;box-shadow:var(--shadow);max-height:calc(100vh - 32px);overflow:auto}
+.rep{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:8px}
+.rep .ring{width:48px;height:48px}
+.rep .ring b{width:38px;height:38px;font-size:12.5px}
+.rep-body{flex:1;min-width:0}
+.rep-body b{display:block;font-size:14px}
+.rep-body span{font-size:12px;color:var(--muted)}
+table.rep-t{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+.rep-t th{text-align:left;font-size:11.5px;color:var(--muted);font-weight:700;padding:4px}
+.rep-t td{border-top:1px solid var(--line);padding:7px 4px;vertical-align:top;line-height:1.45}
 .modal h3{margin:2px 0 8px;font-size:17px;color:var(--brown-deep)}
 .modal p{margin:0;font-size:13.5px;line-height:1.8;color:var(--muted)}
 .modal .btn{margin-top:10px}
@@ -238,13 +247,13 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark"><svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M12 3c3.5 3 5.5 6.2 5.5 9.5A5.5 5.5 0 0 1 12 18a5.5 5.5 0 0 1-5.5-5.5C6.5 9.2 8.5 6 12 3Z"/></svg></div>
-      <div><h1>بشرتي</h1><p>رفيقك اليومي للعناية بالبشرة</p></div>
+      <div><h1>My skin</h1><p>Your daily skincare companion</p></div>
     </div>
-    <button class="icon-btn" id="homeBtn" data-act="go" data-v="home" aria-label="الرئيسية"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/></svg></button>
+    <button class="icon-btn" id="homeBtn" data-act="go" data-v="home" aria-label="Home"><svg class="ic" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/></svg></button>
   </header>
   <nav class="rail" id="rail"></nav>
   <main id="main"></main>
-  <p class="disclaimer">بشرتي أداة إرشادية للتوعية بالعناية اليومية بالبشرة ولا تُغني عن استشارة طبيب جلدية، خاصة عند وجود حالات صحية مزمنة. نتائج التحليل بالكاميرا تقريبية وتتأثر بالإضاءة.</p>
+  <p class="disclaimer">My skin is a guidance tool for everyday skincare and does not replace a dermatologist, especially if you have a chronic health condition. Camera results are approximate and depend on lighting.</p>
 </div>
 <nav class="bnav"><div class="bnav-in" id="bnav"></div></nav>
 <div id="modalRoot"></div>
@@ -282,7 +291,7 @@ function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }c
 ========================================================= */
 const $ = (s, r=document) => r.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-// feminine / masculine phrasing — defaults to feminine until a gender is chosen
+// feminine / masculine phrasing (kept for gendered languages; English uses the same text)
 const t = (f, m) => state.gender === 'male' ? m : f;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -297,7 +306,7 @@ const ICONS = {
   camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
   barcode:'<path d="M4 6v12M7 6v12M10 6v12M14 6v12M16 6v12M20 6v12"/>',
   check:'<path d="m5 12 4.5 4.5L19 7"/>',
-  chevron:'<path d="m14 6-6 6 6 6"/>',
+  chevron:'<path d="m10 6 6 6-6 6"/>',
   bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/>',
   upload:'<path d="M12 16V4M7 9l5-5 5 5M5 16v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/>',
   sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>'
@@ -329,11 +338,11 @@ function closeModal(){ $('#modalRoot').innerHTML = ''; }
    STAGES / NAV
 ========================================================= */
 const STAGES = [
-  {key:'medical',    label:'الملف الطبي',       short:'الملف الطبي'},
-  {key:'skintype',   label:'نوع البشرة',        short:'نوع البشرة'},
-  {key:'pore',       label:'مسح المسام',        short:'مسح المسام'},
-  {key:'ingredient', label:'فحص مكونات الكريم', short:'فحص الكريم'},
-  {key:'spf',        label:'واقي الشمس',        short:'واقي الشمس'},
+  {key:'medical',    label:'Medical profile',   short:'Profile'},
+  {key:'skintype',   label:'Skin type',         short:'Skin type'},
+  {key:'pore',       label:'Pore scan',         short:'Pores'},
+  {key:'ingredient', label:'Ingredient check',  short:'Ingredients'},
+  {key:'spf',        label:'Sunscreen',         short:'Sunscreen'},
 ];
 function isDone(key){
   const poreDone = state.pore || (state.poreAI && state.poreAI.report.image_ok);
@@ -355,7 +364,7 @@ function renderChrome(){
   $('#homeBtn').classList.toggle('active', view === 'home');
   $('#rail').innerHTML = STAGES.map((s, i) =>
     `<button class="rail-item${isDone(s.key) ? ' done' : ''}${view === s.key ? ' active' : ''}" data-act="go" data-v="${s.key}"><span class="dot"></span>${i + 1}. ${s.label}</button>`).join('');
-  const navItems = [{key:'home', short:'الرئيسية'}, ...STAGES];
+  const navItems = [{key:'home', short:'Home'}, ...STAGES];
   $('#bnav').innerHTML = navItems.map(s =>
     `<button class="bn${view === s.key ? ' active' : ''}" data-act="go" data-v="${s.key}">${ic(s.key)}<span>${s.short}</span></button>`).join('');
   const active = $('#rail .active');
@@ -366,21 +375,21 @@ function renderChrome(){
    WEATHER / UV
 ========================================================= */
 function uvLevel(uv){
-  if(uv < 3)  return {label:'منخفض', cls:'good', advice:'الخطر منخفض، لكن الواقي يبقى مفيدًا إذا ستبقى في الخارج طويلًا.'};
-  if(uv < 6)  return {label:'متوسط', cls:'warn', advice:`${t('ضعي','ضع')} واقي شمس SPF 30+ قبل الخروج بربع ساعة.`};
-  if(uv < 8)  return {label:'مرتفع', cls:'bad', advice:`واقي SPF 50 و${t('جدّديه','جدّده')} كل ساعتين، مع قبعة ونظارة شمسية.`};
-  if(uv < 11) return {label:'مرتفع جدًا', cls:'bad', advice:`${t('تجنّبي','تجنّب')} الشمس المباشرة من 11 صباحًا حتى 3 عصرًا قدر الإمكان.`};
-  return {label:'شديد', cls:'bad', advice:`${t('ابقي','ابقَ')} في الظل قدر الإمكان، فالبشرة قد تحترق خلال دقائق.`};
+  if(uv < 3)  return {label:'Low', cls:'good', advice:'Low risk, but sunscreen still helps if you will be outside for a long time.'};
+  if(uv < 6)  return {label:'Moderate', cls:'warn', advice:`Apply SPF 30+ sunscreen 15 minutes before going out.`};
+  if(uv < 8)  return {label:'High', cls:'bad', advice:`Use SPF 50 and reapply every 2 hours, with a hat and sunglasses.`};
+  if(uv < 11) return {label:'Very high', cls:'bad', advice:`Avoid direct sun from 11 am to 3 pm as much as you can.`};
+  return {label:'Extreme', cls:'bad', advice:`Stay in the shade as much as you can — skin can burn within minutes.`};
 }
 
 function fetchWeather(){
-  if(!navigator.geolocation){ ui.weather = {status:'error', msg:'المتصفح لا يدعم تحديد الموقع.'}; return refreshWeather(); }
+  if(!navigator.geolocation){ ui.weather = {status:'error', msg:'This browser does not support location.'}; return refreshWeather(); }
   ui.weather = {status:'loading'}; refreshWeather();
   navigator.geolocation.getCurrentPosition(async pos => {
     try{
       const {latitude:la, longitude:lo} = pos.coords;
       const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,uv_index&hourly=uv_index&daily=uv_index_max&timezone=auto&forecast_days=1`;
-      const gUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=ar`;
+      const gUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=en`;
       const [w, g] = await Promise.all([
         fetch(wUrl).then(r => { if(!r.ok) throw new Error('weather'); return r.json(); }),
         fetch(gUrl).then(r => r.ok ? r.json() : null).catch(() => null)
@@ -400,11 +409,11 @@ function fetchWeather(){
         place: g ? (g.city || g.locality || g.principalSubdivision || '') : ''
       };
     }catch(e){
-      ui.weather = {status:'error', msg:'تعذّر جلب بيانات الطقس، حاول مرة أخرى.'};
+      ui.weather = {status:'error', msg:'Could not load weather data, please try again.'};
     }
     refreshWeather();
   }, err => {
-    ui.weather = {status:'error', msg: err.code === 1 ? 'لم يتم منح إذن الوصول للموقع.' : 'تعذّر تحديد موقعك الحالي.'};
+    ui.weather = {status:'error', msg: err.code === 1 ? 'Location permission was not granted.' : 'Could not find your current location.'};
     refreshWeather();
   }, {timeout:15000, maximumAge:600000});
 }
@@ -417,23 +426,23 @@ function refreshWeather(){
 }
 function weatherCard(){
   const w = ui.weather;
-  let body = '<span class="eyebrow">أشعة الشمس الآن</span>';
+  let body = '<span class="eyebrow">UV right now</span>';
   if(w.status === 'ready'){
     const lvl = uvLevel(w.uv);
     body += `
       <div class="uv-row">
         <div class="uv-big">${w.uv}</div>
         <div class="uv-meta"><span class="pill ${lvl.cls}">${lvl.label}</span><br>
-          ${w.temp}° ${w.place ? '· ' + esc(w.place) : ''}${w.max != null ? ` · أعلى اليوم ${w.max}` : ''}</div>
+          ${w.temp}° ${w.place ? '· ' + esc(w.place) : ''}${w.max != null ? ` · today’s peak ${w.max}` : ''}</div>
       </div>
       <p class="sub">${lvl.advice}</p>
-      <div class="btn-row"><button class="btn btn-ghost" data-act="locate">${ic('pin', 'width:16px;height:16px')} تحديث</button></div>`;
+      <div class="btn-row"><button class="btn btn-ghost" data-act="locate">${ic('pin', 'width:16px;height:16px')} Refresh</button></div>`;
   } else {
-    const msg = w.status === 'loading' ? 'جارٍ تحديد موقعك وجلب مؤشر الأشعة…'
+    const msg = w.status === 'loading' ? 'Finding your location and UV index…'
       : w.status === 'error' ? esc(w.msg)
-      : `${t('فعّلي','فعّل')} الموقع لعرض مؤشر الأشعة فوق البنفسجية ودرجة الحرارة في مكانك الحالي.`;
+      : `Turn on location to see the UV index and temperature where you are.`;
     body += `<p class="sub" style="margin:6px 0 4px">${msg}</p>
-      <div class="btn-row"><button class="btn btn-ghost" data-act="locate" ${w.status === 'loading' ? 'disabled' : ''}>${ic('pin', 'width:16px;height:16px')} استخدام موقعي الحالي</button></div>`;
+      <div class="btn-row"><button class="btn btn-ghost" data-act="locate" ${w.status === 'loading' ? 'disabled' : ''}>${ic('pin', 'width:16px;height:16px')} Use my current location</button></div>`;
   }
   return `<div class="card weather" id="weatherCard">${body}</div>`;
 }
@@ -453,8 +462,8 @@ function armReminder(){
 function fireReminder(){
   if(!state.reminder) return;
   state.reminder.fired = true; save();
-  const body = `${t('جدّدي','جدّد')} واقي الشمس الآن، خاصة على الأنف والأذنين والرقبة.`;
-  try{ if('Notification' in window && Notification.permission === 'granted') new Notification('حان وقت تجديد واقي الشمس', {body}); }catch(e){}
+  const body = `Reapply sunscreen now, especially on your nose, ears and neck.`;
+  try{ if('Notification' in window && Notification.permission === 'granted') new Notification('Time to reapply sunscreen', {body}); }catch(e){}
   toast('⏰ ' + body);
   if(view === 'home' || view === 'spf') refreshReminder();
 }
@@ -465,24 +474,24 @@ async function setReminder(mins){
   }
   state.reminder = {dueAt: Date.now() + mins * 60000, fired:false, perm};
   save(); armReminder(); refreshReminder();
-  toast(`سيتم تذكيرك بعد ${mins >= 60 ? (mins / 60) + ' ساعة' : mins + ' دقيقة'}`);
+  toast(`We’ll remind you in ${fmtMins(Math.round(mins))}`);
 }
 function cancelReminder(){ state.reminder = null; save(); clearTimeout(reminderTimer); refreshReminder(); }
 function fmtRemaining(ms){
   const m = Math.max(0, Math.round(ms / 60000));
   const h = Math.floor(m / 60), mm = m % 60;
-  return h ? `${h} س ${mm} د` : `${mm} دقيقة`;
+  return h ? `${h} h ${mm} min` : `${mm} min`;
 }
 function reminderCard(){
   const r = state.reminder;
   if(!r) return '<div id="reminderBox"></div>';
   const inner = r.fired
-    ? `<p class="sub">انتهى الوقت — ${t('جدّدي','جدّد')} واقي الشمس الآن.</p>
-       <div class="btn-row"><button class="btn btn-primary" data-act="remind" data-v="120">${t('جدّدته','جدّدته')}، ذكّرني بعد ساعتين</button><button class="btn btn-outline" data-act="cancelReminder">إيقاف</button></div>`
-    : `<p class="sub">التجديد القادم بعد <b data-countdown>${fmtRemaining(r.dueAt - Date.now())}</b>.
-       ${r.perm !== 'granted' ? 'الإشعارات غير مفعّلة، لذلك سيظهر التذكير داخل الصفحة فقط.' : ''} التذكير يعمل ما دامت الصفحة مفتوحة.</p>
-       <div class="btn-row"><button class="btn btn-outline" data-act="cancelReminder">إلغاء التذكير</button></div>`;
-  return `<div class="card" id="reminderBox"><span class="eyebrow">${ic('bell', 'width:14px;height:14px;vertical-align:-2px')} تذكير واقي الشمس</span>${inner}</div>`;
+    ? `<p class="sub">Time’s up — reapply sunscreen now.</p>
+       <div class="btn-row"><button class="btn btn-primary" data-act="remind" data-v="120">Done — remind me in 2 hours</button><button class="btn btn-outline" data-act="cancelReminder">Stop</button></div>`
+    : `<p class="sub">Next reapplication in <b data-countdown>${fmtRemaining(r.dueAt - Date.now())}</b>.
+       ${r.perm !== 'granted' ? 'Notifications are off, so the reminder will only show inside the page.' : ''} The reminder works while the page is open.</p>
+       <div class="btn-row"><button class="btn btn-outline" data-act="cancelReminder">Cancel reminder</button></div>`;
+  return `<div class="card" id="reminderBox"><span class="eyebrow">${ic('bell', 'width:14px;height:14px;vertical-align:-2px')} Sunscreen reminder</span>${inner}</div>`;
 }
 function refreshReminder(){ const el = $('#reminderBox'); if(el) el.outerHTML = reminderCard(); }
 setInterval(() => {
@@ -495,59 +504,59 @@ setInterval(() => {
    HOME
 ========================================================= */
 const TYPE_INFO = {
-  oily:       {label:'دهنية',  desc:'إفراز زيوت مرتفع ولمعان، خاصة في منطقة T، ومسام أوضح.'},
-  dry:        {label:'جافة',   desc:'إحساس بالشد وقد يظهر تقشر، تحتاج ترطيبًا غنيًا وحماية للحاجز الجلدي.'},
-  combination:{label:'مختلطة', desc:'دهنية في الجبهة والأنف والذقن، وعادية أو جافة على الخدين.'},
-  sensitive:  {label:'حساسة',  desc:'تتهيج أو تحمرّ بسهولة، والأفضل منتجات قليلة المكونات وخالية من العطور.'},
-  normal:     {label:'عادية',  desc:'متوازنة بدون دهنية أو جفاف ملحوظ، تحتاج روتينًا بسيطًا ثابتًا.'},
+  oily:       {label:'Oily',        desc:'High oil and shine, especially in the T-zone, with more visible pores.'},
+  dry:        {label:'Dry',         desc:'Feels tight and may flake; needs rich moisture and barrier care.'},
+  combination:{label:'Combination', desc:'Oily on the forehead, nose and chin; normal or dry on the cheeks.'},
+  sensitive:  {label:'Sensitive',   desc:'Gets irritated or red easily; short, fragrance-free ingredient lists work best.'},
+  normal:     {label:'Normal',      desc:'Balanced, without noticeable oiliness or dryness; a simple, steady routine works.'},
 };
 function routineFor(type){
-  const preg = state.medical && state.medical.conditions.includes('الحمل أو الرضاعة');
+  const preg = state.medical && state.medical.conditions.includes('Pregnancy or breastfeeding');
   const R = {
-    oily:{am:['غسول جل لطيف','سيروم نياسيناميد','مرطب خفيف خالٍ من الزيوت','واقي شمس SPF 30+ بقوام خفيف'],
-          pm:['غسول جل','حمض الساليسيليك 2–3 مرات أسبوعيًا','مرطب خفيف']},
-    dry:{am:['غسول كريمي بدون سلفات','هيالورونيك على بشرة رطبة','مرطب غني بالسيراميد','واقي شمس SPF 30+ مرطب'],
-         pm:['غسول كريمي','مرطب غني أو بلسم ليلي','ماء فاتر بدل الساخن']},
-    combination:{am:['غسول لطيف','نياسيناميد','مرطب خفيف للمنطقة الوسطى','واقي شمس SPF 30+'],
-                 pm:['غسول لطيف','ساليسيليك لمنطقة T مرتين أسبوعيًا','مرطب أغنى للخدين']},
-    sensitive:{am:['غسول خالٍ من العطور','مرطب بمكونات قليلة (سيراميد، بانثينول)','واقي شمس معدني (أكسيد الزنك)'],
-               pm:['غسول لطيف','مرطب مهدئ',`${t('جرّبي','جرّب')} أي منتج جديد على منطقة صغيرة 48 ساعة`]},
-    normal:{am:['غسول لطيف','مضاد أكسدة مثل فيتامين C','مرطب خفيف','واقي شمس SPF 30+'],
-            pm:['غسول لطيف','مرطب', preg ? 'تجنّب الريتينول خلال الحمل والرضاعة' : 'ريتينول بتركيز منخفض (اختياري)']},
+    oily:{am:['Gentle gel cleanser','Niacinamide serum','Light oil-free moisturiser','Lightweight SPF 30+ sunscreen'],
+          pm:['Gel cleanser','Salicylic acid 2–3 times a week','Light moisturiser']},
+    dry:{am:['Sulfate-free cream cleanser','Hyaluronic acid on damp skin','Ceramide-rich moisturiser','Moisturising SPF 30+ sunscreen'],
+         pm:['Cream cleanser','Rich moisturiser or night balm','Lukewarm water instead of hot']},
+    combination:{am:['Gentle cleanser','Niacinamide','Light moisturiser for the T-zone','SPF 30+ sunscreen'],
+                 pm:['Gentle cleanser','Salicylic acid on the T-zone twice a week','Richer moisturiser for the cheeks']},
+    sensitive:{am:['Fragrance-free cleanser','Moisturiser with few ingredients (ceramides, panthenol)','Mineral sunscreen (zinc oxide)'],
+               pm:['Gentle cleanser','Soothing moisturiser','Patch-test any new product on a small area for 48 hours']},
+    normal:{am:['Gentle cleanser','Antioxidant such as vitamin C','Light moisturiser','SPF 30+ sunscreen'],
+            pm:['Gentle cleanser','Moisturiser', preg ? 'Avoid retinol while pregnant or breastfeeding' : 'Low-strength retinol (optional)']},
   };
   return R[type];
 }
 
 function stageStatus(key){
-  if(key === 'medical' && state.medical) return `العمر ${state.medical.age} · ${state.medical.conditions.join('، ') || 'لا يوجد'}`;
-  if(key === 'skintype' && state.skinType) return `بشرة ${state.skinType.label}`;
-  if(key === 'pore' && state.poreAI && state.poreAI.report.image_ok) return 'بشرتي AI · ' + esc(state.poreAI.report.pore_type);
+  if(key === 'medical' && state.medical) return `Age ${state.medical.age} · ${state.medical.conditions.join(', ') || 'None'}`;
+  if(key === 'skintype' && state.skinType) return `${state.skinType.label} skin`;
+  if(key === 'pore' && state.poreAI && state.poreAI.report.image_ok) return 'My skin · ' + esc(state.poreAI.report.pore_type);
   if(key === 'pore' && state.pore) return poreOverall(state.pore).text;
-  if(key === 'ingredient' && state.ingredient) return `${state.ingredient.productName ? esc(state.ingredient.productName) + ' · ' : ''}${state.ingredient.flags.length ? state.ingredient.score + '/100' : 'غير محدد'}`;
-  if(key === 'spf' && state.spf) return `تغطية ${state.spf.coverage}%`;
-  return 'لم تبدأ بعد';
+  if(key === 'ingredient' && state.ingredient) return `${state.ingredient.productName ? esc(state.ingredient.productName) + ' · ' : ''}${state.ingredient.flags.length ? state.ingredient.score + '/100' : 'Unrated'}`;
+  if(key === 'spf' && state.spf) return `Coverage ${state.spf.coverage}%`;
+  return 'Not started yet';
 }
 
 function summaryLines(){
   const L = [];
   const m = state.medical;
   if(m && m.risky && m.risky.length && m.supervised === false)
-    L.push(`<li>لديك ${esc(m.risky.join('، '))} بدون متابعة طبية حالية — ننصح بمراجعة طبيب جلدية قبل استخدام منتجات علاجية.</li>`);
-  if(m && m.conditions.includes('الحمل أو الرضاعة'))
-    L.push('<li>بسبب الحمل أو الرضاعة: تجنّب الريتينويدات والهيدروكينون.</li>');
-  if(state.skinType) L.push(`<li>بشرتك <b>${state.skinType.label}</b>: ${TYPE_INFO[state.skinType.raw].desc}</li>`);
+    L.push(`<li>You have ${esc(m.risky.join(', '))} without current medical follow-up — we recommend seeing a dermatologist before using treatment products.</li>`);
+  if(m && m.conditions.includes('Pregnancy or breastfeeding'))
+    L.push('<li>Because of pregnancy or breastfeeding: avoid retinoids and hydroquinone.</li>');
+  if(state.skinType) L.push(`<li>Your skin is <b>${state.skinType.label}</b>: ${TYPE_INFO[state.skinType.raw].desc}</li>`);
   if(state.poreAI && state.poreAI.report.image_ok){
     const r = state.poreAI.report;
-    L.push(`<li><b>بشرتي AI:</b> ${esc(r.pore_type)}${r.key_findings[0] ? ' — ' + esc(r.key_findings[0]) : ''}</li>`);
-    if(r.see_doctor) L.push(`<li>ننصح بمراجعة طبيب جلدية: ${esc(r.doctor_reason)}</li>`);
+    L.push(`<li><b>My skin:</b> ${esc(r.pore_type)}${r.key_findings[0] ? ' — ' + esc(r.key_findings[0]) : ''}</li>`);
+    if(r.see_doctor) L.push(`<li>We recommend seeing a dermatologist: ${esc(r.doctor_reason)}</li>`);
   } else if(state.pore){
     const bad = state.pore.zones.filter(z => z.cls === 'bad').map(z => z.name);
-    L.push(`<li>${bad.length ? `لمعان واضح في: ${bad.join('، ')} — ركّز عليها بالغسول ومنتجات تنظيم الزيوت.` : 'المسح لم يُظهر لمعانًا زيتيًا مرتفعًا.'}</li>`);
+    L.push(`<li>${bad.length ? `Clear shine on: ${bad.join(', ')} — focus your cleanser and oil-control products there.` : 'The scan showed no strong oily shine.'}</li>`);
   }
-  if(state.ingredient) L.push(`<li>آخر منتج فحصته: ${state.ingredient.productName ? esc(state.ingredient.productName) + ' — ' : ''}${esc(state.ingredient.verdict.text)}</li>`);
+  if(state.ingredient) L.push(`<li>Last product checked: ${state.ingredient.productName ? esc(state.ingredient.productName) + ' — ' : ''}${esc(state.ingredient.verdict.text)}</li>`);
   if(state.spf){
     const miss = state.spf.missed;
-    L.push(`<li>تغطية الواقي ${state.spf.coverage}%${miss.length ? ` — لا ${t('تنسي','تنسَ')}: ${miss.join('، ')}` : ''}.</li>`);
+    L.push(`<li>Sunscreen coverage ${state.spf.coverage}%${miss.length ? ` — don’t forget: ${miss.join(', ')}` : ''}.</li>`);
   }
   return L;
 }
@@ -560,83 +569,83 @@ function viewHome(){
     ${weatherCard()}
     ${reminderCard()}
     <div class="card">
-      <span class="eyebrow">ملخص بشرتك</span>
-      <h2>نظرة سريعة</h2>
+      <span class="eyebrow">Your skin summary</span>
+      <h2>At a glance</h2>
       ${lines.length ? `<ul class="list">${lines.join('')}</ul>`
-        : `<p class="sub">لم يتم إكمال الملف الطبي ولا اختبار نوع البشرة بعد. ${t('ابدئي','ابدأ')} بالمرحلة الأولى للحصول على توصيات دقيقة.</p>`}
+        : `<p class="sub">You haven’t completed the medical profile or the skin type quiz yet. Start with step 1 to get accurate recommendations.</p>`}
     </div>
     ${routine ? `
     <div class="card">
-      <span class="eyebrow">روتينك المقترح</span>
-      <h2>روتين بشرة ${state.skinType.label}</h2>
+      <span class="eyebrow">Your suggested routine</span>
+      <h2>${state.skinType.label} skin routine</h2>
       <div class="routine">
-        <div><h4>الصباح</h4><ol>${routine.am.map(x => `<li>${x}</li>`).join('')}</ol></div>
-        <div><h4>المساء</h4><ol>${routine.pm.map(x => `<li>${x}</li>`).join('')}</ol></div>
+        <div><h4>Morning</h4><ol>${routine.am.map(x => `<li>${x}</li>`).join('')}</ol></div>
+        <div><h4>Evening</h4><ol>${routine.pm.map(x => `<li>${x}</li>`).join('')}</ol></div>
       </div>
     </div>` : ''}
     <div class="card">
-      <span class="eyebrow">المراحل الخمس · ${done} من 5</span>
-      <h2>رحلتك مع بشرتك</h2>
-      <p class="sub">${t('أكملي','أكمل')} كل مرحلة للحصول على تحليل شامل ومخصص لبشرتك.</p>
+      <span class="eyebrow">Five steps · ${done} of 5</span>
+      <h2>Your skin journey</h2>
+      <p class="sub">Complete each step for a full analysis tailored to your skin.</p>
       ${STAGES.map((s, i) => `
         <button class="stage${isDone(s.key) ? ' done' : ''}" data-act="go" data-v="${s.key}">
           <span class="stage-num">${isDone(s.key) ? ic('check', 'width:16px;height:16px') : i + 1}</span>
           <span class="stage-body"><b>${s.label}</b><span>${stageStatus(s.key)}</span></span>
           ${ic('chevron', 'color:var(--muted)')}
         </button>`).join('')}
-      ${done ? `<button class="link-btn" data-act="reset">مسح كل بياناتي</button>` : ''}
+      ${done ? `<button class="link-btn" data-act="reset">Delete all my data</button>` : ''}
     </div>`;
 }
 
 /* =========================================================
    STAGE 1 — MEDICAL PROFILE
 ========================================================= */
-const CONDITIONS = ['السكري','ارتفاع ضغط الدم','حساسية جلدية معروفة','الأكزيما','الصدفية','الوردية','حب الشباب الهرموني','الحمل أو الرضاعة','لا يوجد'];
-const RISKY = ['الأكزيما','الصدفية','الوردية','حب الشباب الهرموني'];
-const SUN = [{v:'low', t:'قليل (معظم الوقت داخل المباني)'}, {v:'mid', t:'متوسط (ساعة إلى ساعتين يوميًا)'}, {v:'high', t:'كثير (عمل أو رياضة في الخارج)'}];
+const CONDITIONS = ['Diabetes','High blood pressure','Known skin allergy','Eczema','Psoriasis','Rosacea','Hormonal acne','Pregnancy or breastfeeding','None'];
+const RISKY = ['Eczema','Psoriasis','Rosacea','Hormonal acne'];
+const SUN = [{v:'low', t:'Low (mostly indoors)'}, {v:'mid', t:'Moderate (1–2 hours a day)'}, {v:'high', t:'High (outdoor work or sport)'}];
 
 function viewMedical(){
   if(!ui.medical) ui.medical = state.medical
     ? JSON.parse(JSON.stringify(state.medical))
     : {gender:state.gender, age:'', conditions:[], meds:'', allergies:'', sun:null};
   const m = ui.medical;
-  const conds = CONDITIONS.filter(c => !(c === 'الحمل أو الرضاعة' && m.gender === 'male'));
+  const conds = CONDITIONS.filter(c => !(c === 'Pregnancy or breastfeeding' && m.gender === 'male'));
   return `
     <div class="card">
-      <span class="eyebrow">المرحلة 1 من 5</span>
-      <h2>الملف الطبي</h2>
-      <p class="sub">معلوماتك تبقى على جهازك فقط، وتساعدنا على تخصيص التوصيات وتنبيهك للمكونات غير المناسبة.</p>
+      <span class="eyebrow">Step 1 of 5</span>
+      <h2>Medical profile</h2>
+      <p class="sub">Your information stays on your device only. It helps us tailor recommendations and flag unsuitable ingredients.</p>
     </div>
     <div class="card">
       <div class="field" style="margin-top:0">
-        <span class="field-label">الجنس</span>
+        <span class="field-label">Sex</span>
         <div class="chips">
-          <button class="chip${m.gender === 'female' ? ' on' : ''}" data-act="gender" data-v="female">أنثى</button>
-          <button class="chip${m.gender === 'male' ? ' on' : ''}" data-act="gender" data-v="male">ذكر</button>
+          <button class="chip${m.gender === 'female' ? ' on' : ''}" data-act="gender" data-v="female">Female</button>
+          <button class="chip${m.gender === 'male' ? ' on' : ''}" data-act="gender" data-v="male">Male</button>
         </div>
       </div>
       <div class="field">
-        <label for="age">العمر</label>
-        <input class="input" id="age" type="number" inputmode="numeric" min="10" max="100" placeholder="مثال: 26" value="${esc(m.age)}" data-field="age">
+        <label for="age">Age</label>
+        <input class="input" id="age" type="number" inputmode="numeric" min="10" max="100" placeholder="e.g. 26" value="${esc(m.age)}" data-field="age">
       </div>
       <div class="field">
-        <span class="field-label">هل لديك أي من الحالات التالية؟</span>
+        <span class="field-label">Do you have any of these conditions?</span>
         <div class="chips">${conds.map(c => `<button class="chip${m.conditions.includes(c) ? ' on' : ''}" data-act="cond" data-v="${c}">${c}</button>`).join('')}</div>
       </div>
       <div class="field">
-        <label for="meds">أدوية تستخدمها حاليًا (اختياري)</label>
-        <input class="input" id="meds" placeholder="مثال: إيزوتريتينوين، مضاد حيوي…" value="${esc(m.meds)}" data-field="meds">
+        <label for="meds">Medications you currently take (optional)</label>
+        <input class="input" id="meds" placeholder="e.g. isotretinoin, an antibiotic…" value="${esc(m.meds)}" data-field="meds">
       </div>
       <div class="field">
-        <label for="allergies">حساسية من مكونات معيّنة (اختياري)</label>
-        <input class="input" id="allergies" placeholder="مثال: العطور، اللانولين…" value="${esc(m.allergies)}" data-field="allergies">
+        <label for="allergies">Allergies to specific ingredients (optional)</label>
+        <input class="input" id="allergies" placeholder="e.g. fragrance, lanolin…" value="${esc(m.allergies)}" data-field="allergies">
       </div>
       <div class="field">
-        <span class="field-label">كم تتعرض للشمس عادة؟</span>
+        <span class="field-label">How much sun do you usually get?</span>
         <div class="chips">${SUN.map(s => `<button class="chip${m.sun === s.v ? ' on' : ''}" data-act="sun" data-v="${s.v}">${s.t}</button>`).join('')}</div>
       </div>
       <div class="err" id="medErr"></div>
-      <div class="btn-row"><button class="btn btn-primary" data-act="saveMedical">حفظ والمتابعة</button></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="saveMedical">Save and continue</button></div>
     </div>`;
 }
 function rerenderKeepScroll(){ const y = window.scrollY; render(); window.scrollTo(0, y); }
@@ -645,17 +654,17 @@ function saveMedical(){
   const m = ui.medical;
   const age = parseInt(m.age, 10);
   const err = $('#medErr');
-  if(!m.gender){ err.textContent = 'اختر الجنس أولًا.'; return; }
-  if(!(age >= 10 && age <= 100)){ err.textContent = 'أدخل عمرًا صحيحًا بين 10 و100.'; return; }
-  if(!m.conditions.length){ err.textContent = 'اختر حالة واحدة على الأقل، أو "لا يوجد".'; return; }
+  if(!m.gender){ err.textContent = 'Choose your sex first.'; return; }
+  if(!(age >= 10 && age <= 100)){ err.textContent = 'Enter a valid age between 10 and 100.'; return; }
+  if(!m.conditions.length){ err.textContent = 'Choose at least one condition, or "None".'; return; }
   const risky = m.conditions.filter(c => RISKY.includes(c));
   if(risky.length){
     modal(`
-      <span class="eyebrow" style="color:var(--bad)">تنبيه قبل المتابعة</span>
-      <h3>حالة تحتاج إشراف طبي</h3>
-      <p>${t('اخترتِ','اخترتَ')} "${risky.join('، ')}". توصيات بشرتي عامة وقد لا تناسب هذه الحالة دون متابعة طبية. هل ${t('أنتِ','أنتَ')} حاليًا تحت إشراف طبيب مختص بخصوصها؟</p>
-      <button class="btn btn-primary" data-act="gate" data-v="yes">نعم، لدي إشراف طبي</button>
-      <button class="btn btn-outline" data-act="gate" data-v="no">لا، ليس لدي إشراف حاليًا</button>`);
+      <span class="eyebrow" style="color:var(--bad)">Before you continue</span>
+      <h3>A condition that needs medical supervision</h3>
+      <p>You selected "${risky.join(', ')}". My skin’s recommendations are general and may not suit this condition without medical follow-up. Are you currently under a specialist’s care for it?</p>
+      <button class="btn btn-primary" data-act="gate" data-v="yes">Yes, I’m under medical care</button>
+      <button class="btn btn-outline" data-act="gate" data-v="no">No, not right now</button>`);
     return;
   }
   commitMedical(null);
@@ -666,7 +675,7 @@ function commitMedical(supervised){
   state.gender = m.gender;
   ui.medical = null;
   save(); closeModal();
-  if(supervised === false) toast('ننصح بمراجعة طبيب جلدية — سنكمل بتوصيات عامة.');
+  if(supervised === false) toast('We recommend seeing a dermatologist — we’ll continue with general advice.');
   goTo('skintype');
 }
 
@@ -674,31 +683,31 @@ function commitMedical(supervised){
    STAGE 2 — SKIN TYPE QUIZ
 ========================================================= */
 const SKIN_Q = [
-  {id:'q1', text:'كيف تشعر بشرتك بعد الغسل بساعتين دون وضع أي منتج؟', opts:[
-    {v:'oily', t:'لامعة ودهنية خاصة في الجبهة والأنف', s:'إفراز زيوت ملحوظ'},
-    {v:'dry', t:'مشدودة وتميل للجفاف', s:'إحساس بالضيق أو التقشر'},
-    {v:'combination', t:'دهنية في المنطقة الوسطى وجافة عند الخدين', s:'اختلاف بين مناطق الوجه'},
-    {v:'normal', t:'متوازنة ومرتاحة', s:'لا دهنية ولا جفاف ملحوظ'}]},
-  {id:'q2', text:'هل تظهر لديك حبوب أو مسام واسعة بشكل متكرر؟', opts:[
-    {v:'oily', t:'نعم، بشكل متكرر'},
-    {v:'combination', t:'أحيانًا في منطقة T فقط'},
-    {v:'sensitive', t:'نادرًا، لكن بشرتي تتهيج بسهولة'},
-    {v:'normal', t:'نادرًا جدًا'}]},
-  {id:'q3', text:'كيف تتفاعل بشرتك مع منتجات جديدة؟', opts:[
-    {v:'sensitive', t:'تحمرّ أو تتهيج بسرعة', s:'حساسية واضحة تجاه المكونات'},
-    {v:'dry', t:'تتقشر أحيانًا مع بعض المنتجات'},
-    {v:'normal', t:'تتقبل معظم المنتجات دون مشاكل'},
-    {v:'oily', t:'لا تتأثر كثيرًا لكنها تلمع بسرعة'}]},
-  {id:'q4', text:'كيف تبدو بشرتك في نهاية اليوم؟', opts:[
-    {v:'oily', t:'لامعة في كامل الوجه'},
-    {v:'combination', t:'لامعة في الجبهة والأنف فقط'},
-    {v:'dry', t:'باهتة أو متقشرة'},
-    {v:'normal', t:'كما هي في الصباح تقريبًا'}]},
-  {id:'q5', text:'ماذا يحدث لبشرتك مع الحرارة أو الشمس؟', opts:[
-    {v:'sensitive', t:'احمرار أو حكة أو حرقان'},
-    {v:'dry', t:'تزداد جفافًا وشدًّا'},
-    {v:'oily', t:'تزداد اللمعة والدهون'},
-    {v:'normal', t:'لا تتغير كثيرًا'}]},
+  {id:'q1', text:'How does your skin feel two hours after washing, with no products on?', opts:[
+    {v:'oily', t:'Shiny and oily, especially on the forehead and nose', s:'Noticeable oil'},
+    {v:'dry', t:'Tight and on the dry side', s:'Feels tight or flaky'},
+    {v:'combination', t:'Oily in the T-zone and dry on the cheeks', s:'Different across the face'},
+    {v:'normal', t:'Balanced and comfortable', s:'Neither oily nor dry'}]},
+  {id:'q2', text:'Do you often get breakouts or enlarged pores?', opts:[
+    {v:'oily', t:'Yes, often'},
+    {v:'combination', t:'Sometimes, only in the T-zone'},
+    {v:'sensitive', t:'Rarely, but my skin gets irritated easily'},
+    {v:'normal', t:'Very rarely'}]},
+  {id:'q3', text:'How does your skin react to new products?', opts:[
+    {v:'sensitive', t:'Turns red or irritated quickly', s:'Clearly reactive to ingredients'},
+    {v:'dry', t:'Sometimes flakes with certain products'},
+    {v:'normal', t:'Handles most products without problems'},
+    {v:'oily', t:'Barely reacts, but gets shiny fast'}]},
+  {id:'q4', text:'How does your skin look at the end of the day?', opts:[
+    {v:'oily', t:'Shiny all over'},
+    {v:'combination', t:'Shiny on the forehead and nose only'},
+    {v:'dry', t:'Dull or flaky'},
+    {v:'normal', t:'About the same as in the morning'}]},
+  {id:'q5', text:'What happens to your skin in heat or sun?', opts:[
+    {v:'sensitive', t:'Redness, itching or burning'},
+    {v:'dry', t:'Gets drier and tighter'},
+    {v:'oily', t:'Gets shinier and oilier'},
+    {v:'normal', t:'Doesn’t change much'}]},
 ];
 function computeSkinType(ans){
   const tally = {};
@@ -712,24 +721,24 @@ function viewSkin(){
   const answered = SKIN_Q.filter(q => a[q.id]).length;
   return `
     <div class="card">
-      <span class="eyebrow">المرحلة 2 من 5</span>
-      <h2>اختبار نوع البشرة</h2>
-      <p class="sub">${t('أجيبي','أجب')} عن ${SKIN_Q.length} أسئلة قصيرة لتحديد نوع بشرتك.</p>
-      ${state.skinType ? `<div class="verdict good" style="margin-top:10px">نتيجتك الحالية: بشرة ${state.skinType.label}</div>` : ''}
+      <span class="eyebrow">Step 2 of 5</span>
+      <h2>Skin type quiz</h2>
+      <p class="sub">Answer ${SKIN_Q.length} short questions to find your skin type.</p>
+      ${state.skinType ? `<div class="verdict good" style="margin-top:10px">Your current result: ${state.skinType.label} skin</div>` : ''}
     </div>
     ${SKIN_Q.map((q, i) => `
       <div class="card">
-        <span class="eyebrow">سؤال ${i + 1}</span>
+        <span class="eyebrow">Question ${i + 1}</span>
         <h3>${q.text}</h3>
         ${q.opts.map(o => `<button class="opt${a[q.id] === o.v ? ' on' : ''}" data-act="answer" data-q="${q.id}" data-v="${o.v}"><b>${o.t}</b>${o.s ? `<span>${o.s}</span>` : ''}</button>`).join('')}
       </div>`).join('')}
-    <button class="btn btn-primary" data-act="saveSkin" ${answered < SKIN_Q.length ? 'disabled' : ''}>${answered < SKIN_Q.length ? `أجبت ${answered} من ${SKIN_Q.length}` : 'اعرض النتيجة والمتابعة'}</button>`;
+    <button class="btn btn-primary" data-act="saveSkin" ${answered < SKIN_Q.length ? 'disabled' : ''}>${answered < SKIN_Q.length ? `Answered ${answered} of ${SKIN_Q.length}` : 'Show result and continue'}</button>`;
 }
 function saveSkin(){
   const raw = computeSkinType(ui.skin);
   state.skinType = {raw, label: TYPE_INFO[raw].label, answers:{...ui.skin}};
   ui.skin = null; save();
-  toast(`نوع بشرتك: ${TYPE_INFO[raw].label}`);
+  toast(`Your skin type: ${TYPE_INFO[raw].label}`);
   goTo('pore');
 }
 
@@ -757,7 +766,7 @@ function stopCamera(){
   const pa = $('#poreActions'); if(pa) pa.innerHTML = poreActionsHtml('idle');
   const ph = $('#poreHint'); if(ph) ph.textContent = '';
   const pp = $('#poreProg'); if(pp) pp.classList.remove('show');
-  const bb = $('#bcBtn'); if(bb) bb.textContent = 'تشغيل الماسح';
+  const bb = $('#bcBtn'); if(bb) bb.textContent = 'Start scanner';
   if(smart.mode !== 'idle'){
     smart.mode = 'idle'; smart.zones = null; smart.zi = -2; smart.manual = false;
     const sh = $('#spfHint'); if(sh) sh.textContent = '';
@@ -769,21 +778,21 @@ function stopCamera(){
   }
 }
 function camErrorText(e){
-  if(e && e.name === 'NotAllowedError') return `تم رفض إذن الكاميرا. ${t('اسمحي','اسمح')} بالوصول من إعدادات المتصفح ثم ${t('أعيدي','أعد')} المحاولة.`;
-  if(e && (e.name === 'NotFoundError' || e.name === 'OverconstrainedError')) return 'لم يتم العثور على كاميرا مناسبة في هذا الجهاز.';
-  if(e && e.name === 'NotSupportedError') return 'المتصفح لا يدعم الكاميرا. افتح الموقع عبر https في متصفح حديث.';
-  return 'تعذّر تشغيل الكاميرا. أغلق أي تطبيق آخر يستخدمها ثم حاول مجددًا.';
+  if(e && e.name === 'NotAllowedError') return `Camera permission was denied. Allow access in your browser settings, then try again.`;
+  if(e && (e.name === 'NotFoundError' || e.name === 'OverconstrainedError')) return 'No suitable camera was found on this device.';
+  if(e && e.name === 'NotSupportedError') return 'This browser does not support the camera. Open the site over https in a modern browser.';
+  return 'Could not start the camera. Close any other app using it and try again.';
 }
 
 /* =========================================================
    STAGE 3 — PORE / SHINE SCAN (MediaPipe Face Mesh + pixel sampling)
 ========================================================= */
 const PORE_ZONES = [
-  {key:'forehead', name:'الجبهة',       lm:151, hint:() => `${t('ابقي','ابقَ')} ثابتًا ${t('وانظري','وانظر')} للكاميرا — جارٍ فحص الجبهة`},
-  {key:'nose',     name:'الأنف',        lm:5,   hint:() => 'جارٍ فحص الأنف'},
-  {key:'cheekR',   name:'الخدّ الأيمن', lm:50,  hint:() => `${t('لفّي','لفّ')} رأسك قليلًا نحو اليسار — جارٍ فحص الخدّ الأيمن`},
-  {key:'cheekL',   name:'الخدّ الأيسر', lm:280, hint:() => `${t('لفّي','لفّ')} رأسك قليلًا نحو اليمين — جارٍ فحص الخدّ الأيسر`},
-  {key:'chin',     name:'الذقن',        lm:199, hint:() => `${t('ارفعي','ارفع')} ذقنك قليلًا — جارٍ فحص الذقن`},
+  {key:'forehead', name:'Forehead',     lm:151, hint:() => `Hold still and look at the camera — checking your forehead`},
+  {key:'nose',     name:'Nose',         lm:5,   hint:() => 'Checking your nose'},
+  {key:'cheekR',   name:'Right cheek',  lm:50,  hint:() => `Turn your head slightly to the left — checking your right cheek`},
+  {key:'cheekL',   name:'Left cheek',   lm:280, hint:() => `Turn your head slightly to the right — checking your left cheek`},
+  {key:'chin',     name:'Chin',         lm:199, hint:() => `Lift your chin slightly — checking your chin`},
 ];
 // used when the face-tracking model cannot load: fixed spots inside the on-screen oval (unmirrored image coords)
 const FALLBACK_POINTS = {forehead:{x:.5,y:.3}, nose:{x:.5,y:.5}, cheekR:{x:.37,y:.56}, cheekL:{x:.63,y:.56}, chin:{x:.5,y:.74}, r:.035};
@@ -832,64 +841,64 @@ function samplePatch(ctx, cx, cy, rad){
   return {mean, shine: hi / n};
 }
 function classifyShine(s){
-  if(s > 0.09)  return {cls:'bad',  color:'#B5544A', note:'لمعان زيتي واضح'};
-  if(s > 0.03)  return {cls:'warn', color:'#C9773B', note:'لمعان متوسط، تحتاج عناية'};
-  return {cls:'good', color:'#5E8F58', note:'سطح متوازن بدون لمعان زائد'};
+  if(s > 0.09)  return {cls:'bad',  color:'#B5544A', note:'Clear oily shine'};
+  if(s > 0.03)  return {cls:'warn', color:'#C9773B', note:'Moderate shine, needs care'};
+  return {cls:'good', color:'#5E8F58', note:'Balanced surface, no excess shine'};
 }
 function poreOverall(p){
   const bad = p.zones.filter(z => z.cls === 'bad').length, warn = p.zones.filter(z => z.cls === 'warn').length;
-  if(bad >= 2) return {cls:'bad', text:'نشاط زيوت مرتفع'};
-  if(bad || warn >= 2) return {cls:'warn', text:'لمعان متوسط في بعض المناطق'};
-  return {cls:'good', text:'بشرة متوازنة'};
+  if(bad >= 2) return {cls:'bad', text:'High oil activity'};
+  if(bad || warn >= 2) return {cls:'warn', text:'Moderate shine in some areas'};
+  return {cls:'good', text:'Balanced skin'};
 }
 
 function viewPore(){
   return `
     <div class="card">
-      <span class="eyebrow">المرحلة 3 من 5</span>
-      <h2>تحليل المسام بالذكاء الاصطناعي</h2>
-      <p class="sub">${t('التقطي','التقط')} صورة لوجهك أو ${t('ارفعيها','ارفعها')}، وسيحللها بشرتي AI مع ملفك الطبي ونوع بشرتك ويكتب لك تقريرًا مفصّلًا.</p>
+      <span class="eyebrow">Step 3 of 5</span>
+      <h2>AI pore analysis</h2>
+      <p class="sub">Take or upload a photo of your face. My skin analyses it together with your medical profile and skin type and writes you a detailed report.</p>
       <ul class="list small" style="margin-top:6px">
-        <li>بدون مكياج أو فلتر، وبعد غسل الوجه بساعة على الأقل.</li>
-        <li>ضوء نهار من الأمام، بدون فلاش.</li>
-        <li>الوجه قريب ويملأ الإطار، والكاميرا ثابتة.</li>
+        <li>No makeup or filters, at least an hour after washing your face.</li>
+        <li>Daylight from the front, no flash.</li>
+        <li>Face close and filling the frame, camera steady.</li>
       </ul>
-      ${!state.medical || !state.skinType ? `<div class="notice">لتحليل أدق ${t('أكملي','أكمل')} الملف الطبي ونوع البشرة أولًا — سيتم إرسالهما مع الصورة.</div>` : ''}
+      ${!state.medical || !state.skinType ? `<div class="notice">For a more accurate analysis, complete the medical profile and skin type first — they are sent along with the photo.</div>` : ''}
     </div>
     <div class="card">
       <div class="cam mirror" id="poreCam">
         <video id="poreVideo" playsinline muted></video>
         <canvas id="poreCanvas"></canvas>
-        <div class="cam-ph" id="porePh">${ic('camera', 'width:34px;height:34px')}<span>${t('افتحي','افتح')} الكاميرا ${t('والتقطي','والتقط')} صورة، أو ${t('ارفعي','ارفع')} صورة من جهازك.</span></div>
+        <div class="cam-ph" id="porePh">${ic('camera', 'width:34px;height:34px')}<span>Open the camera and take a photo, or upload one from your device.</span></div>
         <div class="cam-hint" id="poreHint"></div>
       </div>
       <div class="progress" id="poreProg"><div class="bar"><i id="poreFill"></i></div><span id="poreTxt"></span></div>
       <div id="poreActions">${poreActionsHtml('idle')}</div>
       <input type="file" id="poreFile" accept="image/*" hidden>
-      <button class="link-btn" id="poreBtn" data-act="startPore">أو جرّب مسح اللمعان المباشر (بدون AI)</button>
+      <button class="link-btn" id="poreBtn" data-act="startPore">Or try the live shine scan (no AI)</button>
     </div>
     <div id="poreResult">${state.poreAI ? aiResultHtml() : ''}${state.pore ? poreResultHtml() : ''}</div>`;
 }
 function poreActionsHtml(mode){
   if(mode === 'live') return `<div class="btn-row">
-      <button class="btn btn-primary" data-act="snap">${ic('camera', 'width:18px;height:18px')} التقاط الآن</button>
-      <button class="btn btn-outline" data-act="cancelCam" style="flex:.5">إلغاء</button></div>`;
+      <button class="btn btn-primary" data-act="snap">${ic('camera', 'width:18px;height:18px')} Capture now</button>
+      <button class="btn btn-outline" data-act="cancelCam" style="flex:.5">Cancel</button></div>`;
   return `<div class="btn-row">
-      <button class="btn btn-primary" data-act="openCam">${ic('camera', 'width:18px;height:18px')} التقط صورة</button>
-      <button class="btn btn-dark" data-act="upload">${ic('upload', 'width:18px;height:18px')} ارفع صورة</button></div>`;
+      <button class="btn btn-primary" data-act="openCam">${ic('camera', 'width:18px;height:18px')} Take a photo</button>
+      <button class="btn btn-dark" data-act="upload">${ic('upload', 'width:18px;height:18px')} Upload a photo</button></div>`;
 }
 
-/* ---------------- بشرتي AI: capture / upload ---------------- */
+/* ---------------- My skin: capture / upload ---------------- */
 async function openCaptureCam(){
   stopCamera();
   const token = session.token;
   const ph = $('#porePh span');
-  ph.textContent = 'جارٍ تشغيل الكاميرا…';
+  ph.textContent = 'Starting camera…';
   try{ await startCamera($('#poreVideo'), 'user'); }
   catch(e){ ph.textContent = camErrorText(e); return; }
   if(token !== session.token) return;
   $('#poreCam').classList.add('live');
-  $('#poreHint').textContent = `${t('قرّبي','قرّب')} وجهك حتى يملأ الإطار ${t('واضغطي','واضغط')} "التقاط الآن"`;
+  $('#poreHint').textContent = `Move closer until your face fills the frame, then tap "Capture now"`;
   $('#poreActions').innerHTML = poreActionsHtml('live');
 }
 function snapPhoto(){
@@ -903,11 +912,11 @@ function snapPhoto(){
 }
 function onPoreFile(file){
   if(!file) return;
-  if(!file.type.startsWith('image/')){ toast('اختر ملف صورة.'); return; }
+  if(!file.type.startsWith('image/')){ toast('Choose an image file.'); return; }
   const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = () => { runAI(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); };
-  img.onerror = () => { toast('تعذّر قراءة الصورة. جرّب صيغة JPG أو PNG.'); URL.revokeObjectURL(url); };
+  img.onerror = () => { toast('Could not read the image. Try a JPG or PNG.'); URL.revokeObjectURL(url); };
   img.src = url;
 }
 // Downscale to what the vision model actually uses (long edge ≤ 1568px) and re-encode as JPEG.
@@ -919,13 +928,13 @@ function encodeImage(src, w, h, maxEdge, quality){
   return c.toDataURL('image/jpeg', quality);
 }
 
-/* ---------------- بشرتي AI: analysing screen ---------------- */
+/* ---------------- My skin: analysing screen ---------------- */
 const AI_CAPTIONS = [
-  'جارٍ النظر إلى المسام…', 'جارٍ فحص الجبهة والأنف…', 'جارٍ قياس حجم المسام…',
-  'جارٍ البحث عن الرؤوس السوداء والانسدادات…', 'جارٍ تحليل البشرة…', 'جارٍ تحديد نوع المسام…',
-  'جارٍ مقارنة النتائج بملفك الطبي…'
+  'Looking at your pores…', 'Checking forehead and nose…', 'Measuring pore size…',
+  'Looking for blackheads and congestion…', 'Analysing your skin…', 'Identifying your pore type…',
+  'Comparing results with your medical profile…'
 ];
-const AI_STEPS = ['التحليل الأول', 'التحليل الثاني', 'التحليل الثالث', 'دمج النتائج وكتابة التقرير'];
+const AI_STEPS = ['First analysis', 'Second analysis', 'Third analysis', 'Merging results and writing the report'];
 const ai = {ctl:null, raf:0, capTimer:0, creep:0, pct:0};
 
 function showAnalyzing(url, ratio){
@@ -940,18 +949,18 @@ function showAnalyzing(url, ratio){
   el.id = 'aiOverlay'; el.className = 'ai-overlay';
   el.innerHTML = `
     <div class="ai-box">
-      <div class="ai-badge">${ic('sparkle', 'width:14px;height:14px')} بشرتي AI</div>
+      <div class="ai-badge">${ic('sparkle', 'width:14px;height:14px')} My skin</div>
       <div class="ai-stage" id="aiStage" style="width:${W}px;height:${H}px;background-image:url(${url})">
         ${dots}
         <div class="ai-scan"></div>
         <div class="ai-lens" id="aiLens" style="background-image:url(${url});background-size:${W * 2.4}px ${H * 2.4}px"></div>
       </div>
-      <h3>جارٍ تحليل البشرة</h3>
+      <h3>Analysing your skin</h3>
       <p class="ai-caption" id="aiCaption">${AI_CAPTIONS[0]}</p>
       <div class="bar" style="margin:12px 0 10px"><i id="aiFill" style="width:4%"></i></div>
       <ul class="ai-steps" id="aiSteps"></ul>
       <p class="ai-err" id="aiErr" hidden></p>
-      <button class="btn btn-outline" data-act="cancelAI" id="aiCancel" style="margin-top:12px">إلغاء</button>
+      <button class="btn btn-outline" data-act="cancelAI" id="aiCancel" style="margin-top:12px">Cancel</button>
     </div>`;
   document.body.appendChild(el);
   document.body.style.overflow = 'hidden';
@@ -988,7 +997,7 @@ function setupAiSteps(runs){
   }
   if(ul.dataset.mode === 'single') return; // already set up
   ul.dataset.mode = 'single';
-  ul.innerHTML = ['فحص الصورة وتحليل المسام', 'كتابة التقرير'].map((s, i) =>
+  ul.innerHTML = ['Checking the photo and analysing pores', 'Writing the report'].map((s, i) =>
     `<li data-i="${i}" class="${i === 0 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('');
   let ticks = 0;
   ai.creep = setInterval(() => {
@@ -1008,8 +1017,8 @@ function aiFail(msg){
   cancelAnimationFrame(ai.raf); clearInterval(ai.capTimer); clearInterval(ai.creep);
   const err = $('#aiErr'); if(!err) return;
   err.textContent = msg; err.hidden = false;
-  $('#aiCaption').textContent = 'توقف التحليل';
-  $('#aiCancel').textContent = 'حسنًا';
+  $('#aiCaption').textContent = 'Analysis stopped';
+  $('#aiCancel').textContent = 'OK';
   $('#aiCancel').dataset.act = 'closeAI';
 }
 
@@ -1029,8 +1038,8 @@ async function runAI(src, w, h){
       let msg = '';
       try{ msg = (await res.json()).error; }catch(e){}
       if(!msg) msg = [404, 405, 501].includes(res.status)
-        ? 'خدمة التحليل غير متاحة هنا — شغّل الموقع بالأمر "npm start" وافتح http://localhost:3000.'
-        : 'تعذّر الاتصال بخدمة التحليل.';
+        ? 'The analysis service is not available here — run the site with "npm start" and open http://localhost:3000.'
+        : 'Could not reach the analysis service.';
       throw new Error(msg);
     }
     aiProgress(10);
@@ -1052,7 +1061,7 @@ async function runAI(src, w, h){
         else if(ev.type === 'error'){ throw new Error(ev.message); }
       }
     }
-    if(!result) throw new Error('انقطع الاتصال قبل اكتمال التحليل، حاول مجددًا.');
+    if(!result) throw new Error('The connection dropped before the analysis finished, please try again.');
     document.querySelectorAll('#aiSteps li').forEach(li => li.className = 'done');
     aiProgress(100);
     await new Promise(r => setTimeout(r, 600));
@@ -1062,67 +1071,67 @@ async function runAI(src, w, h){
     if(box){ box.innerHTML = aiResultHtml() + (state.pore ? poreResultHtml() : ''); box.scrollIntoView({behavior:'smooth', block:'start'}); }
   }catch(e){
     if(e.name === 'AbortError'){ closeAnalyzing(); return; }
-    aiFail(e.message || 'حدث خطأ غير متوقع.');
+    aiFail(e.message || 'Something went wrong.');
   }finally{
     ai.ctl = null;
   }
 }
 
-/* ---------------- بشرتي AI: result ---------------- */
-const ZONE_AR = {forehead:'الجبهة', nose:'الأنف', cheeks:'الخدّان', chin:'الذقن'};
-const ZONE_STATUS = {good:{cls:'good', label:'جيدة', color:'#5E8F58'}, watch:{cls:'warn', label:'تحتاج متابعة', color:'#C9773B'}, concern:{cls:'bad', label:'تحتاج عناية', color:'#B5544A'}};
-const LEVEL_AR = {low:'منخفض', moderate:'متوسط', high:'مرتفع'};
-const AGREE_AR = {high:'اتفاق عالٍ بين التحليلات', medium:'اتفاق متوسط بين التحليلات', low:'اختلاف بين التحليلات'};
-const CONF_AR = {high:'ثقة عالية في التحليل', medium:'ثقة متوسطة في التحليل', low:'ثقة منخفضة في التحليل'};
+/* ---------------- My skin: result ---------------- */
+const ZONE_AR = {forehead:'Forehead', nose:'Nose', cheeks:'Cheeks', chin:'Chin'};
+const ZONE_STATUS = {good:{cls:'good', label:'Good', color:'#5E8F58'}, watch:{cls:'warn', label:'Watch', color:'#C9773B'}, concern:{cls:'bad', label:'Needs care', color:'#B5544A'}};
+const LEVEL_AR = {low:'Low', moderate:'Moderate', high:'High'};
+const AGREE_AR = {high:'Strong agreement between analyses', medium:'Moderate agreement between analyses', low:'The analyses disagreed'};
+const CONF_AR = {high:'High confidence', medium:'Medium confidence', low:'Low confidence'};
 
 function aiResultHtml(){
   const a = state.poreAI, r = a.report;
   const head = `
     <div class="ai-head">
       <div class="ai-logo">${ic('sparkle', 'width:20px;height:20px')}</div>
-      <div><b>بشرتي AI</b><span>${new Date(a.at).toLocaleDateString('ar', {day:'numeric', month:'long'})} · ${a.runs > 1 ? a.runs + ' تحليلات مستقلة' : 'تحليل بالذكاء الاصطناعي'}</span></div>
+      <div><b>My skin</b><span>${new Date(a.at).toLocaleDateString('en', {day:'numeric', month:'long'})} · ${a.runs > 1 ? a.runs + ' independent analyses' : 'AI analysis'}</span></div>
       ${a.thumb ? `<img class="ai-thumb" src="${a.thumb}" alt="">` : ''}
     </div>`;
   if(!r.image_ok){
     return `<div class="card ai-card">${head}
-      <p class="ai-intro">بصفتي مساعدًا شخصيًا لك من موقع بشرتي، لم أتمكّن من تحليل هذه الصورة بدقة:</p>
-      <div class="verdict warn">${esc(r.image_issue || 'الصورة غير واضحة بما يكفي.')}</div>
-      <div class="btn-row"><button class="btn btn-primary" data-act="openCam">التقط صورة جديدة</button><button class="btn btn-outline" data-act="upload">ارفع صورة</button></div>
+      <p class="ai-intro">As your personal assistant from My skin, I couldn’t analyse this photo accurately:</p>
+      <div class="verdict warn">${esc(r.image_issue || 'The photo isn’t clear enough.')}</div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="openCam">Take a new photo</button><button class="btn btn-outline" data-act="upload">Upload a photo</button></div>
     </div>`;
   }
   return `
     <div class="card ai-card">${head}
-      <p class="ai-intro">بصفتي مساعدًا شخصيًا لك من موقع بشرتي، هذا هو التحليل:</p>
+      <p class="ai-intro">As your personal assistant from My skin, here is your analysis:</p>
       <p class="ai-summary">${esc(r.summary)}</p>
 
       <div class="ai-type">
-        <span class="eyebrow">نوع المسام</span>
+        <span class="eyebrow">Pore type</span>
         <b>${esc(r.pore_type)}</b>
         <p>${esc(r.pore_type_explainer)}</p>
-        <span class="pill muted">إفراز الزيوت: ${LEVEL_AR[r.oiliness] || ''}</span>
+        <span class="pill muted">Oil production: ${LEVEL_AR[r.oiliness] || ''}</span>
       </div>
 
-      <h3 class="ai-h">مناطق الوجه</h3>
+      <h3 class="ai-h">Face zones</h3>
       ${r.zones.map(z => { const s = ZONE_STATUS[z.status] || ZONE_STATUS.watch; return `
         <div class="zone"><span class="sw" style="background:${s.color}"></span>
           <div><b>${ZONE_AR[z.zone] || esc(z.zone)}</b> <span class="pill ${s.cls}">${s.label}</span><p>${esc(z.note)}</p></div></div>`; }).join('')}
 
-      ${r.key_findings.length ? `<h3 class="ai-h">أبرز الملاحظات</h3><ul class="list">${r.key_findings.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
+      ${r.key_findings.length ? `<h3 class="ai-h">Key findings</h3><ul class="list">${r.key_findings.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
 
-      <h3 class="ai-h">روتينك المقترح</h3>
+      <h3 class="ai-h">Your suggested routine</h3>
       <ol class="ai-routine">${r.routine.map(s => `<li><b>${esc(s.step)}</b><span>${esc(s.why)}</span></li>`).join('')}</ol>
 
       <div class="ai-ings">
-        ${r.ingredients_seek.length ? `<div><span class="field-label">مكونات ${t('ابحثي','ابحث')} عنها</span><div class="chips">${r.ingredients_seek.map(x => `<span class="pill good">${esc(x)}</span>`).join('')}</div></div>` : ''}
-        ${r.ingredients_avoid.length ? `<div><span class="field-label">مكونات ${t('تجنّبيها','تجنّبها')}</span><div class="chips">${r.ingredients_avoid.map(x => `<span class="pill bad">${esc(x)}</span>`).join('')}</div></div>` : ''}
+        ${r.ingredients_seek.length ? `<div><span class="field-label">Ingredients to look for</span><div class="chips">${r.ingredients_seek.map(x => `<span class="pill good">${esc(x)}</span>`).join('')}</div></div>` : ''}
+        ${r.ingredients_avoid.length ? `<div><span class="field-label">Ingredients to avoid</span><div class="chips">${r.ingredients_avoid.map(x => `<span class="pill bad">${esc(x)}</span>`).join('')}</div></div>` : ''}
       </div>
 
-      ${r.see_doctor ? `<div class="verdict bad" style="margin-top:12px">🩺 ننصح بمراجعة طبيب جلدية: ${esc(r.doctor_reason)}</div>` : ''}
+      ${r.see_doctor ? `<div class="verdict bad" style="margin-top:12px">🩺 We recommend seeing a dermatologist: ${esc(r.doctor_reason)}</div>` : ''}
 
-      <p class="small" style="margin-top:12px">${(a.runs > 1 ? AGREE_AR : CONF_AR)[r.agreement] || ''} · ${esc(r.confidence_note)}<br>تحليل إرشادي بالذكاء الاصطناعي ولا يُعد تشخيصًا طبيًا.</p>
+      <p class="small" style="margin-top:12px">${(a.runs > 1 ? AGREE_AR : CONF_AR)[r.agreement] || ''} · ${esc(r.confidence_note)}<br>AI guidance only — not a medical diagnosis.</p>
       <div class="btn-row">
-        <button class="btn btn-dark" data-act="go" data-v="ingredient">التالي: فحص مكونات الكريم</button>
-        <button class="btn btn-outline" data-act="openCam" style="flex:.6">تحليل جديد</button>
+        <button class="btn btn-dark" data-act="go" data-v="ingredient">Next: ingredient check</button>
+        <button class="btn btn-outline" data-act="openCam" style="flex:.6">New analysis</button>
       </div>
     </div>`;
 }
@@ -1130,11 +1139,11 @@ function poreResultHtml(){
   const p = state.pore, o = poreOverall(p);
   return `
     <div class="card">
-      <span class="eyebrow">النتيجة</span>
-      <h2>${o.text} <span class="pill ${o.cls}">${p.zones.filter(z => z.cls === 'good').length}/5 متوازنة</span></h2>
+      <span class="eyebrow">Result</span>
+      <h2>${o.text} <span class="pill ${o.cls}">${p.zones.filter(z => z.cls === 'good').length}/5 balanced</span></h2>
       ${p.zones.map(z => `<div class="zone"><span class="sw" style="background:${classifyShine(z.shine).color}"></span><div><b>${z.name}</b><p>${classifyShine(z.shine).note}</p></div></div>`).join('')}
-      <p class="small" style="margin-top:8px">${p.approx ? 'تم المسح بدون تتبّع الوجه (تعذّر تحميل النموذج)، لذا النتيجة أقل دقة. ' : ''}النتيجة تقديرية وتتأثر بالإضاءة والكاميرا.</p>
-      <div class="btn-row"><button class="btn btn-dark" data-act="go" data-v="ingredient">التالي: فحص مكونات الكريم</button></div>
+      <p class="small" style="margin-top:8px">${p.approx ? 'Scanned without face tracking (the model failed to load), so the result is less accurate. ' : ''}Results are estimates and depend on lighting and camera.</p>
+      <div class="btn-row"><button class="btn btn-dark" data-act="go" data-v="ingredient">Next: ingredient check</button></div>
     </div>`;
 }
 
@@ -1145,12 +1154,12 @@ async function startPore(){
   const ph = $('#porePh'), hint = $('#poreHint'), btn = $('#poreBtn');
   const prog = $('#poreProg'), fill = $('#poreFill'), txt = $('#poreTxt');
   btn.disabled = true;
-  ph.querySelector('span').textContent = 'جارٍ تشغيل الكاميرا…';
+  ph.querySelector('span').textContent = 'Starting camera…';
   try{ await startCamera(video, 'user'); }
   catch(e){ ph.querySelector('span').textContent = camErrorText(e); btn.disabled = false; return; }
   if(token !== session.token) return;
   cam.classList.add('live');
-  hint.textContent = 'جارٍ تحميل نموذج تتبّع الوجه…';
+  hint.textContent = 'Loading the face tracking model…';
 
   let fm = null;
   try{ fm = await getFaceMesh(); }catch(e){ fm = null; }
@@ -1182,22 +1191,22 @@ async function startPore(){
     if(!fm || !pts) drawOval(ctx, W, H);
     const z = zones[zi];
     if(!pts){
-      hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`;
+      hint.textContent = `Place your face inside the frame`;
     } else {
       const p = pts[z.key];
       const s = samplePatch(octx, p.x * off.width, p.y * off.height, Math.max(6, pts.r * off.width));
       if(s.mean < 0.2){
-        hint.textContent = `الإضاءة ضعيفة — ${t('انتقلي','انتقل')} لمكان أكثر إضاءة`;
+        hint.textContent = `Too dark — move somewhere brighter`;
       } else {
         z.sum += s.shine; z.n++; z.ms += dt;
-        hint.textContent = z.hint() + (fm ? '' : ' (بدون تتبّع)');
+        hint.textContent = z.hint() + (fm ? '' : ' (no tracking)');
       }
       zones.slice(0, zi).forEach(d => drawDot(ctx, pts[d.key].x * W, pts[d.key].y * H, classifyShine(d.shine).color));
       drawPulse(ctx, p.x * W, p.y * H, Math.max(14, pts.r * W * 1.6), now);
     }
     const pct = (zi + Math.min(1, z.ms / ZONE_MS)) / zones.length;
     fill.style.width = (pct * 100).toFixed(1) + '%';
-    txt.textContent = `${Math.round(pct * 100)}% · المنطقة ${zi + 1} من ${zones.length}: ${z.name}`;
+    txt.textContent = `${Math.round(pct * 100)}% · zone ${zi + 1} of ${zones.length}: ${z.name}`;
 
     if(z.ms >= ZONE_MS){
       z.shine = z.n ? z.sum / z.n : 0;
@@ -1214,7 +1223,7 @@ function finishPore(zones, approx){
   save(); renderChrome();
   $('#poreProg').classList.remove('show');
   $('#poreBtn').disabled = false;
-  $('#porePh span').textContent = 'اكتمل المسح ✓';
+  $('#porePh span').textContent = 'Scan complete ✓';
   $('#poreResult').innerHTML = poreResultHtml() + (state.poreAI ? aiResultHtml() : '');
   $('#poreResult').scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -1237,36 +1246,36 @@ function drawPulse(ctx, x, y, r, now){
 ========================================================= */
 // level: irritant | comedogenic | caution | pregnancy | good_oily | good_dry | good
 const ING_DB = [
-  {label:'العطر', level:'irritant', names:['fragrance','parfum','perfume','عطر'], reason:'من أكثر المكونات المسببة للحساسية والتهيج.'},
-  {label:'الكحول المجفّف', level:'irritant', names:['alcohol denat','denatured alcohol','sd alcohol','كحول إيثيلي'], reason:'قد يسبب جفافًا وتهيجًا للبشرة الحساسة أو الجافة.'},
-  {label:'زيوت عطرية', level:'irritant', names:['essential oil','limonene','linalool','citral','eugenol','geraniol','زيت عطري','زيوت عطرية'], reason:'مركبات عطرية طبيعية قد تسبب حساسية تلامسية.'},
-  {label:'السلفات (SLS/SLES)', level:'irritant', names:['sodium lauryl sulfate','sodium laureth sulfate','سلفات'], reason:'منظف قوي قد يضعف حاجز البشرة.'},
-  {label:'زيت جوز الهند', level:'comedogenic', names:['coconut oil','cocos nucifera','زيت جوز الهند'], reason:'احتمالية مرتفعة لانسداد المسام.'},
-  {label:'إيزوبروبيل ميريستات', level:'comedogenic', names:['isopropyl myristate','isopropyl palmitate'], reason:'قد يسد المسام لدى البشرة الدهنية.'},
-  {label:'الزيت المعدني', level:'comedogenic', names:['mineral oil','paraffinum liquidum','زيت معدني'], reason:'قد يُثقل البشرة الدهنية أو المختلطة.'},
-  {label:'زبدة الكاكاو', level:'comedogenic', names:['cocoa butter','theobroma cacao','زبدة الكاكاو'], reason:'قوام ثقيل قد يسبب انسداد المسام.'},
-  {label:'الريتينويدات', level:'pregnancy', names:['retinol','retinyl','retinal','retinoic','tretinoin','ريتينول'], reason:'فعّالة لكنها قد تسبب جفافًا وحساسية للشمس، ولا يُنصح بها خلال الحمل أو الرضاعة.'},
-  {label:'الهيدروكينون', level:'pregnancy', names:['hydroquinone','هيدروكينون'], reason:'مفتّح قوي يُستخدم تحت إشراف طبي فقط.'},
-  {label:'أحماض AHA', level:'caution', names:['glycolic acid','lactic acid','mandelic acid','حمض الجليكوليك','حمض اللاكتيك'], reason:'مقشرات تزيد حساسية البشرة للشمس — استخدمها مساءً مع واقٍ نهارًا.'},
-  {label:'بنزويل بيروكسايد', level:'caution', names:['benzoyl peroxide','بنزويل'], reason:'فعّال ضد حب الشباب لكنه قد يسبب جفافًا وتهيجًا.'},
-  {label:'البارابين', level:'caution', names:['paraben','بارابين'], reason:'مادة حافظة قد تسبب حساسية لدى بعض الأشخاص.'},
-  {label:'حمض الساليسيليك', level:'good_oily', names:['salicylic acid','حمض الساليسيليك','ساليسيليك'], reason:'ينظف المسام ويناسب البشرة الدهنية، وقد يجفف البشرة الجافة.'},
-  {label:'النياسيناميد', level:'good', names:['niacinamide','نياسيناميد'], reason:'يهدئ البشرة وينظم إفراز الزيوت.'},
-  {label:'حمض الهيالورونيك', level:'good_dry', names:['hyaluronic','sodium hyaluronate','هيالورونيك'], reason:'مرطب خفيف يجذب الماء للبشرة.'},
-  {label:'السيراميدات', level:'good_dry', names:['ceramide','سيراميد'], reason:'تقوي حاجز البشرة وتقلل فقدان الرطوبة.'},
-  {label:'الجلسرين', level:'good', names:['glycerin','glycerol','جلسرين','جليسرين'], reason:'مرطب لطيف يناسب كل الأنواع.'},
-  {label:'البانثينول', level:'good', names:['panthenol','بانثينول'], reason:'مهدئ ومرمم للبشرة المتهيجة.'},
-  {label:'أكسيد الزنك', level:'good', names:['zinc oxide','أكسيد الزنك'], reason:'فلتر شمسي معدني لطيف يناسب البشرة الحساسة.'},
-  {label:'فيتامين C', level:'good', names:['ascorbic acid','ascorbyl','vitamin c','فيتامين سي'], reason:'مضاد أكسدة يدعم إشراقة البشرة.'},
-  {label:'الصبار', level:'good', names:['aloe','الصبار','ألوفيرا'], reason:'مهدئ ومرطب خفيف.'},
+  {label:'Fragrance', level:'irritant', names:['fragrance','parfum','perfume'], reason:'One of the most common causes of allergy and irritation.'},
+  {label:'Drying alcohol', level:'irritant', names:['alcohol denat','denatured alcohol','sd alcohol'], reason:'Can dry out and irritate sensitive or dry skin.'},
+  {label:'Essential oils', level:'irritant', names:['essential oil','limonene','linalool','citral','eugenol','geraniol'], reason:'Natural fragrance compounds that can cause contact allergy.'},
+  {label:'Sulfates (SLS/SLES)', level:'irritant', names:['sodium lauryl sulfate','sodium laureth sulfate'], reason:'A harsh cleanser that can weaken the skin barrier.'},
+  {label:'Coconut oil', level:'comedogenic', names:['coconut oil','cocos nucifera'], reason:'High chance of clogging pores.'},
+  {label:'Isopropyl myristate', level:'comedogenic', names:['isopropyl myristate','isopropyl palmitate'], reason:'Can clog pores on oily skin.'},
+  {label:'Mineral oil', level:'comedogenic', names:['mineral oil','paraffinum liquidum'], reason:'Can feel heavy on oily or combination skin.'},
+  {label:'Cocoa butter', level:'comedogenic', names:['cocoa butter','theobroma cacao'], reason:'A rich texture that can clog pores.'},
+  {label:'Retinoids', level:'pregnancy', names:['retinol','retinyl','retinal','retinoic','tretinoin'], reason:'Effective, but can cause dryness and sun sensitivity; not recommended during pregnancy or breastfeeding.'},
+  {label:'Hydroquinone', level:'pregnancy', names:['hydroquinone'], reason:'A strong lightening agent, to be used only under medical supervision.'},
+  {label:'AHA acids', level:'caution', names:['glycolic acid','lactic acid','mandelic acid'], reason:'Exfoliants that increase sun sensitivity — use them at night and wear sunscreen by day.'},
+  {label:'Benzoyl peroxide', level:'caution', names:['benzoyl peroxide'], reason:'Effective against acne but can cause dryness and irritation.'},
+  {label:'Parabens', level:'caution', names:['paraben'], reason:'A preservative that can cause allergy in some people.'},
+  {label:'Salicylic acid', level:'good_oily', names:['salicylic acid'], reason:'Clears pores and suits oily skin; can dry out dry skin.'},
+  {label:'Niacinamide', level:'good', names:['niacinamide'], reason:'Calms the skin and regulates oil.'},
+  {label:'Hyaluronic acid', level:'good_dry', names:['hyaluronic','sodium hyaluronate'], reason:'A light humectant that draws water into the skin.'},
+  {label:'Ceramides', level:'good_dry', names:['ceramide'], reason:'Strengthen the skin barrier and reduce moisture loss.'},
+  {label:'Glycerin', level:'good', names:['glycerin','glycerol'], reason:'A gentle humectant that suits every skin type.'},
+  {label:'Panthenol', level:'good', names:['panthenol'], reason:'Soothes and repairs irritated skin.'},
+  {label:'Zinc oxide', level:'good', names:['zinc oxide'], reason:'A gentle mineral UV filter that suits sensitive skin.'},
+  {label:'Vitamin C', level:'good', names:['ascorbic acid','ascorbyl','vitamin c'], reason:'An antioxidant that supports radiance.'},
+  {label:'Aloe vera', level:'good', names:['aloe'], reason:'Soothing and lightly moisturising.'},
 ];
 
 function analyzeIngredients(raw, productName){
   const text = raw.toLowerCase();
   const m = state.medical || {conditions:[], allergies:''};
   const skin = state.skinType ? state.skinType.raw : null;
-  const sensitive = skin === 'sensitive' || ['حساسية جلدية معروفة','الأكزيما','الوردية'].some(c => m.conditions.includes(c));
-  const preg = m.conditions.includes('الحمل أو الرضاعة');
+  const sensitive = skin === 'sensitive' || ['Known skin allergy','Eczema','Rosacea'].some(c => m.conditions.includes(c));
+  const preg = m.conditions.includes('Pregnancy or breastfeeding');
   const oilyish = skin === 'oily' || skin === 'combination';
   const dryish = skin === 'dry' || sensitive;
 
@@ -1290,7 +1299,7 @@ function analyzeIngredients(raw, productName){
 
   // personal allergies typed in the medical profile
   (m.allergies || '').split(/[،,;\n]/).map(s => s.trim()).filter(s => s.length >= 3).forEach(a => {
-    if(text.includes(a.toLowerCase())){ score -= 40; flags.unshift({name:a, reason:'ذكرته ضمن الحساسية في ملفك الطبي.', sev:'avoid'}); }
+    if(text.includes(a.toLowerCase())){ score -= 40; flags.unshift({name:a, reason:'Listed as an allergy in your medical profile.', sev:'avoid'}); }
   });
 
   score = clamp(Math.round(score), 10, 100);
@@ -1298,10 +1307,10 @@ function analyzeIngredients(raw, productName){
   flags.sort((a, b) => order[a.sev] - order[b.sev]);
   const hasAvoid = flags.some(f => f.sev === 'avoid');
   let verdict;
-  if(!flags.length) verdict = {cls:'warn', text:'لم نتعرّف على أي مكوّن من قائمتنا — لا يمكننا الحكم على هذا المنتج.'};
-  else if(hasAvoid || score < 60) verdict = {cls:'bad', text:'غير موصى به لك — يحتوي مكونات تتعارض مع بشرتك أو حالتك.'};
-  else if(score < 80) verdict = {cls:'warn', text:`مناسب بحذر — ${t('جرّبيه','جرّبه')} على منطقة صغيرة 48 ساعة أولًا.`};
-  else verdict = {cls:'good', text:'مناسب لبشرتك بحسب المكونات التي نعرفها.'};
+  if(!flags.length) verdict = {cls:'warn', text:'We didn’t recognise any ingredient from our list — we can’t rate this product.'};
+  else if(hasAvoid || score < 60) verdict = {cls:'bad', text:'Not recommended for you — it contains ingredients that conflict with your skin or condition.'};
+  else if(score < 80) verdict = {cls:'warn', text:`Suitable with caution — patch-test it on a small area for 48 hours first.`};
+  else verdict = {cls:'good', text:'Suits your skin, based on the ingredients we know.'};
   return {productName: productName || null, score, verdict, flags, matched: flags.length, at:Date.now()};
 }
 
@@ -1309,60 +1318,60 @@ function viewIngredient(){
   const p = ui.ing.product;
   return `
     <div class="card">
-      <span class="eyebrow">المرحلة 4 من 5</span>
-      <h2>فحص مكونات الكريم</h2>
-      <p class="sub">${t('امسحي','امسح')} الباركود، أو ${t('ابحثي','ابحث')} باسم المنتج، أو ${t('الصقي','الصق')} قائمة المكونات من العبوة. نقارنها بنوع بشرتك وملفك الطبي.</p>
-      ${!state.skinType || !state.medical ? `<div class="notice">لنتيجة أدق ${t('أكملي','أكمل')} الملف الطبي واختبار نوع البشرة أولًا.</div>` : ''}
+      <span class="eyebrow">Step 4 of 5</span>
+      <h2>Ingredient check</h2>
+      <p class="sub">Scan the barcode, search by product name, or paste the ingredient list from the pack. We compare it with your skin type and medical profile.</p>
+      ${!state.skinType || !state.medical ? `<div class="notice">For a more accurate result, complete the medical profile and skin type quiz first.</div>` : ''}
     </div>
     <div class="card">
-      <h3>${ic('barcode', 'width:16px;height:16px;vertical-align:-3px')} مسح الباركود</h3>
+      <h3>${ic('barcode', 'width:16px;height:16px;vertical-align:-3px')} Scan barcode</h3>
       <div class="cam wide" id="bcCam">
         <video id="bcVideo" playsinline muted></video>
-        <div class="cam-ph" id="bcPh">${ic('barcode', 'width:34px;height:34px')}<span>وجّه الكاميرا الخلفية إلى باركود العبوة.</span></div>
+        <div class="cam-ph" id="bcPh">${ic('barcode', 'width:34px;height:34px')}<span>Point the back camera at the product’s barcode.</span></div>
       </div>
       <p class="small" id="bcStatus"></p>
-      <div class="btn-row"><button class="btn btn-dark" id="bcBtn" data-act="barcode">تشغيل الماسح</button></div>
+      <div class="btn-row"><button class="btn btn-dark" id="bcBtn" data-act="barcode">Start scanner</button></div>
     </div>
     <div class="card">
-      <h3>البحث باسم المنتج</h3>
+      <h3>Search by product name</h3>
       <div style="display:flex;gap:8px">
-        <input class="input" id="searchQ" placeholder="مثال: CeraVe moisturizing cream" enterkeyhint="search">
-        <button class="btn btn-outline" style="width:auto" data-act="search">بحث</button>
+        <input class="input" id="searchQ" placeholder="e.g. CeraVe moisturizing cream" enterkeyhint="search">
+        <button class="btn btn-outline" style="width:auto" data-act="search">Search</button>
       </div>
       <div id="searchResults"></div>
     </div>
     <div class="card">
-      <h3>قائمة المكونات</h3>
+      <h3>Ingredient list</h3>
       <div id="productBox">${p ? productHtml(p) : ''}</div>
       <textarea class="input" id="ingText" style="margin-top:10px" placeholder="Aqua, Glycerin, Niacinamide, Parfum…">${esc(ui.ing.text || '')}</textarea>
-      <div class="btn-row"><button class="btn btn-primary" data-act="analyze">حلّل المكونات</button></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="analyze">Analyse ingredients</button></div>
     </div>
     <div id="ingResult">${state.ingredient ? ingResultHtml(state.ingredient) : ''}</div>`;
 }
 function productHtml(p){
-  return `<div class="product">${p.img ? `<img src="${esc(p.img)}" alt="">` : ''}<div><b>${esc(p.name || 'منتج بدون اسم')}</b><span>${esc(p.brand || '')}</span></div></div>`;
+  return `<div class="product">${p.img ? `<img src="${esc(p.img)}" alt="">` : ''}<div><b>${esc(p.name || 'Unnamed product')}</b><span>${esc(p.brand || '')}</span></div></div>`;
 }
 function ingResultHtml(r){
   const color = {good:'var(--good)', warn:'var(--warn)', bad:'var(--bad)'}[r.verdict.cls];
-  const sevPill = {avoid:'<span class="pill bad">تجنّب</span>', caution:'<span class="pill warn">بحذر</span>', ok:'<span class="pill good">مناسب</span>'};
+  const sevPill = {avoid:'<span class="pill bad">Avoid</span>', caution:'<span class="pill warn">Caution</span>', ok:'<span class="pill good">Suitable</span>'};
   return `
     <div class="card">
-      <span class="eyebrow">النتيجة${r.productName ? ' · ' + esc(r.productName) : ''}</span>
+      <span class="eyebrow">Result${r.productName ? ' · ' + esc(r.productName) : ''}</span>
       <div class="score">
-        <div class="ring" style="--p:${r.flags.length ? r.score : 0};--c:${color}"><b>${r.flags.length ? r.score : '؟'}</b></div>
+        <div class="ring" style="--p:${r.flags.length ? r.score : 0};--c:${color}"><b>${r.flags.length ? r.score : '?'}</b></div>
         <div class="verdict ${r.verdict.cls}" style="flex:1">${esc(r.verdict.text)}</div>
       </div>
       ${r.flags.length ? r.flags.map(f => `<div class="flag">${sevPill[f.sev]}<div><b>${esc(f.name)}</b><p>${esc(f.reason)}</p></div></div>`).join('')
-        : '<p class="sub">لم نجد مكونات من قائمتنا المعروفة في هذا المنتج.</p>'}
-      <p class="small" style="margin-top:8px">نفحص ${ING_DB.length} مكونًا شائعًا فقط، والتركيز الفعلي غير معروف لنا.</p>
-      <div class="btn-row"><button class="btn btn-dark" data-act="go" data-v="spf">التالي: واقي الشمس</button></div>
+        : '<p class="sub">We found no ingredients from our list in this product.</p>'}
+      <p class="small" style="margin-top:8px">We check ${ING_DB.length} common ingredients only, and we don’t know their actual concentrations.</p>
+      <div class="btn-row"><button class="btn btn-dark" data-act="go" data-v="spf">Next: sunscreen</button></div>
     </div>`;
 }
 
 function setIngStatus(msg){ const el = $('#bcStatus'); if(el) el.textContent = msg; }
 function useProduct(p, code){
-  // our ingredient DB knows Arabic + English (INCI) names, so prefer those over the product's default language
-  const ingredients = p.ingredients_text_ar || p.ingredients_text_en || p.ingredients_text || p.ingredients_text_fr || '';
+  // our ingredient DB uses English (INCI) names, so prefer those over the product's default language
+  const ingredients = p.ingredients_text_en || p.ingredients_text || p.ingredients_text_fr || '';
   ui.ing.product = {name:p.product_name || p.product_name_en || p.product_name_ar || '', brand:p.brands || '', img:p.image_front_small_url || '', code};
   ui.ing.text = ingredients;
   $('#productBox').innerHTML = productHtml(ui.ing.product);
@@ -1370,30 +1379,30 @@ function useProduct(p, code){
   $('#searchResults').innerHTML = '';
   if(ingredients){ runAnalyze(); }
   else{
-    toast('لا تتوفر مكونات لهذا المنتج في قاعدة البيانات — الصقها من العبوة.');
+    toast('No ingredient list for this product in the database — paste it from the pack.');
     $('#ingText').focus();
   }
 }
 async function lookupBarcode(code){
-  setIngStatus(`الباركود ${code} — جارٍ البحث…`);
+  setIngStatus(`Barcode ${code} — searching…`);
   try{
     const r = await fetch(`${OBF}/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_en,product_name_ar,brands,ingredients_text,ingredients_text_en,ingredients_text_ar,ingredients_text_fr,image_front_small_url`);
     const d = await r.json();
-    if(d.status === 1 && d.product){ setIngStatus(`تم العثور على المنتج (${code}).`); useProduct(d.product, code); }
-    else setIngStatus(`لم نجد المنتج ${code} في قاعدة Open Beauty Facts. ${t('جرّبي','جرّب')} البحث بالاسم أو ${t('الصقي','الصق')} المكونات.`);
-  }catch(e){ setIngStatus('تعذّر الاتصال بقاعدة بيانات المنتجات.'); }
+    if(d.status === 1 && d.product){ setIngStatus(`Product found (${code}).`); useProduct(d.product, code); }
+    else setIngStatus(`Product ${code} isn’t in Open Beauty Facts. Try searching by name or paste the ingredients.`);
+  }catch(e){ setIngStatus('Could not reach the product database.'); }
 }
 async function startBarcode(){
   const btn = $('#bcBtn');
-  if(session.streams.length || session.zx){ stopCamera(); btn.textContent = 'تشغيل الماسح'; setIngStatus(''); return; }
+  if(session.streams.length || session.zx){ stopCamera(); btn.textContent = 'Start scanner'; setIngStatus(''); return; }
   stopCamera();
   const token = session.token;
   const cam = $('#bcCam'), video = $('#bcVideo');
-  btn.textContent = 'إيقاف الماسح';
-  setIngStatus('جارٍ تشغيل الكاميرا…');
+  btn.textContent = 'Stop scanner';
+  setIngStatus('Starting camera…');
   const onCode = code => {
     if(token !== session.token) return;
-    stopCamera(); btn.textContent = 'تشغيل الماسح';
+    stopCamera(); btn.textContent = 'Start scanner';
     if(navigator.vibrate) navigator.vibrate(80);
     lookupBarcode(code);
   };
@@ -1407,7 +1416,7 @@ async function startBarcode(){
       await startCamera(video, 'environment');
       if(token !== session.token) return;
       cam.classList.add('live');
-      setIngStatus('وجّه الكاميرا إلى الباركود…');
+      setIngStatus('Point the camera at the barcode…');
       const det = new BarcodeDetector({formats});
       let lastT = 0;
       const loop = async now => {
@@ -1425,19 +1434,19 @@ async function startBarcode(){
       const reader = new ZXing.BrowserMultiFormatReader();
       session.zx = reader;
       cam.classList.add('live');
-      setIngStatus('وجّه الكاميرا إلى الباركود…');
+      setIngStatus('Point the camera at the barcode…');
       await reader.decodeFromConstraints({video:{facingMode:'environment'}}, video, res => { if(res) onCode(res.getText()); });
     }
   }catch(e){
-    stopCamera(); btn.textContent = 'تشغيل الماسح';
+    stopCamera(); btn.textContent = 'Start scanner';
     setIngStatus(camErrorText(e));
   }
 }
 async function searchProducts(){
   const q = $('#searchQ').value.trim();
   const box = $('#searchResults');
-  if(q.length < 2){ box.innerHTML = '<p class="err">اكتب اسم المنتج أولًا.</p>'; return; }
-  box.innerHTML = '<p class="small">جارٍ البحث…</p>';
+  if(q.length < 2){ box.innerHTML = '<p class="err">Type a product name first.</p>'; return; }
+  box.innerHTML = '<p class="small">Searching…</p>';
   try{
     const r = await fetch(`${OBF}/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=12&fields=code,product_name,product_name_en,product_name_ar,brands,ingredients_text,ingredients_text_en,ingredients_text_ar,ingredients_text_fr,image_front_small_url`);
     const d = await r.json();
@@ -1445,14 +1454,14 @@ async function searchProducts(){
     // products that come with an ingredient list first
     ui.ing.results = (d.products || []).filter(p => p.product_name || p.product_name_en).sort((a, b) => hasIng(b) - hasIng(a));
     box.innerHTML = ui.ing.results.length
-      ? ui.ing.results.map((p, i) => `<button class="result-item" data-act="pick" data-i="${i}"><b>${esc(p.product_name || p.product_name_en)}</b><span>${esc(p.brands || '')}${hasIng(p) ? '' : ' · بدون قائمة مكونات'}</span></button>`).join('')
-      : '<p class="small">لا توجد نتائج. جرّب اسمًا بالإنجليزية أو الصق المكونات مباشرة.</p>';
-  }catch(e){ box.innerHTML = '<p class="err">تعذّر البحث حاليًا.</p>'; }
+      ? ui.ing.results.map((p, i) => `<button class="result-item" data-act="pick" data-i="${i}"><b>${esc(p.product_name || p.product_name_en)}</b><span>${esc(p.brands || '')}${hasIng(p) ? '' : ' · no ingredient list'}</span></button>`).join('')
+      : '<p class="small">No results. Try another name, or paste the ingredients directly.</p>';
+  }catch(e){ box.innerHTML = '<p class="err">Search isn’t available right now.</p>'; }
 }
 function runAnalyze(){
   const raw = $('#ingText').value.trim();
   ui.ing.text = raw;
-  if(raw.length < 3){ toast('الصق قائمة المكونات أولًا.'); return; }
+  if(raw.length < 3){ toast('Paste the ingredient list first.'); return; }
   state.ingredient = analyzeIngredients(raw, ui.ing.product && ui.ing.product.name);
   save(); renderChrome();
   $('#ingResult').innerHTML = ingResultHtml(state.ingredient);
@@ -1462,13 +1471,13 @@ function runAnalyze(){
 /* =========================================================
    STAGE 5 — SUNSCREEN SELF-CHECK
 ========================================================= */
-const SPF_ZONES = ['الجبهة','الأنف','الخدّان','الذقن','حول العينين','الأذنان','الرقبة','خلف الرقبة','الشفاه'];
+const SPF_ZONES = ['Forehead','Nose','Cheeks','Chin','Around the eyes','Ears','Neck','Back of neck','Lips'];
 const SPF_TIPS = {
-  'الأذنان':'الأذنان من أكثر الأماكن المنسية والمعرضة للحروق.',
-  'الرقبة':'الرقبة تتعرض للشمس طوال اليوم وتظهر عليها علامات التقدم بسرعة.',
-  'خلف الرقبة':'خلف الرقبة يتعرض مباشرة للشمس عند المشي.',
-  'الشفاه':'استخدم مرطب شفاه يحتوي SPF.',
-  'حول العينين':'ضع طبقة خفيفة بعيدًا عن حافة العين، أو استخدم نظارة شمسية.',
+  'Ears':'Ears are among the most often forgotten — and burned — spots.',
+  'Neck':'Your neck is in the sun all day and shows ageing quickly.',
+  'Back of neck':'The back of your neck gets direct sun whenever you walk.',
+  'Lips':'Use a lip balm with SPF.',
+  'Around the eyes':'Apply a thin layer away from the lash line, or wear sunglasses.',
 };
 function viewSpf(){
   if(!ui.spf) ui.spf = state.spf ? {zones:[...state.spf.zones], spf:state.spf.spf, amount:state.spf.amount} : {zones:[], spf:null, amount:null};
@@ -1476,17 +1485,17 @@ function viewSpf(){
   const w = ui.weather;
   return `
     <div class="card">
-      <span class="eyebrow">المرحلة 5 من 5</span>
-      <h2>واقي الشمس</h2>
-      <p class="sub">${t('ابدئي','ابدأ')} الفحص الذكي <b>قبل</b> وضع الواقي: نلتقط بشرتك أولًا، ثم ${t('تدهنين','تدهن')} كل منطقة والكاميرا ترصد حركة يدك وتغيّر اللمعة واللون، وبعدها نرسم على وجهك خريطة حماية حيّة مبنية على مؤشر الأشعة في مدينتك وعامل الـ SPF.</p>
-      ${w.status === 'ready' ? `<div class="notice" style="background:var(--cream-deep);color:var(--brown)">مؤشر الأشعة الآن ${w.uv} (${uvLevel(w.uv).label}).</div>` : ''}
+      <span class="eyebrow">Step 5 of 5</span>
+      <h2>Sunscreen</h2>
+      <p class="sub">Start the smart check <b>before</b> you apply sunscreen: we capture your bare skin first, then you apply each zone while the camera tracks your hand and the change in shine and colour. Then we draw a live protection map on your face, based on your city’s UV index and your SPF.</p>
+      ${w.status === 'ready' ? `<div class="notice" style="background:var(--cream-deep);color:var(--brown)">UV index now ${w.uv} (${uvLevel(w.uv).label}).</div>` : ''}
     </div>
     <div class="card" id="smartCard">
-      <span class="eyebrow">${ic('sparkle', 'width:14px;height:14px;vertical-align:-2px')} الفحص الذكي بالكاميرا</span>
+      <span class="eyebrow">${ic('sparkle', 'width:14px;height:14px;vertical-align:-2px')} Smart camera check</span>
       <div class="cam mirror" id="spfCam">
         <video id="spfVideo" playsinline muted></video>
         <canvas id="spfCanvas"></canvas>
-        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>${t('اختاري','اختر')} عامل الحماية بالأسفل ثم ${t('ابدئي','ابدأ')} الفحص — الصورة تُحلَّل على جهازك فقط ولا تُرفع.</span></div>
+        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>Choose your SPF below, then start the check — the video is analysed on your device only and never uploaded.</span></div>
         <div class="cam-hint" id="spfHint"></div>
       </div>
       <div class="qual" id="spfQual"></div>
@@ -1496,25 +1505,26 @@ function viewSpf(){
     </div>
     <div class="card" id="spfForm">
       <div class="field" style="margin-top:0">
-        <span class="field-label">المناطق التي ${t('غطّيتِها','غطّيتَها')}</span>
+        <span class="field-label">Areas you covered</span>
         <div class="chips">${SPF_ZONES.map(z => `<button class="chip${s.zones.includes(z) ? ' on' : ''}" data-act="spfZone" data-v="${z}">${s.zones.includes(z) ? '✓ ' : ''}${z}</button>`).join('')}</div>
       </div>
       <div class="field">
-        <span class="field-label">عامل الحماية في منتجك</span>
-        <div class="chips">${['15','30','50+','لا أعرف'].map(v => `<button class="chip${s.spf === v ? ' on' : ''}" data-act="spfVal" data-v="${v}">${v === 'لا أعرف' ? v : 'SPF ' + v}</button>`).join('')}</div>
+        <span class="field-label">Your product’s SPF</span>
+        <div class="chips">${['15','30','50+','Not sure'].map(v => `<button class="chip${s.spf === v ? ' on' : ''}" data-act="spfVal" data-v="${v}">${v === 'Not sure' ? v : 'SPF ' + v}</button>`).join('')}</div>
       </div>
       <div class="field">
-        <span class="field-label">هل ${t('استخدمتِ','استخدمتَ')} كمية كافية؟ (طول إصبعين للوجه والرقبة)</span>
+        <span class="field-label">Did you use enough? (two finger-lengths for face and neck)</span>
         <div class="chips">
-          <button class="chip${s.amount === 'yes' ? ' on' : ''}" data-act="spfAmount" data-v="yes">نعم</button>
-          <button class="chip${s.amount === 'no' ? ' on' : ''}" data-act="spfAmount" data-v="no">أقل من ذلك</button>
+          <button class="chip${s.amount === 'yes' ? ' on' : ''}" data-act="spfAmount" data-v="yes">Yes</button>
+          <button class="chip${s.amount === 'no' ? ' on' : ''}" data-act="spfAmount" data-v="no">Less than that</button>
         </div>
       </div>
       <div class="err" id="spfErr"></div>
-      <div class="btn-row"><button class="btn btn-primary" data-act="saveSpf">احسب التغطية</button></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="saveSpf">Calculate coverage</button></div>
     </div>
     <div id="spfResult">${state.spf ? spfResultHtml() : ''}</div>
     ${liveBoxHtml()}
+    ${reportsCardHtml()}
     ${reminderCard()}`;
 }
 function spfResultHtml(){
@@ -1522,27 +1532,27 @@ function spfResultHtml(){
   const cls = r.coverage >= 90 ? 'good' : r.coverage >= 60 ? 'warn' : 'bad';
   const color = {good:'var(--good)', warn:'var(--warn)', bad:'var(--bad)'}[cls];
   const tips = [];
-  r.missed.forEach(z => tips.push(`<li><b>${z}:</b> ${SPF_TIPS[z] || `${t('أضيفي','أضف')} طبقة على هذه المنطقة.`}</li>`));
-  if(r.spf === '15') tips.push('<li>SPF 15 غير كافٍ للتعرض اليومي — ننصح بـ SPF 30 على الأقل.</li>');
-  if(r.spf === 'لا أعرف') tips.push('<li>تحقّق من العبوة: اختر "واسع الطيف" بعامل SPF 30 أو أعلى.</li>');
-  if(r.amount === 'no') tips.push('<li>الكمية القليلة تخفض الحماية الفعلية كثيرًا — استخدم طول إصبعين كاملين.</li>');
+  r.missed.forEach(z => tips.push(`<li><b>${z}:</b> ${SPF_TIPS[z] || `Add a layer on this area.`}</li>`));
+  if(r.spf === '15') tips.push('<li>SPF 15 isn’t enough for daily exposure — use at least SPF 30.</li>');
+  if(r.spf === 'Not sure') tips.push('<li>Check the pack: choose "broad spectrum" with SPF 30 or higher.</li>');
+  if(r.amount === 'no') tips.push('<li>Too little sunscreen cuts real protection a lot — use two full finger-lengths.</li>');
   return `
     <div class="card">
-      <span class="eyebrow">النتيجة</span>
+      <span class="eyebrow">Result</span>
       <div class="score">
         <div class="ring" style="--p:${r.coverage};--c:${color}"><b>${r.coverage}%</b></div>
-        <div class="verdict ${cls}" style="flex:1">${cls === 'good' ? 'تغطية ممتازة!' : cls === 'warn' ? 'تغطية جيدة مع بعض المناطق المنسية.' : 'التغطية غير كافية — أكمل المناطق الناقصة.'}</div>
+        <div class="verdict ${cls}" style="flex:1">${cls === 'good' ? 'Excellent coverage!' : cls === 'warn' ? 'Good coverage, with a few missed areas.' : 'Not enough coverage — finish the missed areas.'}</div>
       </div>
       ${tips.length ? `<ul class="list">${tips.join('')}</ul>` : ''}
       <div class="btn-row">
-        <button class="btn btn-dark" data-act="remind" data-v="120">ذكّرني بالتجديد بعد ساعتين</button>
+        <button class="btn btn-dark" data-act="remind" data-v="120">Remind me to reapply in 2 hours</button>
       </div>
-      <button class="link-btn" data-act="remind" data-v="80">سأسبح أو أتعرّق — ذكّرني بعد 80 دقيقة</button>
+      <button class="link-btn" data-act="remind" data-v="80">Swimming or sweating? Remind me in 80 minutes</button>
     </div>`;
 }
 function saveSpf(){
   const s = ui.spf;
-  if(!s.zones.length){ $('#spfErr').textContent = 'حدّد المناطق التي غطّيتها.'; return; }
+  if(!s.zones.length){ $('#spfErr').textContent = 'Select the areas you covered.'; return; }
   const coverage = Math.round(s.zones.length / SPF_ZONES.length * 100);
   state.spf = {zones:[...s.zones], missed: SPF_ZONES.filter(z => !s.zones.includes(z)), spf:s.spf, amount:s.amount, coverage, at:Date.now()};
   save(); renderChrome();
@@ -1559,18 +1569,18 @@ function saveSpf(){
       drawn live on the face mesh as a green / yellow / red AR overlay
 --------------------------------------------------------- */
 const SPF_AR_ZONES = [
-  {key:'forehead', name:'الجبهة',       my:'جبهتك',        chip:'الجبهة', lm:151, expo:1.15,
+  {key:'forehead', name:'Forehead',     my:'your forehead',    chip:'Forehead', lm:151, expo:1.15,
    hull:[109,10,338,297,299,337,151,108,69,67]},
-  {key:'nose',     name:'الأنف',        my:'أنفك',         chip:'الأنف',  lm:5,   expo:1.3,
+  {key:'nose',     name:'Nose',         my:'your nose',        chip:'Nose',  lm:5,   expo:1.3,
    hull:[168,6,197,195,5,4,1,19,49,279,48,278,129,358,98,327,64,294]},
-  {key:'cheekR',   name:'الخدّ الأيمن', my:'خدّك الأيمن',  chip:'الخدّان', lm:50,  expo:1,
+  {key:'cheekR',   name:'Right cheek',  my:'your right cheek', chip:'Cheeks', lm:50,  expo:1,
    hull:[116,117,118,119,100,36,205,187,123,50,147]},
-  {key:'cheekL',   name:'الخدّ الأيسر', my:'خدّك الأيسر',  chip:'الخدّان', lm:280, expo:1,
+  {key:'cheekL',   name:'Left cheek',   my:'your left cheek',  chip:'Cheeks', lm:280, expo:1,
    hull:[345,346,347,348,329,266,425,411,352,280,376]},
-  {key:'chin',     name:'الذقن',        my:'ذقنك',         chip:'الذقن',  lm:199, expo:.85,
+  {key:'chin',     name:'Chin',         my:'your chin',        chip:'Chin',  lm:199, expo:.85,
    hull:[18,200,199,175,152,148,176,377,400,201,421,83,313,32,262]},
 ];
-const SPF_STATUS = {verified:'تأكيد بصري باللون', glossy:'تأكيد باللمعة (واقٍ شفاف)', motion:'رُصد الدهن باليد', manual:'تأكيد يدوي'};
+const SPF_STATUS = {verified:'Confirmed by colour', glossy:'Confirmed by shine (clear sunscreen)', motion:'Hand application detected', manual:'Confirmed manually'};
 const BASE_FRAMES = 30;     // analysed frames for the "before" reference
 const AFTER_FRAMES = 12;    // analysed frames per "after" measurement
 const PREP_MS = 1200;       // let auto-exposure settle before locking it
@@ -1581,9 +1591,9 @@ const PROT_GOOD = 70, PROT_WEAK = 40;
 
 function spfNumber(v){ return v === '15' ? 15 : v === '50+' ? 50 : 30; }
 function protCls(p){
-  if(p >= PROT_GOOD) return {cls:'good', color:'#5E8F58', rgb:'94,143,88',  label:'ممتازة'};
-  if(p >= PROT_WEAK) return {cls:'warn', color:'#C99A2E', rgb:'217,169,59', label:'بدأت تضعف'};
-  return {cls:'bad', color:'#B5544A', rgb:'200,70,60', label:'جدّد الآن'};
+  if(p >= PROT_GOOD) return {cls:'good', color:'#5E8F58', rgb:'94,143,88',  label:'Strong'};
+  if(p >= PROT_WEAK) return {cls:'warn', color:'#C99A2E', rgb:'217,169,59', label:'Weakening'};
+  return {cls:'bad', color:'#B5544A', rgb:'200,70,60', label:'Reapply now'};
 }
 
 // ---- geometry ----
@@ -1682,11 +1692,11 @@ function poseOk(d, loose){
     && d.scale > 1 - (1 - POSE_TOL.near) * k && d.scale < 1 + (POSE_TOL.far - 1) * k;
 }
 function poseHint(d){
-  if(d.scale <= POSE_TOL.near) return `${t('قرّبي','قرّب')} الجوال قليلًا (نفس مسافة اللقطة الأولى)`;
-  if(d.scale >= POSE_TOL.far) return `${t('بعّدي','بعّد')} الجوال قليلًا (نفس مسافة اللقطة الأولى)`;
-  if(Math.abs(d.roll) >= POSE_TOL.roll) return `${t('عدّلي','عدّل')} ميلان رأسك ليكون مستقيمًا`;
-  if(Math.abs(d.pitch) >= POSE_TOL.pitch) return d.pitch > 0 ? `${t('ارفعي','ارفع')} ذقنك قليلًا` : `${t('أنزلي','أنزل')} ذقنك قليلًا`;
-  return `${t('رجّعي','رجّع')} وجهك ${t('وانظري','وانظر')} للكاميرا مباشرة كاللقطة الأولى`;
+  if(d.scale <= POSE_TOL.near) return `Bring the phone a little closer (same distance as the first capture)`;
+  if(d.scale >= POSE_TOL.far) return `Move the phone a little farther away (same distance as the first capture)`;
+  if(Math.abs(d.roll) >= POSE_TOL.roll) return `Straighten your head`;
+  if(Math.abs(d.pitch) >= POSE_TOL.pitch) return d.pitch > 0 ? `Lift your chin slightly` : `Lower your chin slightly`;
+  return `Face the camera directly, like in the first capture`;
 }
 // pose gate with hysteresis + a short buzz when the pose locks in, so the user can feel it without reading
 function poseGate(d){
@@ -1850,25 +1860,25 @@ function minutesUntilWeak(L, key){
   }
   return null;
 }
-function fmtMins(m){ return m >= 60 ? `${Math.floor(m / 60)} س${m % 60 ? ` ${m % 60} د` : ''}` : `${m} د`; }
+function fmtMins(m){ return m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`; }
 
 // ---- UI ----
 function smartStepsHtml(){
   const zs = smart.zones;
   const base = smart.zi === -1 ? ' cur' : zs && smart.zi >= 0 ? ' ok' : '';
-  const rows = [`<li class="${base}"><span class="st">${base === ' ok' ? '✓' : '0'}</span>لقطة "قبل" بدون واقي<span class="m">${smart.zi === -1 ? 'الآن' : ''}</span></li>`];
+  const rows = [`<li class="${base}"><span class="st">${base === ' ok' ? '✓' : '0'}</span>"Before" capture, no sunscreen<span class="m">${smart.zi === -1 ? 'now' : ''}</span></li>`];
   SPF_AR_ZONES.forEach((z, i) => {
     const s = zs && zs[i].status, cur = zs && smart.zi === i;
-    rows.push(`<li class="${s ? 'ok' : ''}${cur ? ' cur' : ''}"><span class="st">${s ? '✓' : i + 1}</span>${t('ادهني','ادهن')} ${z.my}<span class="m">${s ? SPF_STATUS[s] : cur ? 'الآن' : ''}</span></li>`);
+    rows.push(`<li class="${s ? 'ok' : ''}${cur ? ' cur' : ''}"><span class="st">${s ? '✓' : i + 1}</span>Apply on ${z.my}<span class="m">${s ? SPF_STATUS[s] : cur ? 'now' : ''}</span></li>`);
   });
   return rows.join('');
 }
 function smartCtlHtml(mode){
-  if(mode === 'busy') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">إلغاء</button></div>`;
-  if(mode === 'check') return `<div class="btn-row"><button class="btn btn-dark" data-act="spfManual" id="spfManualBtn" ${smart.zi < 0 ? 'disabled' : ''}>وضعته على هذه المنطقة ✓</button><button class="btn btn-outline" data-act="spfStop">إيقاف</button></div>`;
-  if(mode === 'ar') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">إغلاق الكاميرا</button></div>`;
-  return `<div class="btn-row"><button class="btn btn-primary" data-act="spfCheck">${state.spfLive ? 'إعادة الفحص (بعد التجديد)' : 'ابدأ الفحص الذكي'}</button>
-    ${state.spfLive ? `<button class="btn btn-outline" data-act="spfAR">عرض الحماية على وجهي</button>` : ''}</div>`;
+  if(mode === 'busy') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Cancel</button></div>`;
+  if(mode === 'check') return `<div class="btn-row"><button class="btn btn-dark" data-act="spfManual" id="spfManualBtn" ${smart.zi < 0 ? 'disabled' : ''}>Applied on this area ✓</button><button class="btn btn-outline" data-act="spfStop">Stop</button></div>`;
+  if(mode === 'ar') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Close camera</button></div>`;
+  return `<div class="btn-row"><button class="btn btn-primary" data-act="spfCheck">${state.spfLive ? 'Check again (after reapplying)' : 'Start smart check'}</button>
+    ${state.spfLive ? `<button class="btn btn-outline" data-act="spfAR">Show protection on my face</button>` : ''}</div>`;
 }
 function renderSmartSteps(){ const el = $('#spfSteps'); if(el) el.innerHTML = smartStepsHtml(); }
 function setSmartCtl(mode){ const el = $('#spfCtl'); if(el) el.innerHTML = smartCtlHtml(mode); }
@@ -1895,41 +1905,221 @@ function liveBoxHtml(){
     const m = r.m;
     const num = (v, d = 1) => `<bdi dir="ltr">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}</bdi>`;
     const icon = {verified:'✅', glossy:'✨', motion:'☑️', manual:'✍️'}[r.status];
-    const metr = m && m.dE != null ? `<br><span class="small">${m.coverage != null ? `تغطية <b>${Math.round(m.coverage * 100)}%</b>${m.cov ? ` (${m.cov.filter(Boolean).length}/${m.cov.length} نقطة)` : ''} · ` : ''}فرق اللون ΔE <bdi dir="ltr">${m.dE.toFixed(1)}</bdi> · إضاءة L* ${num(m.dL)} · بهتان ${num(m.dC)} · لمعة ${num(m.dSpec * 100)}</span>` : '';
-    return `<li><b>${z.name}:</b> ${icon} ${SPF_STATUS[r.status] || ''}${r.rubs ? ` · لُمست ${r.rubs}×` : ''}${metr}</li>`;
+    const metr = m && m.dE != null ? `<br><span class="small">${m.coverage != null ? `Coverage <b>${Math.round(m.coverage * 100)}%</b>${m.cov ? ` (${m.cov.filter(Boolean).length}/${m.cov.length} points)` : ''} · ` : ''}Colour change ΔE <bdi dir="ltr">${m.dE.toFixed(1)}</bdi> · lightness L* ${num(m.dL)} · whitening ${num(m.dC)} · shine ${num(m.dSpec * 100)}</span>` : '';
+    return `<li><b>${z.name}:</b> ${icon} ${SPF_STATUS[r.status] || ''}${r.rubs ? ` · touched ${r.rubs}×` : ''}${metr}</li>`;
   }).join('');
   const prev = [0, 30, 60, 120, 180];
   return `
     <div class="card" id="spfLiveBox">
-      <span class="eyebrow">خريطة الحماية الحيّة</span>
+      <span class="eyebrow">Live protection map</span>
       <div class="score" style="margin-top:6px">
         <div class="ring" style="--p:${avg.toFixed(0)};--c:${protCls(avg).color}"><b>${Math.round(avg)}%</b></div>
         <div style="flex:1">
-          <div class="verdict ${protCls(weakest.p).cls}">${smart.preview ? `بعد ${fmtMins(smart.preview)}: ` : ''}أضعف منطقة ${weakest.z.name} (${Math.round(weakest.p)}%) — ${protCls(weakest.p).label}</div>
-          <p class="small" style="margin:6px 0 0">SPF ${L.spf}${L.spfGuess ? ' (افتراضي)' : ''} · الفعّال الآن ≈ SPF ${effSpf} · مضى ${fmtMins(elapsed)} · UV ${uvNow} ${L.uvLive ? 'من موقعك' : '(تقديري — فعّل الموقع لقيمة حقيقية)'}</p>
+          <div class="verdict ${protCls(weakest.p).cls}">${smart.preview ? `In ${fmtMins(smart.preview)}: ` : ''}Weakest area: ${weakest.z.name} (${Math.round(weakest.p)}%) — ${protCls(weakest.p).label}</div>
+          <p class="small" style="margin:6px 0 0">SPF ${L.spf}${L.spfGuess ? ' (assumed)' : ''} · effective now ≈ SPF ${effSpf} · ${fmtMins(elapsed)} ago · UV ${uvNow} ${L.uvLive ? 'at your location' : '(estimated — turn on location for a real value)'}</p>
         </div>
       </div>
       <div class="prot">${rows}</div>
       <div class="field">
-        <span class="field-label">${t('أنتِ','أنت')} الآن</span>
+        <span class="field-label">Right now you are</span>
         <div class="chips">
-          <button class="chip${out ? ' on' : ''}" data-act="spfEnv" data-v="out">☀️ في الخارج</button>
-          <button class="chip${!out ? ' on' : ''}" data-act="spfEnv" data-v="in">🏠 داخل مبنى</button>
+          <button class="chip${out ? ' on' : ''}" data-act="spfEnv" data-v="out">☀️ Outdoors</button>
+          <button class="chip${!out ? ' on' : ''}" data-act="spfEnv" data-v="in">🏠 Indoors</button>
         </div>
       </div>
       <div class="field">
-        <span class="field-label">معاينة الحماية بعد</span>
-        <div class="chips">${prev.map(m => `<button class="chip${smart.preview === m ? ' on' : ''}" data-act="spfPreview" data-v="${m}">${m ? '+' + fmtMins(m) : 'الآن'}</button>`).join('')}</div>
+        <span class="field-label">Preview protection in</span>
+        <div class="chips">${prev.map(m => `<button class="chip${smart.preview === m ? ' on' : ''}" data-act="spfPreview" data-v="${m}">${m ? '+' + fmtMins(m) : 'Now'}</button>`).join('')}</div>
       </div>
-      ${until != null && until > 0 ? `<div class="btn-row"><button class="btn btn-dark" data-act="remind" data-v="${until}">ذكّرني عندما تضعف الحماية (بعد ${fmtMins(until)})</button></div>` : ''}
-      ${until === 0 ? `<div class="notice" style="background:var(--bad-bg);color:var(--bad)">الحماية على ${weakest.z.name} ضعفت — ${t('جدّدي','جدّد')} الواقي ثم ${t('أعيدي','أعد')} الفحص.</div>` : ''}
+      ${until != null && until > 0 ? `<div class="btn-row"><button class="btn btn-dark" data-act="remind" data-v="${until}">Remind me when protection weakens (in ${fmtMins(until)})</button></div>` : ''}
+      ${until === 0 ? `<div class="notice" style="background:var(--bad-bg);color:var(--bad)">Protection on ${weakest.z.name} has worn off — reapply sunscreen, then check again.</div>` : ''}
       <ul class="list small" style="margin-top:12px">${checks}</ul>
-      <p class="small" style="margin-top:8px">${L.approx ? 'تم القياس بدون تتبّع الوجه، فالدقة أقل. ' : ''}${L.locked ? 'تم قفل تعريض الكاميرا أثناء القياس. ' : ''}النسب تقدير من نموذج رياضي (الأشعة × عامل الحماية × تعرّض كل منطقة × لمس الوجه) وليست قياسًا مخبريًا.</p>
+      <p class="small" style="margin-top:8px">${L.approx ? 'Measured without face tracking, so accuracy is lower. ' : ''}${L.locked ? 'Camera exposure was locked during the measurement. ' : ''}Percentages are estimates from a mathematical model (UV × SPF × each zone’s exposure × face touching), not a lab measurement.</p>
     </div>`;
 }
 function refreshLive(){
   const el = $('#spfLiveBox');
   if(el) el.outerHTML = liveBoxHtml();
+}
+
+/* ---------------------------------------------------------
+   SUNSCREEN CHECK REPORTS
+   Kept on this device for as long as the browser allows: IndexedDB (primary) plus a
+   localStorage mirror (each heals the other on load), and persistent-storage mode so
+   the browser won't evict them when space runs low. A backup file covers the rest
+   (cleared site data, a new phone).
+--------------------------------------------------------- */
+const REPORT_KEY = 'myskin:spfReports';
+const REPORT_MAX = 300;
+const reports = {list:[], persisted:null, all:false};
+let idbPromise = null;
+function idb(){
+  if(!idbPromise) idbPromise = new Promise((res, rej) => {
+    const r = indexedDB.open('myskin', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('spfReports', {keyPath:'id'});
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }).catch(e => { idbPromise = null; throw e; });
+  return idbPromise;
+}
+async function idbDo(mode, fn){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('spfReports', mode), q = fn(tx.objectStore('spfReports'));
+    tx.oncomplete = () => res(q && q.result); tx.onerror = () => rej(tx.error);
+  });
+}
+function mirrorReports(){ try{ localStorage.setItem(REPORT_KEY, JSON.stringify(reports.list.slice(0, REPORT_MAX))); }catch(e){} }
+async function loadReports(){
+  let ls = [], db = [];
+  try{ ls = JSON.parse(localStorage.getItem(REPORT_KEY)) || []; }catch(e){}
+  try{ db = await idbDo('readonly', s => s.getAll()) || []; }catch(e){}
+  const byId = new Map();
+  [...ls, ...db].forEach(r => { if(r && r.id) byId.set(r.id, r); });
+  reports.list = [...byId.values()].sort((a, b) => b.at - a.at).slice(0, REPORT_MAX);
+  const inDb = new Set(db.map(r => r.id));
+  reports.list.filter(r => !inDb.has(r.id)).forEach(r => idbDo('readwrite', s => s.put(r)).catch(() => {}));
+  mirrorReports();
+  try{ if(navigator.storage && navigator.storage.persisted) reports.persisted = await navigator.storage.persisted(); }catch(e){}
+  refreshReports();
+}
+async function storeReports(list){
+  const known = new Set(reports.list.map(r => r.id));
+  list.forEach(r => { if(!known.has(r.id)) reports.list.push(r); });
+  reports.list.sort((a, b) => b.at - a.at);
+  reports.list = reports.list.slice(0, REPORT_MAX);
+  mirrorReports();
+  for(const r of list) await idbDo('readwrite', s => s.put(r)).catch(() => {});
+  // ask once to be exempt from automatic eviction (granted silently on most installed / often-used sites)
+  try{ if(!reports.persisted && navigator.storage && navigator.storage.persist) reports.persisted = await navigator.storage.persist(); }catch(e){}
+  refreshReports();
+}
+async function deleteReport(id){
+  reports.list = reports.list.filter(r => r.id !== id);
+  mirrorReports();
+  await idbDo('readwrite', s => s.delete(id)).catch(() => {});
+  refreshReports();
+}
+async function clearReports(){
+  reports.list = [];
+  try{ localStorage.removeItem(REPORT_KEY); }catch(e){}
+  await idbDo('readwrite', s => s.clear()).catch(() => {});
+}
+
+function buildSpfReport(L){
+  const w = ui.weather.status === 'ready' ? ui.weather : null;
+  const zones = SPF_AR_ZONES.map(z => {
+    const r = L.zones[z.key], m = r.m || {};
+    return {key:z.key, name:z.name, status:r.status, start:Math.round(zoneProtection(L, z.key, L.at)), weakIn:minutesUntilWeak(L, z.key),
+      coverage: m.coverage != null ? Math.round(m.coverage * 100) : null,
+      points: m.cov ? m.cov.length : null, missed: m.cov ? m.cov.filter(v => !v).length : null,
+      dE:m.dE ?? null, dL:m.dL ?? null, dC:m.dC ?? null, dSpec:m.dSpec ?? null};
+  });
+  const weakest = zones.reduce((a, b) => b.start < a.start ? b : a);
+  const weakIns = zones.map(z => z.weakIn).filter(v => v != null);
+  return {id:'spf-' + L.at, v:1, at:L.at, spf:L.spf, spfGuess:L.spfGuess, amount:L.amount,
+    uv:Math.round(uvAt(L.at, L) * 10) / 10, uvMax:L.uvMax, uvLive:L.uvLive, place:w ? w.place : '', temp:w ? w.temp : null,
+    tracked:!L.approx, locked:L.locked, zones, avg:Math.round(mean(zones.map(z => z.start))),
+    weakest:weakest.name, reapplyIn:weakIns.length ? Math.min(...weakIns) : null};
+}
+const fmtWhen = at => new Date(at).toLocaleString('en', {weekday:'short', day:'numeric', month:'short', year:'numeric', hour:'numeric', minute:'2-digit'});
+function reportTips(r){
+  const tips = [];
+  const missed = r.zones.filter(z => z.missed);
+  if(missed.length) tips.push(`Missed spots on ${missed.map(z => `${z.name} (${z.missed}/${z.points})`).join(', ')} — spread more slowly over those areas next time.`);
+  const unverified = r.zones.filter(z => z.status === 'manual' || z.status === 'motion');
+  if(unverified.length) tips.push(`${unverified.map(z => z.name).join(', ')} could not be confirmed by colour — a tinted or white-cast sunscreen makes the check more reliable.`);
+  if(r.amount === 'no') tips.push('You used less than two finger-lengths, which lowers real protection a lot.');
+  if(r.spfGuess) tips.push('SPF was not selected, so SPF 30 was assumed.');
+  else if(r.spf < 30) tips.push('SPF 15 is not enough for daily exposure — use at least SPF 30.');
+  if(r.reapplyIn != null) tips.push(`Modelled protection on ${r.weakest} dropped below ${PROT_WEAK}% about ${fmtMins(r.reapplyIn)} after applying (outdoors).`);
+  if(!r.tracked) tips.push('Measured without face tracking, so this report is less accurate.');
+  return tips;
+}
+function reportBodyHtml(r){
+  const st = {verified:'✅', glossy:'✨', motion:'☑️', manual:'✍️'};
+  const n = (v, d = 1) => v == null ? '–' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d);
+  const rows = r.zones.map(z => {
+    const c = protCls(z.start);
+    return `<tr><td><b>${esc(z.name)}</b><br><span class="small">${st[z.status] || ''} ${SPF_STATUS[z.status] || ''}</span></td>
+      <td>${z.coverage != null ? z.coverage + '%' : '–'}${z.points ? `<br><span class="small">${z.points - z.missed}/${z.points} pts</span>` : ''}</td>
+      <td>${z.dE != null ? z.dE.toFixed(1) : '–'}<br><span class="small">L* ${n(z.dL)} · shine ${n(z.dSpec != null ? z.dSpec * 100 : null)}</span></td>
+      <td style="color:${c.color};font-weight:700">${z.start}%<br><span class="small">${z.weakIn == null ? '12 h+' : z.weakIn === 0 ? 'now' : fmtMins(z.weakIn)}</span></td></tr>`;
+  }).join('');
+  const tips = reportTips(r);
+  return `
+    <p class="small" style="margin:0 0 8px">SPF ${r.spf}${r.spfGuess ? ' (assumed)' : ''} · amount ${r.amount === 'no' ? 'less than recommended' : r.amount === 'yes' ? 'enough' : 'not given'}
+      · UV ${r.uv}${r.uvLive ? '' : ' (estimated)'}${r.uvMax != null ? `, peak ${r.uvMax}` : ''}${r.place ? ' · ' + esc(r.place) : ''}${r.temp != null ? ` · ${r.temp}°` : ''}</p>
+    <div class="verdict ${protCls(r.avg).cls}">Average starting protection ${r.avg}% · weakest area: ${esc(r.weakest)}${r.reapplyIn != null ? ` · reapply after ≈ ${fmtMins(r.reapplyIn)} outdoors` : ''}</div>
+    <table class="rep-t">
+      <tr><th>Area</th><th>Coverage</th><th>ΔE</th><th>Start · weak in</th></tr>${rows}
+    </table>
+    ${tips.length ? `<ul class="list small" style="margin-top:10px">${tips.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    <p class="small" style="margin-top:8px">${r.tracked ? 'Face tracking on' : 'No face tracking'} · ${r.locked ? 'exposure locked' : 'exposure compensated'}. Coverage = share of measured points whose colour changed beyond their own noise (CIELAB ΔE). Protection is a model estimate, not a lab measurement.</p>`;
+}
+function reportsCardHtml(){
+  const L = reports.list;
+  const shown = reports.all ? L : L.slice(0, 5);
+  const store = reports.persisted ? 'Saved on this device, protected from automatic clean-up.' : 'Saved on this device.';
+  return `
+    <div class="card" id="spfReports">
+      <span class="eyebrow">Sunscreen check reports${L.length ? ' · ' + L.length : ''}</span>
+      <p class="sub">${L.length ? store + ' Clearing site data in the browser removes them — keep a backup file to be safe.' : 'Each smart check saves a detailed report here, on this device only.'}</p>
+      ${shown.map(r => { const c = protCls(r.avg); return `
+        <button class="rep" data-act="repOpen" data-id="${esc(r.id)}">
+          <span class="ring" style="--p:${r.avg};--c:${c.color}"><b>${r.avg}%</b></span>
+          <span class="rep-body"><b>${fmtWhen(r.at)}</b><span>SPF ${r.spf} · UV ${r.uv} · weakest ${esc(r.weakest)}</span></span>
+          ${ic('chevron', 'color:var(--muted)')}
+        </button>`; }).join('')}
+      ${L.length > 5 ? `<button class="link-btn" data-act="repAll">${reports.all ? 'Show fewer' : `Show all ${L.length}`}</button>` : ''}
+      <div class="btn-row">
+        ${L.length ? `<button class="btn btn-outline" data-act="repBackup">Save backup file</button>` : ''}
+        <button class="btn btn-outline" data-act="repRestore">Restore from file</button>
+      </div>
+      <input type="file" id="repFile" accept=".json,application/json" hidden>
+    </div>`;
+}
+function refreshReports(){ const el = $('#spfReports'); if(el) el.outerHTML = reportsCardHtml(); }
+function openReport(id){
+  const r = reports.list.find(x => x.id === id); if(!r) return;
+  modal(`
+    <span class="eyebrow">Sunscreen check report</span>
+    <h3>${fmtWhen(r.at)}</h3>
+    ${reportBodyHtml(r)}
+    <button class="btn btn-primary" data-act="repDownload" data-id="${esc(r.id)}">Download report</button>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-outline" data-act="repDelete" data-id="${esc(r.id)}">Delete</button>
+      <button class="btn btn-outline" data-act="closeModal">Close</button>
+    </div>`);
+}
+function saveFile(name, text, type){
+  const url = URL.createObjectURL(new Blob([text], {type}));
+  const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+const stamp = at => { const d = new Date(at), p = v => String(v).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`; };
+function downloadReport(id){
+  const r = reports.list.find(x => x.id === id); if(!r) return;
+  const css = [...document.querySelectorAll('style')].map(s => s.textContent).join('\n');
+  saveFile(`my-skin-sunscreen-report-${stamp(r.at)}.html`, `<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>My skin — sunscreen report ${esc(fmtWhen(r.at))}</title>
+<style>${css}</style></head><body><div class="app" style="padding-bottom:24px">
+<div class="card"><span class="eyebrow">My skin · sunscreen check report</span><h2>${esc(fmtWhen(r.at))}</h2>${reportBodyHtml(r)}</div>
+<p class="disclaimer">Generated by My skin on this device. Guidance only — not a medical assessment.</p></div></body></html>`, 'text/html');
+}
+function backupReports(){
+  saveFile(`my-skin-sunscreen-reports-${stamp(Date.now())}.json`, JSON.stringify({app:'my-skin', kind:'spf-reports', v:1, reports:reports.list}, null, 1), 'application/json');
+}
+async function restoreReports(file){
+  if(!file) return;
+  try{
+    const d = JSON.parse(await file.text());
+    const list = (Array.isArray(d) ? d : d.reports || []).filter(r => r && typeof r.id === 'string' && r.at && Array.isArray(r.zones));
+    if(!list.length) throw new Error('empty');
+    const before = reports.list.length;
+    await storeReports(list);
+    toast(`Restored ${reports.list.length - before} new report${reports.list.length - before === 1 ? '' : 's'}`);
+  }catch(e){ toast('That file is not a My skin reports backup.'); }
 }
 
 // ---- camera runner shared by the check and the AR view ----
@@ -1943,10 +2133,10 @@ function smoothLandmarks(prev, lm){
 function qualHtml(fr){
   const item = (ok, label) => `<span class="${ok == null ? '' : ok ? 'ok' : 'no'}">${ok == null ? '•' : ok ? '✓' : '✗'} ${label}</span>`;
   const q = fr && fr.q;
-  return item(q ? q.light : null, 'الإضاءة') + item(q ? q.dist : null, 'المسافة') + item(q ? q.still : null, 'الثبات')
-    + (smart.basePose && fr && fr.pose ? item(smart.poseGood, 'الوضعية') : '')
-    + item(smart.tracked, 'تتبّع الوجه') + item(smart.hands, 'تتبّع اليد')
-    + `<span class="${smart.locked ? 'ok' : ''}">${smart.locked ? '✓ قفل التعريض' : '• تعويض التعريض'}</span>`;
+  return item(q ? q.light : null, 'Light') + item(q ? q.dist : null, 'Distance') + item(q ? q.still : null, 'Steadiness')
+    + (smart.basePose && fr && fr.pose ? item(smart.poseGood, 'Pose') : '')
+    + item(smart.tracked, 'Face tracking') + item(smart.hands, 'Hand tracking')
+    + `<span class="${smart.locked ? 'ok' : ''}">${smart.locked ? '✓ Exposure locked' : '• Exposure compensated'}</span>`;
 }
 
 async function runSpfCam(mode){
@@ -1955,13 +2145,13 @@ async function runSpfCam(mode){
   const cam = $('#spfCam'), video = $('#spfVideo'), canvas = $('#spfCanvas'), hint = $('#spfHint'), ph = $('#spfPh span');
   smart.mode = 'busy'; setSmartCtl('busy');
   if(mode === 'check' && ui.weather.status === 'idle') fetchWeather();
-  ph.textContent = 'جارٍ تشغيل الكاميرا…';
+  ph.textContent = 'Starting camera…';
   let stream;
   try{ stream = await startCamera(video, 'user'); }
   catch(e){ ph.textContent = camErrorText(e); smart.mode = 'idle'; setSmartCtl('idle'); return; }
   if(token !== session.token) return;
   cam.classList.add('live');
-  hint.textContent = 'جارٍ تحميل نموذج الوجه (468 نقطة) ونموذج اليد (21 نقطة)…';
+  hint.textContent = 'Loading the face model (468 points) and hand model (21 points)…';
   // load one after the other: the two MediaPipe solutions share loader globals and clash if initialised in parallel
   const fm = await getFaceMesh().catch(() => null);
   const hands = token === session.token ? await getHands().catch(() => null) : null;
@@ -2096,10 +2286,10 @@ function checkStepper(){
     const face = fr && fr.face;
     // ---------- 1) reference ("before") ----------
     if(smart.zi === -1){
-      if(!face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
+      if(!face){ hint.textContent = `Place your face inside the frame`; return; }
       SPF_AR_ZONES.forEach(z => paintZone(ctx, fr.geo[z.key], W, H, '255,255,255', .1, 2));
       if(prepMs < PREP_MS){
-        prepMs += dt; hint.textContent = 'جارٍ ضبط إضاءة الكاميرا…';
+        prepMs += dt; hint.textContent = 'Adjusting camera exposure…';
         if(prepMs >= PREP_MS && !locking){
           locking = true;
           lockCamera(smart.track).then(ok => { smart.locked = ok; smart.bgBase = null; });
@@ -2107,9 +2297,9 @@ function checkStepper(){
         return;
       }
       if(!isNew) return;
-      if(!fr.q.light){ hint.textContent = fr.q.dark ? `الإضاءة ضعيفة — ${t('قابلي','قابل')} نافذة أو مصدر ضوء` : `الضوء قوي جدًا على الوجه — ${t('ابتعدي','ابتعد')} عن الضوء المباشر`; return; }
-      if(!fr.q.dist){ hint.textContent = `${t('قرّبي','قرّب')} وجهك ليملأ الإطار`; return; }
-      if(!fr.q.still || fr.held){ hint.textContent = `${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} ${t('وانظري','وانظر')} للكاميرا`; return; }
+      if(!fr.q.light){ hint.textContent = fr.q.dark ? `Too dark — face a window or a light source` : `Too much light on your face — move out of direct light`; return; }
+      if(!fr.q.dist){ hint.textContent = `Move closer so your face fills the frame`; return; }
+      if(!fr.q.still || fr.held){ hint.textContent = `Hold still and look at the camera`; return; }
       SPF_AR_ZONES.forEach(z => {
         const a = acc[z.key] || (acc[z.key] = {cells:fr.meas[z.key].cells.map(() => []), spec:[], gloss:[]});
         fr.meas[z.key].cells.forEach((c, i) => { if(c) a.cells[i].push(c); });
@@ -2117,9 +2307,9 @@ function checkStepper(){
       });
       if(fr.pose) poses.push(fr.pose);
       baseN++;
-      hint.textContent = `لقطة "قبل": ${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} — نقرأ لون ولمعة ${SPF_AR_ZONES.reduce((s, z) => s + fr.meas[z.key].cells.length, 0)} نقطة على وجهك`;
+      hint.textContent = `"Before" capture: hold still — reading the colour and shine of ${SPF_AR_ZONES.reduce((s, z) => s + fr.meas[z.key].cells.length, 0)} points on your face`;
       fill.style.width = (baseN / BASE_FRAMES * 100).toFixed(1) + '%';
-      txt.textContent = `قراءة البشرة قبل الواقي… ${Math.round(baseN / BASE_FRAMES * 100)}%`;
+      txt.textContent = `Reading your skin before sunscreen… ${Math.round(baseN / BASE_FRAMES * 100)}%`;
       if(baseN >= BASE_FRAMES){
         zones.forEach(z => {
           const a = acc[z.key];
@@ -2158,19 +2348,19 @@ function checkStepper(){
     if(!z.status){
       if(z.rubMs < 700){
         hint.textContent = z.retried
-          ? `باقي أجزاء ما وصلها الواقي (النقاط الحمراء) — ${t('كمّلي','كمّل')} على ${z.my}`
-          : `${t('ادهني','ادهن')} ${z.my} الآن${z.idleMs > 12000 ? ' — أو اضغط "وضعته" إذا انتهيت' : ''}`;
+          ? `Some spots were missed (red dots) — finish ${z.my}`
+          : `Apply sunscreen on ${z.my} now${z.idleMs > 12000 ? ' — or tap "Applied" when you’re done' : ''}`;
       } else if(z.awayMs < 500){
         phase = 'rub';
-        hint.textContent = fr && fr.handZones.has(z.key) ? `✋ يدك على ${z.name} — ${t('وزّعي','وزّع')} جيدًا ثم ${t('أبعدي','أبعد')} يدك` : `ممتاز — ${t('أبعدي','أبعد')} يدك عن وجهك للقياس`;
+        hint.textContent = fr && fr.handZones.has(z.key) ? `✋ Hand on ${z.name} — spread it well, then move your hand away` : `Great — move your hand away from your face to measure`;
       } else {
         phase = 'measure';
         const d = fr && fr.pose && smart.basePose ? poseDiff(smart.basePose, fr.pose) : null;
-        if(!face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; }
+        if(!face){ hint.textContent = `Place your face inside the frame`; }
         else if(d && !poseGate(d)){ hint.textContent = poseHint(d); }   // pause, keep frames already taken
-        else if(!fr.q.still){ hint.textContent = `${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} لحظة…`; }
+        else if(!fr.q.still){ hint.textContent = `Hold still for a moment…`; }
         else {
-          hint.textContent = 'جارٍ مقارنة اللون واللمعة مع لقطة "قبل"…';
+          hint.textContent = 'Comparing colour and shine with the "before" capture…';
           if(isNew) z.after.push(fr.meas[z.key]);
           if(z.after.length >= AFTER_FRAMES){
             const res = evaluate(z);
@@ -2179,7 +2369,7 @@ function checkStepper(){
               if(res.coverage < .7 && !z.retried){
                 z.retried = true; z.prevCov = res.cov; z.res = res; resetRub(z);
                 const miss = res.cov.filter(v => !v).length;
-                toast(`${miss} نقطة في ${z.name} ما وصلها الواقي — ${t('كمّلي','كمّل')} عليها`);
+                toast(`${miss} points on ${z.name} were missed — go over them`);
                 buzz([70, 60, 70]);
               } else { z.status = 'verified'; z.res = res; }
             } else if(res.shiny){ z.status = 'glossy'; z.res = res; }
@@ -2213,7 +2403,7 @@ function checkStepper(){
     const doneN = zones.filter(o => o.status).length;
     const part = phase === 'measure' ? .5 + .5 * z.after.length / AFTER_FRAMES : phase === 'rub' ? .35 : 0;
     fill.style.width = ((doneN + (z.status ? 0 : part)) / zones.length * 100).toFixed(1) + '%';
-    txt.textContent = `المنطقة ${Math.min(smart.zi + 1, zones.length)} من ${zones.length}: ${z.name}${smart.tracked ? '' : ' (بدون تتبّع)'}`;
+    txt.textContent = `Zone ${Math.min(smart.zi + 1, zones.length)} of ${zones.length}: ${z.name}${smart.tracked ? '' : ' (no tracking)'}`;
 
     if(z.status){
       smart.zi++; renderSmartSteps(); setSmartCtl('check');
@@ -2223,7 +2413,7 @@ function checkStepper(){
 }
 function finishSmart(zones){
   const now = Date.now();
-  const L = {at:now, spf:spfNumber(ui.spf.spf), spfGuess:!ui.spf.spf || ui.spf.spf === 'لا أعرف', amount:ui.spf.amount,
+  const L = {at:now, spf:spfNumber(ui.spf.spf), spfGuess:!ui.spf.spf || ui.spf.spf === 'Not sure', amount:ui.spf.amount,
     approx:!smart.tracked, locked:smart.locked, segs:[{from:now, outdoor:true}], zones:{},
     cells: smart.cells && smart.cells !== 'fallback' ? smart.cells : null,
     hourly: ui.weather.status === 'ready' ? ui.weather.hourly : null,
@@ -2237,11 +2427,12 @@ function finishSmart(zones){
               dE:r.dE, dL:r.dL, dC:r.dC, dSpec:r.dSpec, dGloss:r.dGloss} : null};
   });
   state.spfLive = L;
+  storeReports([buildSpfReport(L)]);
   SPF_AR_ZONES.forEach(z => { if(!ui.spf.zones.includes(z.chip)) ui.spf.zones.push(z.chip); });
   smart.preview = 0;
   save(); refreshSpfForm(); refreshLive();
   $('#spfProg').classList.remove('show');
-  toast('✅ تم القياس — هذه خريطة حمايتك الحيّة');
+  toast('✅ Measured — report saved. Here is your live protection map');
   buzz([100, 60, 100, 60, 220]);
   return arStepper();
 }
@@ -2254,7 +2445,7 @@ function arStepper(){
   const L = state.spfLive, touchMs = {}, cool = {};
   let cache = null, cacheAt = 0, cachePreview = -1, lastBox = 0;
   return {step({dt, now, fr, isNew, ctx, W, H, hint}){
-    if(!fr || !fr.face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
+    if(!fr || !fr.face){ hint.textContent = `Place your face inside the frame`; return; }
     if(!cache || now - cacheAt > 1000 || cachePreview !== smart.preview){
       const at = Date.now() + smart.preview * 60000;
       cache = {}; SPF_AR_ZONES.forEach(z => cache[z.key] = zoneProtection(L, z.key, at));
@@ -2268,7 +2459,7 @@ function arStepper(){
         if(touchMs[z.key] > 700 && !(cool[z.key] > now)){
           cool[z.key] = now + 4000; touchMs[z.key] = 0;
           L.zones[z.key].rubs = (L.zones[z.key].rubs || 0) + 1; save(); cache = null; refreshLive();
-          toast(`لمست ${z.name} — اللمس يزيل جزءًا من الواقي`); buzz([40, 40, 40]);
+          toast(`You touched ${z.name} — touching wipes off some sunscreen`); buzz([40, 40, 40]);
         }
       });
     }
@@ -2280,10 +2471,30 @@ function arStepper(){
       if(m && m.cov && fr.norm[z.key].length === m.cov.length)
         dots(ctx, fr.norm[z.key].filter((_, i) => !m.cov[i]), W, H, 'rgba(200,60,50,.95)', Math.max(2.5, W / 220));
     });
-    hint.textContent = smart.preview ? `معاينة بعد ${fmtMins(smart.preview)} · 🟢 ممتازة 🟡 تضعف 🔴 جدّد`
-      : '🟢 ممتازة · 🟡 بدأت تضعف · 🔴 جدّد الآن · النقاط الحمراء = أماكن ناقصة';
+    hint.textContent = smart.preview ? `Preview in ${fmtMins(smart.preview)} · 🟢 strong 🟡 weakening 🔴 reapply`
+      : '🟢 strong · 🟡 weakening · 🔴 reapply now · red dots = missed spots';
     if(now - lastBox > 5000){ lastBox = now; refreshLive(); }
   }};
+}
+
+/* =========================================================
+   MIGRATION — values saved while the app was in Arabic
+========================================================= */
+function migrateState(){
+  const AR = {'السكري':'Diabetes', 'ارتفاع ضغط الدم':'High blood pressure', 'حساسية جلدية معروفة':'Known skin allergy',
+    'الأكزيما':'Eczema', 'الصدفية':'Psoriasis', 'الوردية':'Rosacea', 'حب الشباب الهرموني':'Hormonal acne',
+    'الحمل أو الرضاعة':'Pregnancy or breastfeeding', 'لا يوجد':'None', 'الجبهة':'Forehead', 'الأنف':'Nose', 'الخدّان':'Cheeks',
+    'الذقن':'Chin', 'حول العينين':'Around the eyes', 'الأذنان':'Ears', 'الرقبة':'Neck', 'خلف الرقبة':'Back of neck', 'الشفاه':'Lips', 'لا أعرف':'Not sure'};
+  const arabic = v => /[؀-ۿ]/.test(typeof v === 'string' ? v : JSON.stringify(v));
+  if(!arabic(state)) return;
+  const map = a => (a || []).map(v => AR[v] || v);
+  const m = state.medical;
+  if(m){ m.conditions = map(m.conditions); m.risky = map(m.risky); }
+  if(state.skinType && TYPE_INFO[state.skinType.raw]) state.skinType.label = TYPE_INFO[state.skinType.raw].label;
+  if(state.spf){ state.spf.zones = map(state.spf.zones); state.spf.missed = map(state.spf.missed); state.spf.spf = AR[state.spf.spf] || state.spf.spf; }
+  if(state.pore) state.pore.zones.forEach(z => { const p = PORE_ZONES.find(x => x.key === z.key); if(p) z.name = p.name; });
+  if(state.ingredient && arabic(state.ingredient)) state.ingredient = null;   // re-check the product to get it in English
+  save();
 }
 
 /* =========================================================
@@ -2295,21 +2506,21 @@ const ACTIONS = {
   go: d => goTo(d.v),
   locate: () => fetchWeather(),
   reset: () => {
-    if(!confirm('سيتم حذف كل بياناتك المحفوظة على هذا الجهاز. متابعة؟')) return;
+    if(!confirm('This deletes all your saved data on this device, including sunscreen reports. Continue?')) return;
     state = {...DEFAULT_STATE}; ui.medical = ui.skin = ui.spf = null; ui.ing = {product:null, results:[]};
-    clearTimeout(reminderTimer); save(); goTo('home');
+    clearTimeout(reminderTimer); save(); clearReports(); goTo('home');
   },
   // medical
   gender: d => {
     ui.medical.gender = d.v; state.gender = d.v; save();
-    if(d.v === 'male') ui.medical.conditions = ui.medical.conditions.filter(c => c !== 'الحمل أو الرضاعة');
+    if(d.v === 'male') ui.medical.conditions = ui.medical.conditions.filter(c => c !== 'Pregnancy or breastfeeding');
     rerenderKeepScroll();
   },
   cond: d => {
     const m = ui.medical;
-    if(d.v === 'لا يوجد') m.conditions = m.conditions.includes('لا يوجد') ? [] : ['لا يوجد'];
+    if(d.v === 'None') m.conditions = m.conditions.includes('None') ? [] : ['None'];
     else{
-      m.conditions = m.conditions.filter(c => c !== 'لا يوجد');
+      m.conditions = m.conditions.filter(c => c !== 'None');
       m.conditions = m.conditions.includes(d.v) ? m.conditions.filter(c => c !== d.v) : [...m.conditions, d.v];
     }
     rerenderKeepScroll();
@@ -2350,6 +2561,14 @@ const ACTIONS = {
   spfAmount: d => { ui.spf.amount = d.v; refreshSpfForm(); },
   saveSpf,
   remind: d => setReminder(+d.v),
+  // reports
+  repOpen: d => openReport(d.id),
+  repDownload: d => downloadReport(d.id),
+  repDelete: d => { if(confirm('Delete this report? This cannot be undone.')){ closeModal(); deleteReport(d.id); } },
+  repAll: () => { reports.all = !reports.all; refreshReports(); },
+  repBackup: backupReports,
+  repRestore: () => { const f = $('#repFile'); if(f){ f.value = ''; f.click(); } },
+  closeModal: () => closeModal(),
   cancelReminder,
 };
 // re-render the SPF form chips without touching the (possibly live) mirror camera
@@ -2372,14 +2591,17 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', e => {
   if(e.target.id === 'poreFile') onPoreFile(e.target.files && e.target.files[0]);
+  if(e.target.id === 'repFile') restoreReports(e.target.files && e.target.files[0]);
 });
 document.addEventListener('keydown', e => {
   if(e.key === 'Enter' && e.target.id === 'searchQ'){ e.preventDefault(); searchProducts(); }
 });
 document.addEventListener('visibilitychange', () => { if(document.hidden && view !== 'home') stopCamera(); });
 
+migrateState();
 render();
 armReminder();
+loadReports();
 </script>
 </body>
 </html>

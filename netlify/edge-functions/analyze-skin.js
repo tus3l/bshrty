@@ -10,11 +10,11 @@ export default async function handler(req) {
   if (origin && origin !== new URL(req.url).origin) return json({ error: "Forbidden" }, 403);
 
   const apiKey = Netlify.env.get("GROQ_API_KEY");
-  if (!apiKey) return json({ error: "لم يتم ضبط مفتاح GROQ_API_KEY على الخادم." }, 500);
+  if (!apiKey) return json({ error: "GROQ_API_KEY is not set on the server." }, 500);
   const model = Netlify.env.get("GROQ_MODEL") || undefined;
 
   let body;
-  try { body = await req.json(); } catch { return json({ error: "طلب غير صالح." }, 400); }
+  try { body = await req.json(); } catch { return json({ error: "Invalid request." }, 400); }
   const invalid = validateRequest(body);
   if (invalid) return json({ error: invalid }, 400);
 

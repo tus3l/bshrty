@@ -1,4 +1,4 @@
-// Local server for بشرتي: serves ./public and the AI endpoint POST /api/analyze-skin.
+// Local server for My skin: serves ./public and the AI endpoint POST /api/analyze-skin.
 // Run:  npm start   → http://localhost:3000
 // The API key is read from .env (ANTHROPIC_API_KEY=...) and never sent to the browser.
 
@@ -22,7 +22,7 @@ function getApiKey() {
   // GROQ_API_KEY is the expected name; a Groq key (gsk_…) left under ANTHROPIC_API_KEY in .env is accepted too.
   const fromFile = env.GROQ_API_KEY || (env.ANTHROPIC_API_KEY?.trim().startsWith("gsk_") ? env.ANTHROPIC_API_KEY : "");
   const key = (fromFile || process.env.GROQ_API_KEY || "").trim();
-  return key && !key.includes("ضع") ? key : null;
+  return key && !key.includes("ضع") && !key.includes("your_key") ? key : null;   // ignore the .env.example placeholders
 }
 function getModel() {
   return (readEnvFile().GROQ_MODEL || process.env.GROQ_MODEL || "").trim() || undefined;
@@ -47,7 +47,7 @@ const server = http.createServer(async (req, res) => {
     return await serveStatic(url.pathname, res);
   } catch (err) {
     console.error(err);
-    if (!res.headersSent) sendJson(res, 500, { error: "خطأ في الخادم." });
+    if (!res.headersSent) sendJson(res, 500, { error: "Server error." });
     else res.end();
   }
 });
@@ -55,16 +55,16 @@ const server = http.createServer(async (req, res) => {
 async function handleAnalyze(req, res) {
   if (req.method !== "POST") return sendJson(res, 405, { error: "Method not allowed" });
   const apiKey = getApiKey();
-  if (!apiKey) return sendJson(res, 500, { error: "لم يتم ضبط المفتاح: أضف GROQ_API_KEY في ملف ‎.env أو في متغيرات البيئة على الاستضافة." });
+  if (!apiKey) return sendJson(res, 500, { error: "No API key set: add GROQ_API_KEY to .env or to your host's environment variables." });
   const model = getModel();
 
   let raw = "";
   for await (const chunk of req) {
     raw += chunk;
-    if (raw.length > MAX_BODY) return sendJson(res, 413, { error: "حجم الصورة كبير جدًا." });
+    if (raw.length > MAX_BODY) return sendJson(res, 413, { error: "The image is too large." });
   }
   let body;
-  try { body = JSON.parse(raw); } catch { return sendJson(res, 400, { error: "طلب غير صالح." }); }
+  try { body = JSON.parse(raw); } catch { return sendJson(res, 400, { error: "Invalid request." }); }
   const invalid = validateRequest(body);
   if (invalid) return sendJson(res, 400, { error: invalid });
 
@@ -100,6 +100,6 @@ function sendJson(res, status, obj) {
 }
 
 server.listen(PORT, HOST, () => {
-  console.log(`بشرتي يعمل على http://localhost:${PORT}`);
-  console.log(getApiKey() ? "✓ تم العثور على المفتاح" : "⚠ لا يوجد مفتاح — أضف GROQ_API_KEY في .env أو في متغيرات البيئة.");
+  console.log(`My skin is running at http://localhost:${PORT}`);
+  console.log(getApiKey() ? "✓ API key found" : "⚠ No API key — add GROQ_API_KEY to .env or your environment variables.");
 });
