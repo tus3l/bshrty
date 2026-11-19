@@ -160,6 +160,11 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .prot-row b{text-align:left}
 .prot-bar{height:10px;border-radius:999px;background:var(--cream-deep);overflow:hidden}
 .prot-bar i{display:block;height:100%;border-radius:inherit;transition:width .4s}
+.qual{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.qual:empty{display:none}
+.qual span{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--cream-deep);color:var(--muted);font-weight:600}
+.qual span.ok{background:var(--good-bg);color:var(--good)}
+.qual span.no{background:var(--bad-bg);color:var(--bad)}
 .notice{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;margin-top:10px}
 .disclaimer{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.8;margin:18px 6px 0}
 .link-btn{background:none;border:none;color:var(--rose-deep);font-weight:700;font-size:13px;padding:6px 0;text-decoration:underline}
@@ -250,6 +255,7 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 ========================================================= */
 const STORE_KEY = 'bshrty:v1';
 const FM_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/';
+const HANDS_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/';
 const ZXING_URL = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js';
 const OBF = 'https://world.openbeautyfacts.org';
 
@@ -266,7 +272,7 @@ const ui = {
 };
 const session = {streams:[], raf:0, token:0, zx:null};
 // sunscreen smart-check camera state (not persisted)
-const smart = {mode:'idle', zones:null, zi:-2, manual:false, preview:0};
+const smart = {mode:'idle', zones:null, zi:-2, manual:false, preview:0, basePose:null, cells:null, tracked:false, hands:false, locked:false, bgBase:null, track:null};
 
 function loadState(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; } }
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
@@ -756,6 +762,8 @@ function stopCamera(){
     smart.mode = 'idle'; smart.zones = null; smart.zi = -2; smart.manual = false;
     const sh = $('#spfHint'); if(sh) sh.textContent = '';
     const sp = $('#spfProg'); if(sp) sp.classList.remove('show');
+    const sq = $('#spfQual'); if(sq) sq.innerHTML = '';
+    smart.basePose = null;
     const ss = $('#spfSteps'); if(ss) ss.innerHTML = smartStepsHtml();
     const sc = $('#spfCtl'); if(sc) sc.innerHTML = smartCtlHtml('idle');
   }
@@ -1481,6 +1489,7 @@ function viewSpf(){
         <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>${t('اختاري','اختر')} عامل الحماية بالأسفل ثم ${t('ابدئي','ابدأ')} الفحص — الصورة تُحلَّل على جهازك فقط ولا تُرفع.</span></div>
         <div class="cam-hint" id="spfHint"></div>
       </div>
+      <div class="qual" id="spfQual"></div>
       <div class="progress" id="spfProg"><div class="bar"><i id="spfFill"></i></div><span id="spfTxt"></span></div>
       <ul class="zsteps" id="spfSteps">${smartStepsHtml()}</ul>
       <div id="spfCtl">${smartCtlHtml(smart.mode)}</div>
@@ -1561,8 +1570,10 @@ const SPF_AR_ZONES = [
   {key:'chin',     name:'الذقن',        my:'ذقنك',         chip:'الذقن',  lm:199, expo:.85,
    hull:[18,200,199,175,152,148,176,377,400,201,421,83,313,32,262]},
 ];
-const SPF_STATUS = {verified:'تأكيد بصري', motion:'رُصدت حركة اليد', manual:'تأكيد يدوي'};
-const BASELINE_MS = 2500;
+const SPF_STATUS = {verified:'تأكيد بصري باللون', glossy:'تأكيد باللمعة (واقٍ شفاف)', motion:'رُصد الدهن باليد', manual:'تأكيد يدوي'};
+const BASE_FRAMES = 30;     // analysed frames for the "before" reference
+const AFTER_FRAMES = 12;    // analysed frames per "after" measurement
+const PREP_MS = 1200;       // let auto-exposure settle before locking it
 // decay per minute: everyday wear (sebum, touching ≈ 20% lost in 4h) + UV photodegradation
 // calibrated so UV 6 outdoors for 2h leaves ≈ 40% (the usual "reapply every 2 hours")
 const SPF_DECAY = {base: Math.log(1 / 0.8) / 240, uv: 0.0012};
@@ -1585,6 +1596,18 @@ function convexHull(pts){
   for(let i = p.length - 1; i >= 0; i--){ const q = p[i]; while(up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
   return lo.slice(0, -1).concat(up.slice(0, -1));
 }
+function scalePoly(poly, k){
+  const c = poly.reduce((a, p) => ({x:a.x + p.x / poly.length, y:a.y + p.y / poly.length}), {x:0, y:0});
+  return poly.map(p => ({x:c.x + (p.x - c.x) * k, y:c.y + (p.y - c.y) * k}));
+}
+function pointInPoly(p, poly){
+  let inside = false;
+  for(let i = 0, j = poly.length - 1; i < poly.length; j = i++){
+    const a = poly[i], b = poly[j];
+    if((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
 function zoneGeometry(lm){
   const r = Math.abs(lm[454].x - lm[234].x) * 0.07;
   const g = {};
@@ -1595,6 +1618,29 @@ const FALLBACK_GEO = (() => {
   const g = {};
   SPF_AR_ZONES.forEach(z => g[z.key] = {cx:FALLBACK_POINTS[z.key].x, cy:FALLBACK_POINTS[z.key].y, r:FALLBACK_POINTS.r, hull:null});
   return g;
+})();
+// measurement cells = every Face Mesh landmark lying inside the zone (shrunk a little to stay off
+// brows, hairline, nostrils and lips). Cells ride on the mesh, so "before" and "after" compare the
+// exact same patch of skin even after the head moves.
+function buildCells(lm){
+  const out = {}, used = new Set();
+  SPF_AR_ZONES.forEach(z => {
+    const poly = scalePoly(convexHull(z.hull.map(i => lm[i])), .9);
+    let idx = [];
+    for(let i = 0; i < 468; i++) if(!used.has(i) && pointInPoly(lm[i], poly)) idx.push(i);
+    if(idx.length < 6) idx = [...new Set([...idx, z.lm, ...z.hull])].filter(i => !used.has(i));
+    idx.forEach(i => used.add(i));
+    out[z.key] = idx;
+  });
+  return out;
+}
+const FALLBACK_CELLS = (() => {
+  const o = {}, r = FALLBACK_POINTS.r;
+  SPF_AR_ZONES.forEach(z => {
+    const c = FALLBACK_POINTS[z.key]; o[z.key] = [];
+    for(let i = -1; i <= 1; i++) for(let j = -1; j <= 1; j++) o[z.key].push({x:c.x + i * r * 1.1, y:c.y + j * r * 1.1});
+  });
+  return o;
 })();
 function zonePath(ctx, z, W, H){
   ctx.beginPath();
@@ -1608,51 +1654,140 @@ function paintZone(ctx, z, W, H, rgb, alpha, lw){
   ctx.fillStyle = `rgba(${rgb},${alpha})`; ctx.fill();
   if(lw){ ctx.lineWidth = lw; ctx.strokeStyle = `rgba(${rgb},.95)`; ctx.stroke(); }
 }
-
-// ---- pixels: mean tone, specular share, bright tail, coarse texture grid ----
-function sampleZone(ctx, cx, cy, rad){
-  const W = ctx.canvas.width, H = ctx.canvas.height;
-  const x0 = clamp(Math.round(cx - rad), 0, W - 2), y0 = clamp(Math.round(cy - rad), 0, H - 2);
-  const w = clamp(Math.round(rad * 2), 2, W - x0), h = clamp(Math.round(rad * 2), 2, H - y0);
-  const d = ctx.getImageData(x0, y0, w, h).data;
-  const n = w * h, GN = 6;
-  const grid = new Float32Array(GN * GN), gc = new Float32Array(GN * GN);
-  const L = new Float32Array(n), S = new Float32Array(n);
-  let R = 0, G = 0, B = 0, sum = 0;
-  for(let y = 0, j = 0; y < h; y++) for(let x = 0; x < w; x++, j++){
-    const i = j * 4, r = d[i], g = d[i + 1], b = d[i + 2];
-    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-    L[j] = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    S[j] = mx ? (mx - mn) / mx : 0;
-    R += r; G += g; B += b; sum += L[j];
-    const k = Math.min(GN - 1, (y * GN / h) | 0) * GN + Math.min(GN - 1, (x * GN / w) | 0);
-    grid[k] += L[j]; gc[k]++;
-  }
-  for(let k = 0; k < grid.length; k++) grid[k] /= gc[k] || 1;
-  const mean = sum / n, thr = Math.max(0.72, mean + 0.18);
-  let hi = 0;
-  for(let j = 0; j < n; j++) if(L[j] > thr && S[j] < 0.28) hi++;
-  const sorted = L.slice().sort();
-  R /= n; G /= n; B /= n;
-  const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
-  return {L:mean, shine:hi / n, p95:sorted[Math.floor(n * .95)], sat: mx ? (mx - mn) / mx : 0, rgb:[R, G, B], grid};
+function dots(ctx, pts, W, H, color, r){
+  ctx.fillStyle = color;
+  pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x * W, p.y * H, r, 0, Math.PI * 2); ctx.fill(); });
 }
-function sampleAll(octx, geo){
-  const W = octx.canvas.width, H = octx.canvas.height, out = {};
-  SPF_AR_ZONES.forEach(z => { const g = geo[z.key]; out[z.key] = sampleZone(octx, g.cx * W, g.cy * H, Math.max(6, g.r * W * 1.25)); });
+
+// ---- head pose (same pose as the reference = same lighting geometry) ----
+function facePose(lm, w, h){
+  const P = i => ({x:lm[i].x * w, y:lm[i].y * h});
+  const L = P(234), R = P(454), T = P(10), B = P(152), N = P(1), E1 = P(33), E2 = P(263);
+  const fw = Math.hypot(R.x - L.x, R.y - L.y), fh = Math.hypot(B.x - T.x, B.y - T.y);
+  return {fw, fh, cx:(L.x + R.x) / 2, cy:(T.y + B.y) / 2,
+    yaw:(N.x - (L.x + R.x) / 2) / fw, pitch:(N.y - (T.y + B.y) / 2) / fh, roll:Math.atan2(E2.y - E1.y, E2.x - E1.x)};
+}
+function avgPose(list){
+  const o = {fw:0, fh:0, cx:0, cy:0, yaw:0, pitch:0, roll:0};
+  list.forEach(p => { for(const k in o) o[k] += p[k] / list.length; });
+  return o;
+}
+function poseDiff(a, b){ return {yaw:b.yaw - a.yaw, pitch:b.pitch - a.pitch, roll:b.roll - a.roll, scale:b.fw / a.fw}; }
+function poseOk(d){ return Math.abs(d.yaw) < .06 && Math.abs(d.pitch) < .06 && Math.abs(d.roll) < .09 && d.scale > .88 && d.scale < 1.12; }
+function poseHint(d){
+  if(d.scale <= .88) return `${t('اقتربي','اقترب')} قليلًا من الكاميرا (نفس مسافة اللقطة الأولى)`;
+  if(d.scale >= 1.12) return `${t('ابتعدي','ابتعد')} قليلًا عن الكاميرا (نفس مسافة اللقطة الأولى)`;
+  if(Math.abs(d.roll) >= .09) return `${t('عدّلي','عدّل')} ميلان رأسك ليكون مستقيمًا`;
+  if(Math.abs(d.pitch) >= .06) return d.pitch > 0 ? `${t('ارفعي','ارفع')} ذقنك قليلًا` : `${t('أنزلي','أنزل')} ذقنك قليلًا`;
+  return `${t('رجّعي','رجّع')} وجهك ${t('وانظري','وانظر')} للكاميرا مباشرة كاللقطة الأولى`;
+}
+
+// ---- colour science: sRGB -> linear -> CIE L*a*b* (D65) ----
+const SRGB_LIN = new Float32Array(256).map((_, i) => { const c = i / 255; return c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); });
+function lin2lab(r, g, b){
+  const X = (.4124 * r + .3576 * g + .1805 * b) / .95047, Y = .2126 * r + .7152 * g + .0722 * b, Z = (.0193 * r + .1192 * g + .9505 * b) / 1.08883;
+  const f = v => v > .008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116;
+  const fx = f(X), fy = f(Y), fz = f(Z);
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+}
+const labDist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);   // ΔE*76
+const chroma = c => Math.hypot(c[1], c[2]);
+function avgLab(list){
+  const o = [0, 0, 0];
+  list.forEach(c => { o[0] += c[0]; o[1] += c[1]; o[2] += c[2]; });
+  return o.map(v => v / list.length);
+}
+const mean = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
+const sd = a => { const m = mean(a); return Math.sqrt(mean(a.map(v => (v - m) * (v - m)))); };
+const median = a => { if(!a.length) return 0; const s = a.slice().sort((x, y) => x - y); return s[s.length >> 1]; };
+
+// one analysed frame: Lab of every cell + specular share and gloss of each zone
+function measureFrame(img, ptsByZone, rad, gain){
+  const {data, width:w, height:h} = img;
+  const out = {};
+  let clip = 0, tot = 0;
+  for(const z of SPF_AR_ZONES){
+    const pts = ptsByZone[z.key], cells = new Array(pts.length), Ys = [], Ss = [];
+    for(let c = 0; c < pts.length; c++){
+      const cx = Math.round(pts[c].x), cy = Math.round(pts[c].y);
+      let R = 0, G = 0, B = 0, n = 0;
+      for(let y = Math.max(0, cy - rad); y <= Math.min(h - 1, cy + rad); y++)
+        for(let x = Math.max(0, cx - rad); x <= Math.min(w - 1, cx + rad); x++){
+          const i = (y * w + x) * 4, r = data[i], g = data[i + 1], b = data[i + 2];
+          const lr = SRGB_LIN[r], lg = SRGB_LIN[g], lb = SRGB_LIN[b];
+          R += lr; G += lg; B += lb; n++;
+          const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+          if(mx >= 250) clip++;
+          tot++;
+          Ys.push(.2126 * lr + .7152 * lg + .0722 * lb); Ss.push(mx ? (mx - mn) / mx : 0);
+        }
+      cells[c] = n ? lin2lab(Math.min(1, R / n * gain), Math.min(1, G / n * gain), Math.min(1, B / n * gain)) : null;
+    }
+    // exposure-independent shine: share of near-colourless pixels far brighter than the zone median,
+    // and the bright-tail ratio p95/median (a fresh film reflects more light as specular highlights)
+    const sorted = Float32Array.from(Ys).sort();
+    const med = sorted[sorted.length >> 1] || 0, p95 = sorted[Math.floor(sorted.length * .95)] || 0;
+    let spec = 0;
+    for(let k = 0; k < Ys.length; k++) if(Ys[k] > med * 1.6 && Ss[k] < .3) spec++;
+    const ok = cells.filter(Boolean);
+    out[z.key] = {cells, spec: Ys.length ? spec / Ys.length : 0, gloss: med ? p95 / med : 1, L: mean(ok.map(c => c[0]))};
+  }
+  out.clip = tot ? clip / tot : 0;
   return out;
 }
-// frame-to-frame change of the zone's texture (exposure-independent) => a hand rubbing over it
-function motionScore(a, b){
-  let s = 0;
-  for(let k = 0; k < a.grid.length; k++) s += Math.abs((a.grid[k] - a.L) - (b.grid[k] - b.L));
-  return s / a.grid.length + Math.abs(a.L - b.L) * .5;
+// how much a zone's cells changed since the previous frame (a hand passing over it), minus global drift
+function cellMotion(a, b){
+  let s = 0, m = 0, k = 0;
+  for(let i = 0; i < Math.min(a.cells.length, b.cells.length); i++){
+    if(!a.cells[i] || !b.cells[i]) continue;
+    const d = a.cells[i][0] - b.cells[i][0]; s += Math.abs(d); m += d; k++;
+  }
+  return k ? s / k - Math.abs(m / k) * .5 : 0;
 }
-function avgSamples(list){
-  const o = {L:0, shine:0, p95:0, sat:0};
-  list.forEach(s => { o.L += s.L; o.shine += s.shine; o.p95 += s.p95; o.sat += s.sat; });
-  for(const k in o) o[k] /= list.length || 1;
-  return o;
+// mean luminance of the background (frame edges away from the face) — exposure reference when the camera can't be locked
+function bgLevel(img, pose){
+  const {data, width:w, height:h} = img, s = Math.max(4, Math.round(w * .06));
+  const spots = [[0, 0], [w - s, 0], [0, Math.round(h * .45)], [w - s, Math.round(h * .45)]];
+  const vals = [];
+  spots.forEach(([x0, y0]) => {
+    if(pose && Math.abs(x0 + s / 2 - pose.cx) < pose.fw * .8 && Math.abs(y0 + s / 2 - pose.cy) < pose.fh * .8) return;
+    let Y = 0, n = 0;
+    for(let y = y0; y < y0 + s; y += 2) for(let x = x0; x < x0 + s; x += 2){
+      const i = (y * w + x) * 4; Y += .2126 * SRGB_LIN[data[i]] + .7152 * SRGB_LIN[data[i + 1]] + .0722 * SRGB_LIN[data[i + 2]]; n++;
+    }
+    vals.push(Y / n);
+  });
+  const v = median(vals);
+  return v > .02 && v < .95 ? v : null;
+}
+// lock exposure + white balance once settled, so the camera can't "undo" the white cast it sees
+async function lockCamera(track){
+  try{
+    const caps = track.getCapabilities ? track.getCapabilities() : {};
+    const cur = track.getSettings ? track.getSettings() : {};
+    const adv = {};
+    if(caps.exposureMode && caps.exposureMode.includes('manual')){ adv.exposureMode = 'manual'; if(cur.exposureTime) adv.exposureTime = cur.exposureTime; }
+    if(caps.whiteBalanceMode && caps.whiteBalanceMode.includes('manual')){ adv.whiteBalanceMode = 'manual'; if(cur.colorTemperature) adv.colorTemperature = cur.colorTemperature; }
+    if(!Object.keys(adv).length) return false;
+    await track.applyConstraints({advanced:[adv]});
+    return true;
+  }catch(e){ return false; }
+}
+
+// ---- hand tracking (MediaPipe Hands, 21 points per hand) ----
+let handsPromise = null;
+function getHands(){
+  if(!handsPromise){
+    handsPromise = withTimeout((async () => {
+      if(faceMeshPromise) await faceMeshPromise.catch(() => {});   // never initialise alongside Face Mesh
+      await loadScript(HANDS_BASE + 'hands.js');
+      const h = new Hands({locateFile: f => HANDS_BASE + f});
+      h.setOptions({maxNumHands:2, modelComplexity:0, minDetectionConfidence:.5, minTrackingConfidence:.5});
+      await h.initialize();
+      return h;
+    })(), 25000).catch(e => { handsPromise = null; throw e; });
+  }
+  return handsPromise;
 }
 
 // ---- fade model ----
@@ -1740,9 +1875,10 @@ function liveBoxHtml(){
     const r = L.zones[z.key];
     if(!r) return '';
     const m = r.m;
-    const num = v => `<bdi dir="ltr">${v >= 0 ? '+' : '−'}${Math.abs(v * 100).toFixed(1)}</bdi>`;
-    const metr = m ? ` — لمعة ${num(m.dShine)}، تفتيح ${num(m.dL)}، بهتان اللون ${num(m.dSat)}` : '';
-    return `<li><b>${z.name}:</b> ${r.status === 'verified' ? '✅' : r.status === 'motion' ? '☑️' : '✍️'} ${SPF_STATUS[r.status]}${metr}${r.rubs ? ` · لُمست ${r.rubs}×` : ''}</li>`;
+    const num = (v, d = 1) => `<bdi dir="ltr">${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(d)}</bdi>`;
+    const icon = {verified:'✅', glossy:'✨', motion:'☑️', manual:'✍️'}[r.status];
+    const metr = m && m.dE != null ? `<br><span class="small">${m.coverage != null ? `تغطية <b>${Math.round(m.coverage * 100)}%</b>${m.cov ? ` (${m.cov.filter(Boolean).length}/${m.cov.length} نقطة)` : ''} · ` : ''}فرق اللون ΔE <bdi dir="ltr">${m.dE.toFixed(1)}</bdi> · إضاءة L* ${num(m.dL)} · بهتان ${num(m.dC)} · لمعة ${num(m.dSpec * 100)}</span>` : '';
+    return `<li><b>${z.name}:</b> ${icon} ${SPF_STATUS[r.status] || ''}${r.rubs ? ` · لُمست ${r.rubs}×` : ''}${metr}</li>`;
   }).join('');
   const prev = [0, 30, 60, 120, 180];
   return `
@@ -1770,7 +1906,7 @@ function liveBoxHtml(){
       ${until != null && until > 0 ? `<div class="btn-row"><button class="btn btn-dark" data-act="remind" data-v="${until}">ذكّرني عندما تضعف الحماية (بعد ${fmtMins(until)})</button></div>` : ''}
       ${until === 0 ? `<div class="notice" style="background:var(--bad-bg);color:var(--bad)">الحماية على ${weakest.z.name} ضعفت — ${t('جدّدي','جدّد')} الواقي ثم ${t('أعيدي','أعد')} الفحص.</div>` : ''}
       <ul class="list small" style="margin-top:12px">${checks}</ul>
-      <p class="small" style="margin-top:8px">النسب تقدير من نموذج رياضي (الأشعة × عامل الحماية × تعرّض كل منطقة × لمس الوجه) وليست قياسًا مخبريًا.</p>
+      <p class="small" style="margin-top:8px">${L.approx ? 'تم القياس بدون تتبّع الوجه، فالدقة أقل. ' : ''}${L.locked ? 'تم قفل تعريض الكاميرا أثناء القياس. ' : ''}النسب تقدير من نموذج رياضي (الأشعة × عامل الحماية × تعرّض كل منطقة × لمس الوجه) وليست قياسًا مخبريًا.</p>
     </div>`;
 }
 function refreshLive(){
@@ -1779,6 +1915,22 @@ function refreshLive(){
 }
 
 // ---- camera runner shared by the check and the AR view ----
+function smoothLandmarks(prev, lm){
+  if(!prev) return lm.map(p => ({x:p.x, y:p.y, z:p.z}));
+  // follow real moves quickly, damp sub-pixel jitter
+  const d = Math.hypot(lm[1].x - prev[1].x, lm[1].y - prev[1].y);
+  const a = d > .012 ? .85 : .45;
+  return lm.map((p, i) => ({x:prev[i].x + (p.x - prev[i].x) * a, y:prev[i].y + (p.y - prev[i].y) * a, z:p.z}));
+}
+function qualHtml(fr){
+  const item = (ok, label) => `<span class="${ok == null ? '' : ok ? 'ok' : 'no'}">${ok == null ? '•' : ok ? '✓' : '✗'} ${label}</span>`;
+  const q = fr && fr.q;
+  return item(q ? q.light : null, 'الإضاءة') + item(q ? q.dist : null, 'المسافة') + item(q ? q.still : null, 'الثبات')
+    + (smart.basePose && fr && fr.pose ? item(poseOk(poseDiff(smart.basePose, fr.pose)), 'الوضعية') : '')
+    + item(smart.tracked, 'تتبّع الوجه') + item(smart.hands, 'تتبّع اليد')
+    + `<span class="${smart.locked ? 'ok' : ''}">${smart.locked ? '✓ قفل التعريض' : '• تعويض التعريض'}</span>`;
+}
+
 async function runSpfCam(mode){
   stopCamera();
   const token = session.token;
@@ -1786,37 +1938,104 @@ async function runSpfCam(mode){
   smart.mode = 'busy'; setSmartCtl('busy');
   if(mode === 'check' && ui.weather.status === 'idle') fetchWeather();
   ph.textContent = 'جارٍ تشغيل الكاميرا…';
-  try{ await startCamera(video, 'user'); }
+  let stream;
+  try{ stream = await startCamera(video, 'user'); }
   catch(e){ ph.textContent = camErrorText(e); smart.mode = 'idle'; setSmartCtl('idle'); return; }
   if(token !== session.token) return;
   cam.classList.add('live');
-  hint.textContent = 'جارٍ تحميل نموذج تتبّع الوجه (468 نقطة)…';
-  let fm = null;
-  try{ fm = await getFaceMesh(); }catch(e){ fm = null; }
+  hint.textContent = 'جارٍ تحميل نموذج الوجه (468 نقطة) ونموذج اليد (21 نقطة)…';
+  // load one after the other: the two MediaPipe solutions share loader globals and clash if initialised in parallel
+  const fm = await getFaceMesh().catch(() => null);
+  const hands = token === session.token ? await getHands().catch(() => null) : null;
   if(token !== session.token) return;
+  smart.tracked = !!fm; smart.hands = !!hands; smart.locked = false; smart.bgBase = null;
+  smart.track = stream.getVideoTracks()[0];
 
   const W = video.videoWidth, H = video.videoHeight;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   const off = document.createElement('canvas');
-  const sc = Math.min(1, 480 / W);
+  const sc = Math.min(1, 640 / W);
   off.width = Math.round(W * sc); off.height = Math.round(H * sc);
   const octx = off.getContext('2d', {willReadFrequently:true});
-  let landmarks = null, busy = false;
-  if(fm) fm.onResults(r => { landmarks = (r.multiFaceLandmarks && r.multiFaceLandmarks[0]) || null; });
+
+  // the pixels are read from the exact frame Face Mesh analysed, so landmarks and pixels line up
+  const F = {seq:0, lm:null, held:false, img:null, hands:[], handT:0, lastLm:null, lastT:0};
+  if(fm) fm.onResults(r => {
+    if(token !== session.token) return;
+    octx.drawImage(r.image, 0, 0, off.width, off.height);
+    F.img = octx.getImageData(0, 0, off.width, off.height);
+    const lm = r.multiFaceLandmarks && r.multiFaceLandmarks[0];
+    const tnow = performance.now();
+    if(lm){ F.lm = F.lastLm = smoothLandmarks(F.lastLm, lm); F.lastT = tnow; F.held = false; }
+    else if(F.lastLm && tnow - F.lastT < 1200){ F.lm = F.lastLm; F.held = true; }   // face hidden by the hand
+    else { F.lm = null; F.lastLm = null; F.held = false; }
+    F.seq++;
+  });
+  if(hands) hands.onResults(r => { if(token === session.token){ F.hands = r.multiHandLandmarks || []; F.handT = performance.now(); } });
 
   let S = mode === 'ar' ? arStepper() : checkStepper();
-  let last = performance.now();
+  let cells = mode === 'ar' && state.spfLive && state.spfLive.cells || (fm ? null : 'fallback');
+  if(!fm) cells = 'fallback';
+  let last = performance.now(), seen = 0, tick = 0, grab = 0, busy = false, prevMeas = null, prevPose = null, fr = null, qualT = 0;
+
+  const analyse = () => {
+    const w = off.width, h = off.height, lm = F.lm;
+    if(fm && !lm) return {face:false};
+    if(lm && !cells) cells = buildCells(lm);
+    smart.cells = cells;
+    const norm = {};
+    SPF_AR_ZONES.forEach(z => norm[z.key] = cells === 'fallback' ? FALLBACK_CELLS[z.key] : cells[z.key].map(i => lm[i]));
+    const geo = lm ? zoneGeometry(lm) : FALLBACK_GEO;
+    const pose = lm ? facePose(lm, w, h) : null;
+    const rad = Math.max(2, Math.round((pose ? pose.fw : w * .45) * .018));
+    let gain = 1;
+    if(!smart.locked){
+      const bg = bgLevel(F.img, pose);
+      if(bg){ if(!smart.bgBase) smart.bgBase = bg; gain = clamp(smart.bgBase / bg, .75, 1.33); }
+    }
+    const pts = {};
+    SPF_AR_ZONES.forEach(z => pts[z.key] = norm[z.key].map(p => ({x:p.x * w, y:p.y * h})));
+    const meas = measureFrame(F.img, pts, rad, gain);
+    const motion = {};
+    SPF_AR_ZONES.forEach(z => motion[z.key] = prevMeas ? cellMotion(meas[z.key], prevMeas[z.key]) : 0);
+    const still = pose && prevPose ? Math.hypot(pose.cx - prevPose.cx, pose.cy - prevPose.cy) / pose.fw < .012 : true;
+    prevMeas = meas; prevPose = pose;
+    // hands: which zones a hand point is over, and whether any hand is still near the face
+    const hp = performance.now() - F.handT < 500 ? F.hands.flat() : [];
+    const handZones = new Set();
+    SPF_AR_ZONES.forEach(z => {
+      const g = geo[z.key];
+      const poly = g.hull ? scalePoly(g.hull, 1.2) : null;
+      if(hp.some(p => poly ? pointInPoly(p, poly) : Math.hypot(p.x - g.cx, p.y - g.cy) < g.r * 2.4)) handZones.add(z.key);
+    });
+    const handOnFace = pose ? hp.some(p => Math.abs(p.x * w - pose.cx) < pose.fw * .75 && Math.abs(p.y * h - pose.cy) < pose.fh * .8) : handZones.size > 0;
+    const Ls = SPF_AR_ZONES.map(z => meas[z.key].L);
+    return {face:true, lm, held:F.held, geo, norm, pose, meas, motion, handZones, handOnFace, handPts:hp,
+      q:{light: mean(Ls) > 28 && mean(Ls) < 90 && meas.clip < .06, dark: mean(Ls) <= 28, dist: !pose || pose.fw / w > .22, still}};
+  };
+
   const frame = now => {
     if(token !== session.token) return;
     const dt = Math.min(100, now - last); last = now;
-    if(fm && !busy){ busy = true; fm.send({image:video}).catch(() => {}).finally(() => { busy = false; }); }
-    octx.drawImage(video, 0, 0, off.width, off.height);
+    if(!busy && (fm || hands)){
+      busy = true; tick++;
+      (async () => {
+        try{
+          if(fm) await fm.send({image:video});
+          if(hands && (tick % 2 === 0 || !fm)) await hands.send({image:video});
+        }catch(e){}
+        busy = false;
+      })();
+    }
+    if(!fm && (grab++ % 2 === 0)){ octx.drawImage(video, 0, 0, off.width, off.height); F.img = octx.getImageData(0, 0, off.width, off.height); F.seq++; }
+    let isNew = false;
+    if(F.seq !== seen && F.img){ seen = F.seq; fr = analyse(); isNew = true; }
     ctx.clearRect(0, 0, W, H);
-    const geo = fm ? (landmarks ? zoneGeometry(landmarks) : null) : FALLBACK_GEO;
-    if(!fm || !geo) drawOval(ctx, W, H);
-    const samples = geo ? sampleAll(octx, geo) : null;
-    const r = S.step({dt, now, geo, samples, ctx, W, H, hint, tracked:!!fm});
+    if(!fm || !fr || !fr.face) drawOval(ctx, W, H);
+    if(fr && fr.handPts && fr.handPts.length) dots(ctx, fr.handPts, W, H, 'rgba(255,255,255,.85)', Math.max(2.5, W / 260));
+    const r = S.step({dt, now, fr, isNew, ctx, W, H, hint});
+    if(now - qualT > 300){ qualT = now; const q = $('#spfQual'); if(q) q.innerHTML = qualHtml(fr); }
     if(r === true) return;
     if(r) S = r;
     session.raf = requestAnimationFrame(frame);
@@ -1825,29 +2044,77 @@ async function runSpfCam(mode){
 }
 
 function checkStepper(){
-  const zones = SPF_AR_ZONES.map(z => ({key:z.key, name:z.name, my:z.my, base:null, acc:[], status:null,
-    prev:null, motionMs:0, calmMs:0, settleMs:0, idleMs:0, hits:0, meas:[]}));
-  smart.mode = 'check'; smart.zones = zones; smart.zi = -1; smart.manual = false;
+  const zones = SPF_AR_ZONES.map(z => ({key:z.key, name:z.name, my:z.my, status:null, base:null,
+    rubbing:false, away:false, rubMs:0, awayMs:0, idleMs:0, after:[], batches:0, retried:false, prevCov:null, res:null}));
+  smart.mode = 'check'; smart.zones = zones; smart.zi = -1; smart.manual = false; smart.basePose = null;
   renderSmartSteps(); setSmartCtl('check');
   const prog = $('#spfProg'), fill = $('#spfFill'), txt = $('#spfTxt');
   prog.classList.add('show');
-  let baseMs = 0;
+  let prepMs = 0, baseN = 0, locking = false;
+  const acc = {}, poses = [];
 
-  return {step({dt, now, geo, samples, ctx, W, H, hint, tracked}){
-    // ---------- 1) before snapshot ----------
+  const evaluate = z => {
+    const b = z.base, n = b.cells.length;
+    const cov = [], dEs = [], dLs = [], dCs = [];
+    for(let c = 0; c < n; c++){
+      const vals = z.after.map(m => m.cells[c]).filter(Boolean);
+      if(!vals.length || !b.cells[c]){ cov.push(z.prevCov ? z.prevCov[c] : 0); continue; }
+      const m = avgLab(vals), bc = b.cells[c];
+      const dE = labDist(m, bc.mean);
+      // a cell counts as covered when its colour moved clearly beyond its own frame-to-frame noise
+      const hit = dE > Math.max(1.6, 2.5 * bc.sd + .8) ? 1 : 0;
+      cov.push(z.prevCov ? Math.max(hit, z.prevCov[c]) : hit);
+      dEs.push(dE); dLs.push(m[0] - bc.mean[0]); dCs.push(chroma(bc.mean) - chroma(m));
+    }
+    const coverage = mean(cov);
+    const spec = mean(z.after.map(m => m.spec)), gloss = mean(z.after.map(m => m.gloss));
+    const specZ = (spec - b.spec.m) / Math.max(.004, b.spec.s), glossZ = (gloss - b.gloss.m) / Math.max(.015, b.gloss.s);
+    const shiny = (specZ > 3 && spec - b.spec.m > .006) || glossZ > 3;
+    return {coverage, cov, dE:median(dEs), dL:median(dLs), dC:median(dCs), dSpec:spec - b.spec.m, dGloss:gloss - b.gloss.m, shiny};
+  };
+  const resetRub = z => { z.rubMs = 0; z.awayMs = 0; z.idleMs = 0; z.after = []; z.rubbing = false; };
+
+  return {step({dt, now, fr, isNew, ctx, W, H, hint}){
+    const face = fr && fr.face;
+    // ---------- 1) reference ("before") ----------
     if(smart.zi === -1){
-      if(!samples){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
-      const meanL = SPF_AR_ZONES.reduce((s, z) => s + samples[z.key].L, 0) / SPF_AR_ZONES.length;
-      if(meanL < .2){ hint.textContent = `الإضاءة ضعيفة — ${t('انتقلي','انتقل')} لمكان أكثر إضاءة`; return; }
-      zones.forEach(z => z.acc.push(samples[z.key]));
-      baseMs += dt;
-      hint.textContent = `لقطة "قبل": ${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} ${t('وانظري','وانظر')} للكاميرا`;
-      SPF_AR_ZONES.forEach(z => paintZone(ctx, geo[z.key], W, H, '255,255,255', .12, 2));
-      const pct = Math.min(1, baseMs / BASELINE_MS);
-      fill.style.width = (pct * 100).toFixed(1) + '%';
-      txt.textContent = `تحليل اللمعة ولون البشرة قبل الواقي… ${Math.round(pct * 100)}%`;
-      if(baseMs >= BASELINE_MS){
-        zones.forEach(z => { z.base = avgSamples(z.acc); z.acc = null; });
+      if(!face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
+      SPF_AR_ZONES.forEach(z => paintZone(ctx, fr.geo[z.key], W, H, '255,255,255', .1, 2));
+      if(prepMs < PREP_MS){
+        prepMs += dt; hint.textContent = 'جارٍ ضبط إضاءة الكاميرا…';
+        if(prepMs >= PREP_MS && !locking){
+          locking = true;
+          lockCamera(smart.track).then(ok => { smart.locked = ok; smart.bgBase = null; });
+        }
+        return;
+      }
+      if(!isNew) return;
+      if(!fr.q.light){ hint.textContent = fr.q.dark ? `الإضاءة ضعيفة — ${t('قابلي','قابل')} نافذة أو مصدر ضوء` : `الضوء قوي جدًا على الوجه — ${t('ابتعدي','ابتعد')} عن الضوء المباشر`; return; }
+      if(!fr.q.dist){ hint.textContent = `${t('قرّبي','قرّب')} وجهك ليملأ الإطار`; return; }
+      if(!fr.q.still || fr.held){ hint.textContent = `${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} ${t('وانظري','وانظر')} للكاميرا`; return; }
+      SPF_AR_ZONES.forEach(z => {
+        const a = acc[z.key] || (acc[z.key] = {cells:fr.meas[z.key].cells.map(() => []), spec:[], gloss:[]});
+        fr.meas[z.key].cells.forEach((c, i) => { if(c) a.cells[i].push(c); });
+        a.spec.push(fr.meas[z.key].spec); a.gloss.push(fr.meas[z.key].gloss);
+      });
+      if(fr.pose) poses.push(fr.pose);
+      baseN++;
+      hint.textContent = `لقطة "قبل": ${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} — نقرأ لون ولمعة ${SPF_AR_ZONES.reduce((s, z) => s + fr.meas[z.key].cells.length, 0)} نقطة على وجهك`;
+      fill.style.width = (baseN / BASE_FRAMES * 100).toFixed(1) + '%';
+      txt.textContent = `قراءة البشرة قبل الواقي… ${Math.round(baseN / BASE_FRAMES * 100)}%`;
+      if(baseN >= BASE_FRAMES){
+        zones.forEach(z => {
+          const a = acc[z.key];
+          z.base = {
+            cells: a.cells.map(list => {
+              if(list.length < 5) return null;
+              const m = avgLab(list);
+              return {mean:m, sd:Math.sqrt(mean(list.map(c => labDist(c, m) ** 2)))};
+            }),
+            spec:{m:mean(a.spec), s:sd(a.spec)}, gloss:{m:mean(a.gloss), s:sd(a.gloss)}
+          };
+        });
+        smart.basePose = poses.length ? avgPose(poses) : null;
         smart.zi = 0; renderSmartSteps(); setSmartCtl('check');
       }
       return;
@@ -1855,112 +2122,144 @@ function checkStepper(){
 
     // ---------- 2) guided application ----------
     const z = zones[smart.zi];
-    const zg = geo && geo[z.key];
-    let motion = 0, phase = 'wait';
-    if(!samples){
-      // face lost while a hand is over it = occlusion, counts as application movement
-      if(z.motionMs > 0 || z.idleMs > 400){ z.motionMs += dt; z.calmMs = 0; }
-      hint.textContent = `${t('ادهني','ادهن')} ${z.my}… ثم ${t('أبعدي','أبعد')} يدك ${t('وانظري','وانظر')} للكاميرا`;
-    } else {
-      const s = samples[z.key];
-      motion = z.prev ? motionScore(s, z.prev) : 0;
-      z.prev = s; z.idleMs += dt;
-      if(motion > .035){ z.motionMs += dt; z.calmMs = 0; z.settleMs = 0; z.hits = 0; z.meas = []; }
-      else z.calmMs += dt;
+    if(smart.manual){ smart.manual = false; z.status = 'manual'; z.res = null; }
+    if(isNew){
+      if(face){
+        const mot = fr.motion[z.key];
+        // a hand on the zone (hand model), strong texture change, or the face hidden behind the hand
+        z.rubbing = fr.handZones.has(z.key) || mot > 4 || (fr.held && z.idleMs > 300);
+        z.away = !fr.handOnFace && mot < 2.5 && !fr.held;
+      } else { z.rubbing = z.rubMs > 0; z.away = false; }
+    }
+    z.idleMs += dt;
+    if(z.rubbing){ z.rubMs += dt; z.awayMs = 0; z.after = []; }
+    else if(z.away) z.awayMs += dt;
 
-      if(z.motionMs < 600){
-        hint.textContent = `${t('ادهني','ادهن')} ${z.my} الآن${z.idleMs > 12000 ? ' — أو اضغط "وضعته" إذا انتهيت' : ''}`;
-      } else if(z.calmMs < 800){
+    let phase = 'wait';
+    if(!z.status){
+      if(z.rubMs < 700){
+        hint.textContent = z.retried
+          ? `باقي أجزاء ما وصلها الواقي (النقاط الحمراء) — ${t('كمّلي','كمّل')} على ${z.my}`
+          : `${t('ادهني','ادهن')} ${z.my} الآن${z.idleMs > 12000 ? ' — أو اضغط "وضعته" إذا انتهيت' : ''}`;
+      } else if(z.awayMs < 500){
         phase = 'rub';
-        hint.textContent = `ممتاز، ${t('وزّعي','وزّع')} الواقي جيدًا… ثم ${t('أبعدي','أبعد')} يدك`;
+        hint.textContent = fr && fr.handZones.has(z.key) ? `✋ يدك على ${z.name} — ${t('وزّعي','وزّع')} جيدًا ثم ${t('أبعدي','أبعد')} يدك` : `ممتاز — ${t('أبعدي','أبعد')} يدك عن وجهك للقياس`;
       } else {
         phase = 'measure';
-        // compare against the "before" snapshot; untreated zones act as a control for auto-exposure drift
-        const ctrl = zones.filter(o => !o.status && o !== z);
-        const cL = ctrl.length ? ctrl.reduce((a, o) => a + samples[o.key].L - o.base.L, 0) / ctrl.length : 0;
-        const cP = ctrl.length ? ctrl.reduce((a, o) => a + samples[o.key].p95 - o.base.p95, 0) / ctrl.length : 0;
-        const m = {dShine: s.shine - z.base.shine, dL: (s.L - z.base.L) - cL, dP: (s.p95 - z.base.p95) - cP, dSat: z.base.sat - s.sat};
-        z.meas.push(m); z.settleMs += dt;
-        if(m.dShine > .008 || m.dP > .015 || m.dL > .012 || m.dSat > .015) z.hits++;
-        hint.textContent = 'جارٍ مقارنة اللمعة ولون البشرة مع لقطة "قبل"…';
-        if(z.hits >= 10) finishZone(z, 'verified');
-        else if(z.settleMs > 2500) finishZone(z, 'motion');
+        const d = fr && fr.pose && smart.basePose ? poseDiff(smart.basePose, fr.pose) : null;
+        if(!face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; }
+        else if(d && !poseOk(d)){ hint.textContent = poseHint(d); z.after = []; }
+        else if(!fr.q.still){ hint.textContent = `${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} لحظة…`; }
+        else {
+          hint.textContent = 'جارٍ مقارنة اللون واللمعة مع لقطة "قبل"…';
+          if(isNew) z.after.push(fr.meas[z.key]);
+          if(z.after.length >= AFTER_FRAMES){
+            const res = evaluate(z);
+            z.batches++;
+            if(res.coverage >= .4){
+              if(res.coverage < .7 && !z.retried){
+                z.retried = true; z.prevCov = res.cov; z.res = res; resetRub(z);
+                const miss = res.cov.filter(v => !v).length;
+                toast(`${miss} نقطة في ${z.name} ما وصلها الواقي — ${t('كمّلي','كمّل')} عليها`);
+              } else { z.status = 'verified'; z.res = res; }
+            } else if(res.shiny){ z.status = 'glossy'; z.res = res; }
+            else if(z.batches >= 3){ z.status = 'motion'; z.res = res; }
+            else z.after = [];   // the film may still be settling — measure again
+          }
+        }
       }
     }
-    if(smart.manual){ smart.manual = false; if(!z.status) finishZone(z, 'manual'); }
 
-    // draw
-    if(geo){
-      zones.forEach(o => { if(o.status) paintZone(ctx, geo[o.key], W, H, '94,143,88', .32, 2); });
-      if(zg){
-        const a = phase === 'rub' ? .25 + Math.min(.3, motion * 4) : phase === 'measure' ? .22 : .1 + .08 * Math.sin(now / 220);
-        paintZone(ctx, zg, W, H, phase === 'measure' ? '217,169,59' : '232,134,140', Math.max(.05, a), 3);
-        drawPulse(ctx, zg.cx * W, zg.cy * H, Math.max(14, zg.r * W * 1.6), now);
+    // ---------- draw ----------
+    if(face){
+      zones.forEach(o => {
+        if(!o.status) return;
+        paintZone(ctx, fr.geo[o.key], W, H, '94,143,88', .26, 2);
+        if(o.res && o.res.cov && o.status === 'verified') dots(ctx, fr.norm[o.key].filter((_, i) => !o.res.cov[i]), W, H, 'rgba(200,60,50,.9)', Math.max(2.5, W / 220));
+      });
+      if(!z.status){
+        const g = fr.geo[z.key];
+        const a = phase === 'rub' ? .3 : phase === 'measure' ? .22 : .1 + .08 * Math.sin(now / 220);
+        paintZone(ctx, g, W, H, phase === 'measure' ? '217,169,59' : '232,134,140', a, 3);
+        drawPulse(ctx, g.cx * W, g.cy * H, Math.max(14, g.r * W * 1.6), now);
+        if(z.retried && z.prevCov){
+          const pts = fr.norm[z.key];
+          dots(ctx, pts.filter((_, i) => !z.prevCov[i]), W, H, 'rgba(200,60,50,.95)', Math.max(3, W / 180));
+          dots(ctx, pts.filter((_, i) => z.prevCov[i]), W, H, 'rgba(94,143,88,.9)', Math.max(2, W / 260));
+        }
       }
     }
     const doneN = zones.filter(o => o.status).length;
-    fill.style.width = ((doneN + (phase === 'measure' ? .7 : phase === 'rub' ? .4 : 0)) / zones.length * 100).toFixed(1) + '%';
-    txt.textContent = `المنطقة ${Math.min(smart.zi + 1, zones.length)} من ${zones.length}: ${z.name}${tracked ? '' : ' (بدون تتبّع)'}`;
+    const part = phase === 'measure' ? .5 + .5 * z.after.length / AFTER_FRAMES : phase === 'rub' ? .35 : 0;
+    fill.style.width = ((doneN + (z.status ? 0 : part)) / zones.length * 100).toFixed(1) + '%';
+    txt.textContent = `المنطقة ${Math.min(smart.zi + 1, zones.length)} من ${zones.length}: ${z.name}${smart.tracked ? '' : ' (بدون تتبّع)'}`;
 
     if(z.status){
       smart.zi++; renderSmartSteps(); setSmartCtl('check');
-      if(smart.zi >= zones.length) return finishSmart(zones, !tracked);
+      if(smart.zi >= zones.length) return finishSmart(zones);
     }
   }};
 }
-function finishZone(z, status){
-  z.status = status;
-  const n = z.meas.length;
-  z.metrics = n ? {dShine: z.meas.reduce((a, m) => a + m.dShine, 0) / n, dL: z.meas.reduce((a, m) => a + m.dL, 0) / n,
-                   dSat: z.meas.reduce((a, m) => a + m.dSat, 0) / n} : null;
-}
-function finishSmart(zones, approx){
-  const L = {at:Date.now(), spf:spfNumber(ui.spf.spf), spfGuess:!ui.spf.spf || ui.spf.spf === 'لا أعرف', amount:ui.spf.amount,
-    approx, segs:[{from:Date.now(), outdoor:true}], zones:{},
+function finishSmart(zones){
+  const now = Date.now();
+  const L = {at:now, spf:spfNumber(ui.spf.spf), spfGuess:!ui.spf.spf || ui.spf.spf === 'لا أعرف', amount:ui.spf.amount,
+    approx:!smart.tracked, locked:smart.locked, segs:[{from:now, outdoor:true}], zones:{},
+    cells: smart.cells && smart.cells !== 'fallback' ? smart.cells : null,
     hourly: ui.weather.status === 'ready' ? ui.weather.hourly : null,
     uvMax: ui.weather.status === 'ready' ? ui.weather.max : null, uvLive: ui.weather.status === 'ready'};
-  zones.forEach(z => L.zones[z.key] = {status:z.status, q: z.status === 'verified' ? 1 : z.status === 'motion' ? .92 : .85, m:z.metrics, rubs:0});
+  zones.forEach(z => {
+    const r = z.res;
+    // initial protection follows measured coverage: missed spots = little real protection
+    const q = z.status === 'verified' ? .55 + .45 * r.coverage : z.status === 'glossy' ? .9 : z.status === 'motion' ? .85 : .8;
+    L.zones[z.key] = {status:z.status, q, rubs:0,
+      m: r ? {coverage: z.status === 'verified' ? r.coverage : null, cov: z.status === 'verified' ? r.cov : null,
+              dE:r.dE, dL:r.dL, dC:r.dC, dSpec:r.dSpec, dGloss:r.dGloss} : null};
+  });
   state.spfLive = L;
-  // tick the matching zones in the manual form
   SPF_AR_ZONES.forEach(z => { if(!ui.spf.zones.includes(z.chip)) ui.spf.zones.push(z.chip); });
   smart.preview = 0;
   save(); refreshSpfForm(); refreshLive();
   $('#spfProg').classList.remove('show');
-  toast('✅ تم التحقق من كل المناطق — هذه خريطة حمايتك الحيّة');
+  toast('✅ تم القياس — هذه خريطة حمايتك الحيّة');
   return arStepper();
 }
 
-// live AR overlay; also notices when a hand rubs a zone (wiping sunscreen off)
+// live AR overlay: zone colour = modelled protection, red dots = spots the measurement found uncovered.
+// A hand resting on a zone (hand model) counts as touching, which wipes some sunscreen off.
 function arStepper(){
-  smart.mode = 'ar'; smart.zones = null; smart.zi = -2;
+  smart.mode = 'ar'; smart.zones = null; smart.zi = -2; smart.basePose = null;
   renderSmartSteps(); setSmartCtl('ar');
-  const L = state.spfLive, prev = {}, rubMs = {}, cool = {};
+  const L = state.spfLive, touchMs = {}, cool = {};
   let cache = null, cacheAt = 0, cachePreview = -1, lastBox = 0;
-  return {step({dt, now, geo, samples, ctx, W, H, hint}){
-    if(!geo){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
+  return {step({dt, now, fr, isNew, ctx, W, H, hint}){
+    if(!fr || !fr.face){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
     if(!cache || now - cacheAt > 1000 || cachePreview !== smart.preview){
       const at = Date.now() + smart.preview * 60000;
       cache = {}; SPF_AR_ZONES.forEach(z => cache[z.key] = zoneProtection(L, z.key, at));
       cacheAt = now; cachePreview = smart.preview;
     }
-    // touch detection: motion localized on one zone (not the whole head moving)
-    if(samples && !smart.preview){
-      const ms = {};
-      SPF_AR_ZONES.forEach(z => { ms[z.key] = prev[z.key] ? motionScore(samples[z.key], prev[z.key]) : 0; prev[z.key] = samples[z.key]; });
+    if(isNew && !smart.preview){
+      const others = k => mean(SPF_AR_ZONES.filter(o => o.key !== k).map(o => fr.motion[o.key]));
       SPF_AR_ZONES.forEach(z => {
-        const others = SPF_AR_ZONES.filter(o => o !== z).reduce((a, o) => a + ms[o.key], 0) / (SPF_AR_ZONES.length - 1);
-        rubMs[z.key] = ms[z.key] > .06 && ms[z.key] > others * 2.5 ? (rubMs[z.key] || 0) + dt : Math.max(0, (rubMs[z.key] || 0) - dt / 2);
-        if(rubMs[z.key] > 700 && !(cool[z.key] > now)){
-          cool[z.key] = now + 4000; rubMs[z.key] = 0;
+        const touching = fr.handZones.has(z.key) || (fr.motion[z.key] > 5 && fr.motion[z.key] > others(z.key) * 2.5);
+        touchMs[z.key] = touching ? (touchMs[z.key] || 0) + 70 : Math.max(0, (touchMs[z.key] || 0) - 35);
+        if(touchMs[z.key] > 700 && !(cool[z.key] > now)){
+          cool[z.key] = now + 4000; touchMs[z.key] = 0;
           L.zones[z.key].rubs = (L.zones[z.key].rubs || 0) + 1; save(); cache = null; refreshLive();
           toast(`لمست ${z.name} — اللمس يزيل جزءًا من الواقي`);
         }
       });
     }
     if(!cache) return;
-    SPF_AR_ZONES.forEach(z => { const c = protCls(cache[z.key]); paintZone(ctx, geo[z.key], W, H, c.rgb, .38, 2.5); });
+    SPF_AR_ZONES.forEach(z => {
+      const c = protCls(cache[z.key]);
+      paintZone(ctx, fr.geo[z.key], W, H, c.rgb, .36, 2.5);
+      const m = L.zones[z.key].m;
+      if(m && m.cov && fr.norm[z.key].length === m.cov.length)
+        dots(ctx, fr.norm[z.key].filter((_, i) => !m.cov[i]), W, H, 'rgba(200,60,50,.95)', Math.max(2.5, W / 220));
+    });
     hint.textContent = smart.preview ? `معاينة بعد ${fmtMins(smart.preview)} · 🟢 ممتازة 🟡 تضعف 🔴 جدّد`
-      : '🟢 حماية ممتازة · 🟡 بدأت تضعف · 🔴 جدّد الآن';
+      : '🟢 ممتازة · 🟡 بدأت تضعف · 🔴 جدّد الآن · النقاط الحمراء = أماكن ناقصة';
     if(now - lastBox > 5000){ lastBox = now; refreshLive(); }
   }};
 }
