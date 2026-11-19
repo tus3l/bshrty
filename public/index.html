@@ -149,6 +149,17 @@ ul.list{margin:6px 0 0;padding:0 18px 0 0;font-size:13.5px;line-height:1.9}
 .routine h4{margin:0 0 4px;font-size:13px;color:var(--rose-deep)}
 .routine ol{margin:0;padding-right:18px;font-size:12.5px;line-height:1.8}
 @media (max-width:380px){.routine{grid-template-columns:1fr}}
+.zsteps{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.zsteps li{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:7px 10px;border-radius:12px;background:var(--cream-deep)}
+.zsteps li.cur{box-shadow:inset 0 0 0 2px var(--rose)}
+.zsteps .st{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1px solid var(--line);font-size:11px;font-weight:700;flex:none}
+.zsteps li.ok .st{background:var(--good);border-color:var(--good);color:#fff}
+.zsteps .m{margin-inline-start:auto;font-size:12px;color:var(--muted)}
+.prot{display:grid;gap:9px;margin-top:12px}
+.prot-row{display:grid;grid-template-columns:88px 1fr 44px;align-items:center;gap:10px;font-size:13.5px}
+.prot-row b{text-align:left}
+.prot-bar{height:10px;border-radius:999px;background:var(--cream-deep);overflow:hidden}
+.prot-bar i{display:block;height:100%;border-radius:inherit;transition:width .4s}
 .notice{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;margin-top:10px}
 .disclaimer{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.8;margin:18px 6px 0}
 .link-btn{background:none;border:none;color:var(--rose-deep);font-weight:700;font-size:13px;padding:6px 0;text-decoration:underline}
@@ -245,7 +256,7 @@ const OBF = 'https://world.openbeautyfacts.org';
 /* =========================================================
    STATE (persisted in localStorage)
 ========================================================= */
-const DEFAULT_STATE = {gender:null, medical:null, skinType:null, pore:null, ingredient:null, spf:null, reminder:null};
+const DEFAULT_STATE = {gender:null, medical:null, skinType:null, pore:null, ingredient:null, spf:null, spfLive:null, reminder:null};
 let state = Object.assign({}, DEFAULT_STATE, loadState());
 let view = 'home';
 const ui = {
@@ -254,6 +265,8 @@ const ui = {
   weather:{status:'idle'}
 };
 const session = {streams:[], raf:0, token:0, zx:null};
+// sunscreen smart-check camera state (not persisted)
+const smart = {mode:'idle', zones:null, zi:-2, manual:false, preview:0};
 
 function loadState(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; } }
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
@@ -377,6 +390,7 @@ function fetchWeather(){
         uv: Math.round((uv || 0) * 10) / 10,
         temp: Math.round(w.current.temperature_2m),
         max: w.daily && w.daily.uv_index_max ? Math.round(w.daily.uv_index_max[0] * 10) / 10 : null,
+        hourly: w.hourly ? {time:w.hourly.time, uv:w.hourly.uv_index} : null,
         place: g ? (g.city || g.locality || g.principalSubdivision || '') : ''
       };
     }catch(e){
@@ -391,6 +405,9 @@ function fetchWeather(){
 function refreshWeather(){
   const el = $('#weatherCard');
   if(el) el.outerHTML = weatherCard();
+  // feed the real UV forecast into the sunscreen fade model
+  const w = ui.weather, L = state.spfLive;
+  if(L && w.status === 'ready'){ L.hourly = w.hourly; L.uvMax = w.max; L.uvLive = true; save(); refreshLive(); }
 }
 function weatherCard(){
   const w = ui.weather;
@@ -465,6 +482,7 @@ function refreshReminder(){ const el = $('#reminderBox'); if(el) el.outerHTML = 
 setInterval(() => {
   const r = state.reminder;
   document.querySelectorAll('[data-countdown]').forEach(el => { if(r) el.textContent = fmtRemaining(r.dueAt - Date.now()); });
+  if(view === 'spf' && smart.mode !== 'ar') refreshLive();
 }, 30000);
 
 /* =========================================================
@@ -734,7 +752,13 @@ function stopCamera(){
   const ph = $('#poreHint'); if(ph) ph.textContent = '';
   const pp = $('#poreProg'); if(pp) pp.classList.remove('show');
   const bb = $('#bcBtn'); if(bb) bb.textContent = 'تشغيل الماسح';
-  const mb = $('#mirrorBtn'); if(mb) mb.textContent = 'فتح المرآة';
+  if(smart.mode !== 'idle'){
+    smart.mode = 'idle'; smart.zones = null; smart.zi = -2; smart.manual = false;
+    const sh = $('#spfHint'); if(sh) sh.textContent = '';
+    const sp = $('#spfProg'); if(sp) sp.classList.remove('show');
+    const ss = $('#spfSteps'); if(ss) ss.innerHTML = smartStepsHtml();
+    const sc = $('#spfCtl'); if(sc) sc.innerHTML = smartCtlHtml('idle');
+  }
 }
 function camErrorText(e){
   if(e && e.name === 'NotAllowedError') return `تم رفض إذن الكاميرا. ${t('اسمحي','اسمح')} بالوصول من إعدادات المتصفح ثم ${t('أعيدي','أعد')} المحاولة.`;
@@ -1446,17 +1470,22 @@ function viewSpf(){
     <div class="card">
       <span class="eyebrow">المرحلة 5 من 5</span>
       <h2>واقي الشمس</h2>
-      <p class="sub">بعد وضع الواقي ${t('افتحي','افتح')} المرآة ${t('وتأكدي','وتأكد')} من كل منطقة، ثم ${t('حدّدي','حدّد')} المناطق التي ${t('غطّيتِها','غطّيتَها')}. سنحسب نسبة التغطية ونذكّرك بالتجديد.</p>
+      <p class="sub">${t('ابدئي','ابدأ')} الفحص الذكي <b>قبل</b> وضع الواقي: نلتقط بشرتك أولًا، ثم ${t('تدهنين','تدهن')} كل منطقة والكاميرا ترصد حركة يدك وتغيّر اللمعة واللون، وبعدها نرسم على وجهك خريطة حماية حيّة مبنية على مؤشر الأشعة في مدينتك وعامل الـ SPF.</p>
       ${w.status === 'ready' ? `<div class="notice" style="background:var(--cream-deep);color:var(--brown)">مؤشر الأشعة الآن ${w.uv} (${uvLevel(w.uv).label}).</div>` : ''}
     </div>
-    <div class="card">
+    <div class="card" id="smartCard">
+      <span class="eyebrow">${ic('sparkle', 'width:14px;height:14px;vertical-align:-2px')} الفحص الذكي بالكاميرا</span>
       <div class="cam mirror" id="spfCam">
         <video id="spfVideo" playsinline muted></video>
-        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>مرآة اختيارية لمراجعة التغطية — لا يتم حفظ أو رفع أي صورة.</span></div>
+        <canvas id="spfCanvas"></canvas>
+        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>${t('اختاري','اختر')} عامل الحماية بالأسفل ثم ${t('ابدئي','ابدأ')} الفحص — الصورة تُحلَّل على جهازك فقط ولا تُرفع.</span></div>
+        <div class="cam-hint" id="spfHint"></div>
       </div>
-      <div class="btn-row"><button class="btn btn-outline" id="mirrorBtn" data-act="mirror">فتح المرآة</button></div>
+      <div class="progress" id="spfProg"><div class="bar"><i id="spfFill"></i></div><span id="spfTxt"></span></div>
+      <ul class="zsteps" id="spfSteps">${smartStepsHtml()}</ul>
+      <div id="spfCtl">${smartCtlHtml(smart.mode)}</div>
     </div>
-    <div class="card">
+    <div class="card" id="spfForm">
       <div class="field" style="margin-top:0">
         <span class="field-label">المناطق التي ${t('غطّيتِها','غطّيتَها')}</span>
         <div class="chips">${SPF_ZONES.map(z => `<button class="chip${s.zones.includes(z) ? ' on' : ''}" data-act="spfZone" data-v="${z}">${s.zones.includes(z) ? '✓ ' : ''}${z}</button>`).join('')}</div>
@@ -1476,6 +1505,7 @@ function viewSpf(){
       <div class="btn-row"><button class="btn btn-primary" data-act="saveSpf">احسب التغطية</button></div>
     </div>
     <div id="spfResult">${state.spf ? spfResultHtml() : ''}</div>
+    ${liveBoxHtml()}
     ${reminderCard()}`;
 }
 function spfResultHtml(){
@@ -1511,16 +1541,428 @@ function saveSpf(){
   $('#spfResult').innerHTML = spfResultHtml();
   $('#spfResult').scrollIntoView({behavior:'smooth', block:'start'});
 }
-async function toggleMirror(){
-  const btn = $('#mirrorBtn');
-  if(session.streams.length){ stopCamera(); btn.textContent = 'فتح المرآة'; return; }
+/* ---------------------------------------------------------
+   SMART SUNSCREEN CHECK
+   1) "before" snapshot of every zone (tone, shine)
+   2) guided application per zone: hand motion over the zone + change in
+      specular shine / brightness / saturation vs the snapshot => ✅
+   3) fade model: real UV index (Open-Meteo) × SPF × zone exposure,
+      drawn live on the face mesh as a green / yellow / red AR overlay
+--------------------------------------------------------- */
+const SPF_AR_ZONES = [
+  {key:'forehead', name:'الجبهة',       my:'جبهتك',        chip:'الجبهة', lm:151, expo:1.15,
+   hull:[109,10,338,297,299,337,151,108,69,67]},
+  {key:'nose',     name:'الأنف',        my:'أنفك',         chip:'الأنف',  lm:5,   expo:1.3,
+   hull:[168,6,197,195,5,4,1,19,49,279,48,278,129,358,98,327,64,294]},
+  {key:'cheekR',   name:'الخدّ الأيمن', my:'خدّك الأيمن',  chip:'الخدّان', lm:50,  expo:1,
+   hull:[116,117,118,119,100,36,205,187,123,50,147]},
+  {key:'cheekL',   name:'الخدّ الأيسر', my:'خدّك الأيسر',  chip:'الخدّان', lm:280, expo:1,
+   hull:[345,346,347,348,329,266,425,411,352,280,376]},
+  {key:'chin',     name:'الذقن',        my:'ذقنك',         chip:'الذقن',  lm:199, expo:.85,
+   hull:[18,200,199,175,152,148,176,377,400,201,421,83,313,32,262]},
+];
+const SPF_STATUS = {verified:'تأكيد بصري', motion:'رُصدت حركة اليد', manual:'تأكيد يدوي'};
+const BASELINE_MS = 2500;
+// decay per minute: everyday wear (sebum, touching ≈ 20% lost in 4h) + UV photodegradation
+// calibrated so UV 6 outdoors for 2h leaves ≈ 40% (the usual "reapply every 2 hours")
+const SPF_DECAY = {base: Math.log(1 / 0.8) / 240, uv: 0.0012};
+const PROT_GOOD = 70, PROT_WEAK = 40;
+
+function spfNumber(v){ return v === '15' ? 15 : v === '50+' ? 50 : 30; }
+function protCls(p){
+  if(p >= PROT_GOOD) return {cls:'good', color:'#5E8F58', rgb:'94,143,88',  label:'ممتازة'};
+  if(p >= PROT_WEAK) return {cls:'warn', color:'#C99A2E', rgb:'217,169,59', label:'بدأت تضعف'};
+  return {cls:'bad', color:'#B5544A', rgb:'200,70,60', label:'جدّد الآن'};
+}
+
+// ---- geometry ----
+function convexHull(pts){
+  const p = pts.slice().sort((a, b) => a.x - b.x || a.y - b.y);
+  if(p.length < 3) return p;
+  const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lo = [], up = [];
+  for(const q of p){ while(lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+  for(let i = p.length - 1; i >= 0; i--){ const q = p[i]; while(up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+function zoneGeometry(lm){
+  const r = Math.abs(lm[454].x - lm[234].x) * 0.07;
+  const g = {};
+  SPF_AR_ZONES.forEach(z => g[z.key] = {cx:lm[z.lm].x, cy:lm[z.lm].y, r, hull:convexHull(z.hull.map(i => lm[i]))});
+  return g;
+}
+const FALLBACK_GEO = (() => {
+  const g = {};
+  SPF_AR_ZONES.forEach(z => g[z.key] = {cx:FALLBACK_POINTS[z.key].x, cy:FALLBACK_POINTS[z.key].y, r:FALLBACK_POINTS.r, hull:null});
+  return g;
+})();
+function zonePath(ctx, z, W, H){
+  ctx.beginPath();
+  if(z.hull && z.hull.length > 2){
+    z.hull.forEach((p, i) => i ? ctx.lineTo(p.x * W, p.y * H) : ctx.moveTo(p.x * W, p.y * H));
+    ctx.closePath();
+  } else ctx.arc(z.cx * W, z.cy * H, z.r * W * 2, 0, Math.PI * 2);
+}
+function paintZone(ctx, z, W, H, rgb, alpha, lw){
+  zonePath(ctx, z, W, H);
+  ctx.fillStyle = `rgba(${rgb},${alpha})`; ctx.fill();
+  if(lw){ ctx.lineWidth = lw; ctx.strokeStyle = `rgba(${rgb},.95)`; ctx.stroke(); }
+}
+
+// ---- pixels: mean tone, specular share, bright tail, coarse texture grid ----
+function sampleZone(ctx, cx, cy, rad){
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  const x0 = clamp(Math.round(cx - rad), 0, W - 2), y0 = clamp(Math.round(cy - rad), 0, H - 2);
+  const w = clamp(Math.round(rad * 2), 2, W - x0), h = clamp(Math.round(rad * 2), 2, H - y0);
+  const d = ctx.getImageData(x0, y0, w, h).data;
+  const n = w * h, GN = 6;
+  const grid = new Float32Array(GN * GN), gc = new Float32Array(GN * GN);
+  const L = new Float32Array(n), S = new Float32Array(n);
+  let R = 0, G = 0, B = 0, sum = 0;
+  for(let y = 0, j = 0; y < h; y++) for(let x = 0; x < w; x++, j++){
+    const i = j * 4, r = d[i], g = d[i + 1], b = d[i + 2];
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    L[j] = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    S[j] = mx ? (mx - mn) / mx : 0;
+    R += r; G += g; B += b; sum += L[j];
+    const k = Math.min(GN - 1, (y * GN / h) | 0) * GN + Math.min(GN - 1, (x * GN / w) | 0);
+    grid[k] += L[j]; gc[k]++;
+  }
+  for(let k = 0; k < grid.length; k++) grid[k] /= gc[k] || 1;
+  const mean = sum / n, thr = Math.max(0.72, mean + 0.18);
+  let hi = 0;
+  for(let j = 0; j < n; j++) if(L[j] > thr && S[j] < 0.28) hi++;
+  const sorted = L.slice().sort();
+  R /= n; G /= n; B /= n;
+  const mx = Math.max(R, G, B), mn = Math.min(R, G, B);
+  return {L:mean, shine:hi / n, p95:sorted[Math.floor(n * .95)], sat: mx ? (mx - mn) / mx : 0, rgb:[R, G, B], grid};
+}
+function sampleAll(octx, geo){
+  const W = octx.canvas.width, H = octx.canvas.height, out = {};
+  SPF_AR_ZONES.forEach(z => { const g = geo[z.key]; out[z.key] = sampleZone(octx, g.cx * W, g.cy * H, Math.max(6, g.r * W * 1.25)); });
+  return out;
+}
+// frame-to-frame change of the zone's texture (exposure-independent) => a hand rubbing over it
+function motionScore(a, b){
+  let s = 0;
+  for(let k = 0; k < a.grid.length; k++) s += Math.abs((a.grid[k] - a.L) - (b.grid[k] - b.L));
+  return s / a.grid.length + Math.abs(a.L - b.L) * .5;
+}
+function avgSamples(list){
+  const o = {L:0, shine:0, p95:0, sat:0};
+  list.forEach(s => { o.L += s.L; o.shine += s.shine; o.p95 += s.p95; o.sat += s.sat; });
+  for(const k in o) o[k] /= list.length || 1;
+  return o;
+}
+
+// ---- fade model ----
+function localHourKey(d){
+  const p = v => String(v).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:00`;
+}
+function uvAt(ms, L){
+  const d = new Date(ms);
+  const H = (ui.weather.status === 'ready' && ui.weather.hourly) || L.hourly;
+  if(H){ const i = H.time.indexOf(localHourKey(d)); if(i >= 0 && H.uv[i] != null) return H.uv[i]; }
+  // no forecast for that hour: daylight curve peaking at today's max (or a typical 6)
+  const peak = L.uvMax != null ? L.uvMax : 6;
+  const h = d.getHours() + d.getMinutes() / 60;
+  return Math.max(0, peak * Math.sin(Math.PI * (h - 6) / 13));
+}
+function outdoorAt(ms, L){
+  let o = true;
+  for(const s of L.segs) if(s.from <= ms) o = s.outdoor;
+  return o;
+}
+function decayPerMin(L, key, ms){
+  const z = SPF_AR_ZONES.find(x => x.key === key);
+  const uv = uvAt(ms, L) * (outdoorAt(ms, L) ? 1 : 0.08);   // glass + shade indoors
+  return SPF_DECAY.base + SPF_DECAY.uv * z.expo * uv;
+}
+function zoneProtection(L, key, at){
+  const z = L.zones[key];
+  if(!z) return 0;
+  let k = 0;
+  for(let t = L.at; t < at; t += 300000) k += Math.min(5, (at - t) / 60000) * decayPerMin(L, key, t);
+  const amount = L.amount === 'no' ? .6 : 1;
+  return clamp(100 * z.q * amount * Math.pow(.88, z.rubs || 0) * Math.exp(-k), 0, 100);
+}
+// minutes from now until the zone drops under the "weak" line (null if > 12h)
+function minutesUntilWeak(L, key){
+  let p = zoneProtection(L, key, Date.now());
+  if(p < PROT_WEAK) return 0;
+  for(let m = 5, t = Date.now(); m <= 720; m += 5, t += 300000){
+    p *= Math.exp(-5 * decayPerMin(L, key, t));
+    if(p < PROT_WEAK) return m;
+  }
+  return null;
+}
+function fmtMins(m){ return m >= 60 ? `${Math.floor(m / 60)} س${m % 60 ? ` ${m % 60} د` : ''}` : `${m} د`; }
+
+// ---- UI ----
+function smartStepsHtml(){
+  const zs = smart.zones;
+  const base = smart.zi === -1 ? ' cur' : zs && smart.zi >= 0 ? ' ok' : '';
+  const rows = [`<li class="${base}"><span class="st">${base === ' ok' ? '✓' : '0'}</span>لقطة "قبل" بدون واقي<span class="m">${smart.zi === -1 ? 'الآن' : ''}</span></li>`];
+  SPF_AR_ZONES.forEach((z, i) => {
+    const s = zs && zs[i].status, cur = zs && smart.zi === i;
+    rows.push(`<li class="${s ? 'ok' : ''}${cur ? ' cur' : ''}"><span class="st">${s ? '✓' : i + 1}</span>${t('ادهني','ادهن')} ${z.my}<span class="m">${s ? SPF_STATUS[s] : cur ? 'الآن' : ''}</span></li>`);
+  });
+  return rows.join('');
+}
+function smartCtlHtml(mode){
+  if(mode === 'busy') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">إلغاء</button></div>`;
+  if(mode === 'check') return `<div class="btn-row"><button class="btn btn-dark" data-act="spfManual" id="spfManualBtn" ${smart.zi < 0 ? 'disabled' : ''}>وضعته على هذه المنطقة ✓</button><button class="btn btn-outline" data-act="spfStop">إيقاف</button></div>`;
+  if(mode === 'ar') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">إغلاق الكاميرا</button></div>`;
+  return `<div class="btn-row"><button class="btn btn-primary" data-act="spfCheck">${state.spfLive ? 'إعادة الفحص (بعد التجديد)' : 'ابدأ الفحص الذكي'}</button>
+    ${state.spfLive ? `<button class="btn btn-outline" data-act="spfAR">عرض الحماية على وجهي</button>` : ''}</div>`;
+}
+function renderSmartSteps(){ const el = $('#spfSteps'); if(el) el.innerHTML = smartStepsHtml(); }
+function setSmartCtl(mode){ const el = $('#spfCtl'); if(el) el.innerHTML = smartCtlHtml(mode); }
+
+function liveBoxHtml(){
+  const L = state.spfLive;
+  if(!L) return '<div id="spfLiveBox"></div>';
+  const now = Date.now(), at = now + smart.preview * 60000;
+  const prot = SPF_AR_ZONES.map(z => ({z, p:zoneProtection(L, z.key, at)}));
+  const rows = prot.map(({z, p}) => {
+    const c = protCls(p);
+    return `<div class="prot-row"><span>${z.name}</span><div class="prot-bar"><i style="width:${p.toFixed(1)}%;background:${c.color}"></i></div><b style="color:${c.color}">${Math.round(p)}%</b></div>`;
+  }).join('');
+  const weakest = prot.reduce((a, b) => b.p < a.p ? b : a);
+  const avg = prot.reduce((s, x) => s + x.p, 0) / prot.length;
+  const effSpf = Math.max(1, Math.round(1 + (L.spf - 1) * avg / 100));
+  const until = minutesUntilWeak(L, weakest.z.key);
+  const uvNow = Math.round(uvAt(now, L) * 10) / 10;
+  const out = outdoorAt(now, L);
+  const elapsed = Math.round((now - L.at) / 60000);
+  const checks = SPF_AR_ZONES.map(z => {
+    const r = L.zones[z.key];
+    if(!r) return '';
+    const m = r.m;
+    const num = v => `<bdi dir="ltr">${v >= 0 ? '+' : '−'}${Math.abs(v * 100).toFixed(1)}</bdi>`;
+    const metr = m ? ` — لمعة ${num(m.dShine)}، تفتيح ${num(m.dL)}، بهتان اللون ${num(m.dSat)}` : '';
+    return `<li><b>${z.name}:</b> ${r.status === 'verified' ? '✅' : r.status === 'motion' ? '☑️' : '✍️'} ${SPF_STATUS[r.status]}${metr}${r.rubs ? ` · لُمست ${r.rubs}×` : ''}</li>`;
+  }).join('');
+  const prev = [0, 30, 60, 120, 180];
+  return `
+    <div class="card" id="spfLiveBox">
+      <span class="eyebrow">خريطة الحماية الحيّة</span>
+      <div class="score" style="margin-top:6px">
+        <div class="ring" style="--p:${avg.toFixed(0)};--c:${protCls(avg).color}"><b>${Math.round(avg)}%</b></div>
+        <div style="flex:1">
+          <div class="verdict ${protCls(weakest.p).cls}">${smart.preview ? `بعد ${fmtMins(smart.preview)}: ` : ''}أضعف منطقة ${weakest.z.name} (${Math.round(weakest.p)}%) — ${protCls(weakest.p).label}</div>
+          <p class="small" style="margin:6px 0 0">SPF ${L.spf}${L.spfGuess ? ' (افتراضي)' : ''} · الفعّال الآن ≈ SPF ${effSpf} · مضى ${fmtMins(elapsed)} · UV ${uvNow} ${L.uvLive ? 'من موقعك' : '(تقديري — فعّل الموقع لقيمة حقيقية)'}</p>
+        </div>
+      </div>
+      <div class="prot">${rows}</div>
+      <div class="field">
+        <span class="field-label">${t('أنتِ','أنت')} الآن</span>
+        <div class="chips">
+          <button class="chip${out ? ' on' : ''}" data-act="spfEnv" data-v="out">☀️ في الخارج</button>
+          <button class="chip${!out ? ' on' : ''}" data-act="spfEnv" data-v="in">🏠 داخل مبنى</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">معاينة الحماية بعد</span>
+        <div class="chips">${prev.map(m => `<button class="chip${smart.preview === m ? ' on' : ''}" data-act="spfPreview" data-v="${m}">${m ? '+' + fmtMins(m) : 'الآن'}</button>`).join('')}</div>
+      </div>
+      ${until != null && until > 0 ? `<div class="btn-row"><button class="btn btn-dark" data-act="remind" data-v="${until}">ذكّرني عندما تضعف الحماية (بعد ${fmtMins(until)})</button></div>` : ''}
+      ${until === 0 ? `<div class="notice" style="background:var(--bad-bg);color:var(--bad)">الحماية على ${weakest.z.name} ضعفت — ${t('جدّدي','جدّد')} الواقي ثم ${t('أعيدي','أعد')} الفحص.</div>` : ''}
+      <ul class="list small" style="margin-top:12px">${checks}</ul>
+      <p class="small" style="margin-top:8px">النسب تقدير من نموذج رياضي (الأشعة × عامل الحماية × تعرّض كل منطقة × لمس الوجه) وليست قياسًا مخبريًا.</p>
+    </div>`;
+}
+function refreshLive(){
+  const el = $('#spfLiveBox');
+  if(el) el.outerHTML = liveBoxHtml();
+}
+
+// ---- camera runner shared by the check and the AR view ----
+async function runSpfCam(mode){
   stopCamera();
   const token = session.token;
-  try{
-    await startCamera($('#spfVideo'), 'user');
+  const cam = $('#spfCam'), video = $('#spfVideo'), canvas = $('#spfCanvas'), hint = $('#spfHint'), ph = $('#spfPh span');
+  smart.mode = 'busy'; setSmartCtl('busy');
+  if(mode === 'check' && ui.weather.status === 'idle') fetchWeather();
+  ph.textContent = 'جارٍ تشغيل الكاميرا…';
+  try{ await startCamera(video, 'user'); }
+  catch(e){ ph.textContent = camErrorText(e); smart.mode = 'idle'; setSmartCtl('idle'); return; }
+  if(token !== session.token) return;
+  cam.classList.add('live');
+  hint.textContent = 'جارٍ تحميل نموذج تتبّع الوجه (468 نقطة)…';
+  let fm = null;
+  try{ fm = await getFaceMesh(); }catch(e){ fm = null; }
+  if(token !== session.token) return;
+
+  const W = video.videoWidth, H = video.videoHeight;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const off = document.createElement('canvas');
+  const sc = Math.min(1, 480 / W);
+  off.width = Math.round(W * sc); off.height = Math.round(H * sc);
+  const octx = off.getContext('2d', {willReadFrequently:true});
+  let landmarks = null, busy = false;
+  if(fm) fm.onResults(r => { landmarks = (r.multiFaceLandmarks && r.multiFaceLandmarks[0]) || null; });
+
+  let S = mode === 'ar' ? arStepper() : checkStepper();
+  let last = performance.now();
+  const frame = now => {
     if(token !== session.token) return;
-    $('#spfCam').classList.add('live'); btn.textContent = 'إغلاق المرآة';
-  }catch(e){ $('#spfPh span').textContent = camErrorText(e); }
+    const dt = Math.min(100, now - last); last = now;
+    if(fm && !busy){ busy = true; fm.send({image:video}).catch(() => {}).finally(() => { busy = false; }); }
+    octx.drawImage(video, 0, 0, off.width, off.height);
+    ctx.clearRect(0, 0, W, H);
+    const geo = fm ? (landmarks ? zoneGeometry(landmarks) : null) : FALLBACK_GEO;
+    if(!fm || !geo) drawOval(ctx, W, H);
+    const samples = geo ? sampleAll(octx, geo) : null;
+    const r = S.step({dt, now, geo, samples, ctx, W, H, hint, tracked:!!fm});
+    if(r === true) return;
+    if(r) S = r;
+    session.raf = requestAnimationFrame(frame);
+  };
+  session.raf = requestAnimationFrame(frame);
+}
+
+function checkStepper(){
+  const zones = SPF_AR_ZONES.map(z => ({key:z.key, name:z.name, my:z.my, base:null, acc:[], status:null,
+    prev:null, motionMs:0, calmMs:0, settleMs:0, idleMs:0, hits:0, meas:[]}));
+  smart.mode = 'check'; smart.zones = zones; smart.zi = -1; smart.manual = false;
+  renderSmartSteps(); setSmartCtl('check');
+  const prog = $('#spfProg'), fill = $('#spfFill'), txt = $('#spfTxt');
+  prog.classList.add('show');
+  let baseMs = 0;
+
+  return {step({dt, now, geo, samples, ctx, W, H, hint, tracked}){
+    // ---------- 1) before snapshot ----------
+    if(smart.zi === -1){
+      if(!samples){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
+      const meanL = SPF_AR_ZONES.reduce((s, z) => s + samples[z.key].L, 0) / SPF_AR_ZONES.length;
+      if(meanL < .2){ hint.textContent = `الإضاءة ضعيفة — ${t('انتقلي','انتقل')} لمكان أكثر إضاءة`; return; }
+      zones.forEach(z => z.acc.push(samples[z.key]));
+      baseMs += dt;
+      hint.textContent = `لقطة "قبل": ${t('ابقي','ابقَ')} ${t('ثابتة','ثابتًا')} ${t('وانظري','وانظر')} للكاميرا`;
+      SPF_AR_ZONES.forEach(z => paintZone(ctx, geo[z.key], W, H, '255,255,255', .12, 2));
+      const pct = Math.min(1, baseMs / BASELINE_MS);
+      fill.style.width = (pct * 100).toFixed(1) + '%';
+      txt.textContent = `تحليل اللمعة ولون البشرة قبل الواقي… ${Math.round(pct * 100)}%`;
+      if(baseMs >= BASELINE_MS){
+        zones.forEach(z => { z.base = avgSamples(z.acc); z.acc = null; });
+        smart.zi = 0; renderSmartSteps(); setSmartCtl('check');
+      }
+      return;
+    }
+
+    // ---------- 2) guided application ----------
+    const z = zones[smart.zi];
+    const zg = geo && geo[z.key];
+    let motion = 0, phase = 'wait';
+    if(!samples){
+      // face lost while a hand is over it = occlusion, counts as application movement
+      if(z.motionMs > 0 || z.idleMs > 400){ z.motionMs += dt; z.calmMs = 0; }
+      hint.textContent = `${t('ادهني','ادهن')} ${z.my}… ثم ${t('أبعدي','أبعد')} يدك ${t('وانظري','وانظر')} للكاميرا`;
+    } else {
+      const s = samples[z.key];
+      motion = z.prev ? motionScore(s, z.prev) : 0;
+      z.prev = s; z.idleMs += dt;
+      if(motion > .035){ z.motionMs += dt; z.calmMs = 0; z.settleMs = 0; z.hits = 0; z.meas = []; }
+      else z.calmMs += dt;
+
+      if(z.motionMs < 600){
+        hint.textContent = `${t('ادهني','ادهن')} ${z.my} الآن${z.idleMs > 12000 ? ' — أو اضغط "وضعته" إذا انتهيت' : ''}`;
+      } else if(z.calmMs < 800){
+        phase = 'rub';
+        hint.textContent = `ممتاز، ${t('وزّعي','وزّع')} الواقي جيدًا… ثم ${t('أبعدي','أبعد')} يدك`;
+      } else {
+        phase = 'measure';
+        // compare against the "before" snapshot; untreated zones act as a control for auto-exposure drift
+        const ctrl = zones.filter(o => !o.status && o !== z);
+        const cL = ctrl.length ? ctrl.reduce((a, o) => a + samples[o.key].L - o.base.L, 0) / ctrl.length : 0;
+        const cP = ctrl.length ? ctrl.reduce((a, o) => a + samples[o.key].p95 - o.base.p95, 0) / ctrl.length : 0;
+        const m = {dShine: s.shine - z.base.shine, dL: (s.L - z.base.L) - cL, dP: (s.p95 - z.base.p95) - cP, dSat: z.base.sat - s.sat};
+        z.meas.push(m); z.settleMs += dt;
+        if(m.dShine > .008 || m.dP > .015 || m.dL > .012 || m.dSat > .015) z.hits++;
+        hint.textContent = 'جارٍ مقارنة اللمعة ولون البشرة مع لقطة "قبل"…';
+        if(z.hits >= 10) finishZone(z, 'verified');
+        else if(z.settleMs > 2500) finishZone(z, 'motion');
+      }
+    }
+    if(smart.manual){ smart.manual = false; if(!z.status) finishZone(z, 'manual'); }
+
+    // draw
+    if(geo){
+      zones.forEach(o => { if(o.status) paintZone(ctx, geo[o.key], W, H, '94,143,88', .32, 2); });
+      if(zg){
+        const a = phase === 'rub' ? .25 + Math.min(.3, motion * 4) : phase === 'measure' ? .22 : .1 + .08 * Math.sin(now / 220);
+        paintZone(ctx, zg, W, H, phase === 'measure' ? '217,169,59' : '232,134,140', Math.max(.05, a), 3);
+        drawPulse(ctx, zg.cx * W, zg.cy * H, Math.max(14, zg.r * W * 1.6), now);
+      }
+    }
+    const doneN = zones.filter(o => o.status).length;
+    fill.style.width = ((doneN + (phase === 'measure' ? .7 : phase === 'rub' ? .4 : 0)) / zones.length * 100).toFixed(1) + '%';
+    txt.textContent = `المنطقة ${Math.min(smart.zi + 1, zones.length)} من ${zones.length}: ${z.name}${tracked ? '' : ' (بدون تتبّع)'}`;
+
+    if(z.status){
+      smart.zi++; renderSmartSteps(); setSmartCtl('check');
+      if(smart.zi >= zones.length) return finishSmart(zones, !tracked);
+    }
+  }};
+}
+function finishZone(z, status){
+  z.status = status;
+  const n = z.meas.length;
+  z.metrics = n ? {dShine: z.meas.reduce((a, m) => a + m.dShine, 0) / n, dL: z.meas.reduce((a, m) => a + m.dL, 0) / n,
+                   dSat: z.meas.reduce((a, m) => a + m.dSat, 0) / n} : null;
+}
+function finishSmart(zones, approx){
+  const L = {at:Date.now(), spf:spfNumber(ui.spf.spf), spfGuess:!ui.spf.spf || ui.spf.spf === 'لا أعرف', amount:ui.spf.amount,
+    approx, segs:[{from:Date.now(), outdoor:true}], zones:{},
+    hourly: ui.weather.status === 'ready' ? ui.weather.hourly : null,
+    uvMax: ui.weather.status === 'ready' ? ui.weather.max : null, uvLive: ui.weather.status === 'ready'};
+  zones.forEach(z => L.zones[z.key] = {status:z.status, q: z.status === 'verified' ? 1 : z.status === 'motion' ? .92 : .85, m:z.metrics, rubs:0});
+  state.spfLive = L;
+  // tick the matching zones in the manual form
+  SPF_AR_ZONES.forEach(z => { if(!ui.spf.zones.includes(z.chip)) ui.spf.zones.push(z.chip); });
+  smart.preview = 0;
+  save(); refreshSpfForm(); refreshLive();
+  $('#spfProg').classList.remove('show');
+  toast('✅ تم التحقق من كل المناطق — هذه خريطة حمايتك الحيّة');
+  return arStepper();
+}
+
+// live AR overlay; also notices when a hand rubs a zone (wiping sunscreen off)
+function arStepper(){
+  smart.mode = 'ar'; smart.zones = null; smart.zi = -2;
+  renderSmartSteps(); setSmartCtl('ar');
+  const L = state.spfLive, prev = {}, rubMs = {}, cool = {};
+  let cache = null, cacheAt = 0, cachePreview = -1, lastBox = 0;
+  return {step({dt, now, geo, samples, ctx, W, H, hint}){
+    if(!geo){ hint.textContent = `${t('ضعي','ضع')} وجهك داخل الإطار`; return; }
+    if(!cache || now - cacheAt > 1000 || cachePreview !== smart.preview){
+      const at = Date.now() + smart.preview * 60000;
+      cache = {}; SPF_AR_ZONES.forEach(z => cache[z.key] = zoneProtection(L, z.key, at));
+      cacheAt = now; cachePreview = smart.preview;
+    }
+    // touch detection: motion localized on one zone (not the whole head moving)
+    if(samples && !smart.preview){
+      const ms = {};
+      SPF_AR_ZONES.forEach(z => { ms[z.key] = prev[z.key] ? motionScore(samples[z.key], prev[z.key]) : 0; prev[z.key] = samples[z.key]; });
+      SPF_AR_ZONES.forEach(z => {
+        const others = SPF_AR_ZONES.filter(o => o !== z).reduce((a, o) => a + ms[o.key], 0) / (SPF_AR_ZONES.length - 1);
+        rubMs[z.key] = ms[z.key] > .06 && ms[z.key] > others * 2.5 ? (rubMs[z.key] || 0) + dt : Math.max(0, (rubMs[z.key] || 0) - dt / 2);
+        if(rubMs[z.key] > 700 && !(cool[z.key] > now)){
+          cool[z.key] = now + 4000; rubMs[z.key] = 0;
+          L.zones[z.key].rubs = (L.zones[z.key].rubs || 0) + 1; save(); cache = null; refreshLive();
+          toast(`لمست ${z.name} — اللمس يزيل جزءًا من الواقي`);
+        }
+      });
+    }
+    if(!cache) return;
+    SPF_AR_ZONES.forEach(z => { const c = protCls(cache[z.key]); paintZone(ctx, geo[z.key], W, H, c.rgb, .38, 2.5); });
+    hint.textContent = smart.preview ? `معاينة بعد ${fmtMins(smart.preview)} · 🟢 ممتازة 🟡 تضعف 🔴 جدّد`
+      : '🟢 حماية ممتازة · 🟡 بدأت تضعف · 🔴 جدّد الآن';
+    if(now - lastBox > 5000){ lastBox = now; refreshLive(); }
+  }};
 }
 
 /* =========================================================
@@ -1571,7 +2013,17 @@ const ACTIONS = {
   pick: d => { const p = ui.ing.results[+d.i]; if(p) useProduct(p, p.code); },
   analyze: runAnalyze,
   // spf
-  mirror: toggleMirror,
+  spfCheck: () => runSpfCam('check'),
+  spfAR: () => runSpfCam('ar'),
+  spfStop: () => stopCamera(),
+  spfManual: () => { smart.manual = true; },
+  spfPreview: d => { smart.preview = +d.v; refreshLive(); },
+  spfEnv: d => {
+    const L = state.spfLive; if(!L) return;
+    const out = d.v === 'out';
+    if(outdoorAt(Date.now(), L) !== out){ L.segs.push({from:Date.now(), outdoor:out}); save(); }
+    refreshLive();
+  },
   spfZone: d => { const z = ui.spf.zones; ui.spf.zones = z.includes(d.v) ? z.filter(x => x !== d.v) : [...z, d.v]; refreshSpfForm(); },
   spfVal: d => { ui.spf.spf = d.v; refreshSpfForm(); },
   spfAmount: d => { ui.spf.amount = d.v; refreshSpfForm(); },
@@ -1583,7 +2035,7 @@ const ACTIONS = {
 function refreshSpfForm(){
   const tmp = document.createElement('div');
   tmp.innerHTML = viewSpf();
-  const fresh = tmp.querySelectorAll('.card')[2], cur = $('#main').querySelectorAll('.card')[2];
+  const fresh = tmp.querySelector('#spfForm'), cur = $('#spfForm');
   if(fresh && cur) cur.replaceWith(fresh);
 }
 
