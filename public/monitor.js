@@ -69,11 +69,80 @@ async function clearSessions(){
   try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
   await idbDo('readwrite', s => s.clear(), 'sessions').catch(() => {});
 }
+/* ---------------- AI skin analyses (pores, dark circles, pigmentation) ---------------- */
+const ANA_KEY = 'myskin:analyses';
+const analyses = {list:[]};
+const noThumb = a => { const {thumb, ...r} = a; return r; };
+function mirrorAnalyses(){ try{ localStorage.setItem(ANA_KEY, JSON.stringify(analyses.list.map(noThumb))); }catch(e){} }
+async function loadAnalyses(){
+  let ls = [], db = [];
+  try{ ls = JSON.parse(localStorage.getItem(ANA_KEY)) || []; }catch(e){}
+  try{ db = await idbDo('readonly', s => s.getAll(), 'analyses') || []; }catch(e){}
+  const byId = new Map();
+  ls.forEach(r => { if(r && r.id) byId.set(r.id, r); });
+  db.forEach(r => { if(r && r.id) byId.set(r.id, r); });
+  // the analysis already on the pore page (from before the record existed) goes in too, without its photo
+  const a = state.poreAI;
+  if(a && a.report && !byId.has('ana-' + a.at)) byId.set('ana-' + a.at, {id:'ana-' + a.at, at:a.at, runs:a.runs, report:a.report});
+  analyses.list = [...byId.values()].sort((x, y) => y.at - x.at);
+  const inDb = new Set(db.map(r => r.id));
+  analyses.list.filter(r => !inDb.has(r.id)).forEach(r => idbDo('readwrite', s => s.put(r), 'analyses').catch(() => {}));
+  mirrorAnalyses();
+  if(view === 'record' && smart.mode === 'idle') rerenderKeepScroll();
+}
+async function putAnalysis(rec){
+  analyses.list = analyses.list.filter(x => x.id !== rec.id).concat(rec).sort((x, y) => y.at - x.at);
+  mirrorAnalyses();
+  await idbDo('readwrite', s => s.put(rec), 'analyses').catch(() => {});
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+}
+// called by the pore page after every AI analysis
+function saveAnalysis(a, keepPhoto){
+  const rec = {id:'ana-' + a.at, at:a.at, runs:a.runs, report:a.report};
+  if(keepPhoto && a.thumb) rec.thumb = a.thumb;
+  return putAnalysis(rec);
+}
+async function deleteAnalysis(id){
+  analyses.list = analyses.list.filter(r => r.id !== id);
+  mirrorAnalyses();
+  await idbDo('readwrite', s => s.delete(id), 'analyses').catch(() => {});
+}
+// numeric scores for comparisons: pores 0 (fine) – 2 (enlarged), dark circles / pigmentation 0 (none) – 3 (marked)
+function analysisScores(a){
+  const r = a.report;
+  if(!r || !r.image_ok) return null;
+  const sev = v => ({none:0, mild:1, moderate:2, marked:3})[v];
+  return {pores:poreScore(r), dark:r.dark_circles ? sev(r.dark_circles.level) ?? null : null, pig:r.pigmentation ? sev(r.pigmentation.level) ?? null : null};
+}
+function analysisLine(a){
+  const r = a.report;
+  if(!r.image_ok) return 'The photo isn’t clear enough.';
+  const pl = poreLevel(r), d = SEV[(r.dark_circles || {}).level], p = SEV[(r.pigmentation || {}).level];
+  return [pl ? `Pores: ${pl.label}` : '', d ? `Dark circles: ${d.label}` : '', p ? `Pigmentation: ${p.label}` : ''].filter(Boolean).join(' · ');
+}
+function openAnalysis(id){
+  const a = analyses.list.find(x => x.id === id); if(!a) return;
+  modal(`
+    <span class="eyebrow">AI skin analysis</span>
+    <h3>${dGreg(a.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h3>
+    <p class="small">${dBoth(a.at)} · <span data-noi18n>${dTime(a.at)}</span></p>
+    ${aiResultHtml(a, true)}
+    <div class="btn-row">
+      <button class="btn btn-primary" data-act="anaDownload" data-id="${esc(a.id)}">Download report</button>
+      <button class="btn btn-outline" data-act="closeModal">Close</button>
+    </div>
+    <button class="link-btn" data-act="anaDelete" data-id="${esc(a.id)}">Delete this analysis</button>`);
+}
+const analysisDoc = a => `<div class="card"><span class="eyebrow">AI skin analysis</span><h2>${dGreg(a.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h2>
+  <p class="small">${dBoth(a.at)} · <span data-noi18n>${dTime(a.at)}</span></p>${aiResultHtml(a, true)}</div>`;
+
 async function deletePhotos(){
-  const n = sessions.list.reduce((s, r) => s + r.checks.filter(c => c.photo).length, 0);
+  const n = sessions.list.reduce((s, r) => s + r.checks.filter(c => c.photo).length, 0) + analyses.list.filter(a => a.thumb).length;
   if(!n) return toast('No face photos are saved.');
   if(!confirm('Delete all saved face photos? Notes and numbers stay.')) return;
   for(const r of sessions.list) if(r.checks.some(c => c.photo)) await putSession(noPhotos(r));
+  for(const a of analyses.list) if(a.thumb) await putAnalysis(noThumb(a));
+  state.anPhoto = false;
   if(state.monitor) state.monitor.photos = false, save();
   toast('Face photos deleted.');
   rerenderKeepScroll();
@@ -358,10 +427,16 @@ const METRICS = [
   ['tex', 'Texture (pore visibility) index', '', true],
   ['reapplies', 'Reapplications per session', '', null],
   ['dur', 'Session length', 'min', null],
+  ['pores', 'Pores (AI analysis)', '0 fine – 2 enlarged', true],
+  ['dark', 'Dark circles (AI analysis)', '0 none – 3 marked', true],
+  ['pig', 'Pigmentation (AI analysis)', '0 none – 3 marked', true],
 ];
-function aggregate(list){
-  const st = list.map(sessionStats), o = {n:list.length};
-  METRICS.forEach(([k]) => { const v = st.map(x => x[k]).filter(x => x != null); o[k] = v.length ? mean(v) : null; });
+function aggregate(list, anas = []){
+  const st = list.map(sessionStats), sc = anas.map(analysisScores).filter(Boolean), o = {n:list.length, na:anas.length};
+  METRICS.forEach(([k]) => {
+    const src = ['pores', 'dark', 'pig'].includes(k) ? sc : st;
+    const v = src.map(x => x[k]).filter(x => x != null); o[k] = v.length ? mean(v) : null;
+  });
   return o;
 }
 function verdict(k, prev, cur){
@@ -390,8 +465,9 @@ function periodEnd(start, type){
   return d.getTime() - 1;
 }
 function groupSessions(type){
-  const map = new Map();
+  const map = new Map(), amap = new Map();
   sessions.list.forEach(s => { const k = periodStart(s.at, type); if(!map.has(k)) map.set(k, []); map.get(k).push(s); });
+  analyses.list.forEach(a => { const k = periodStart(a.at, type); if(!map.has(k)) map.set(k, []); if(!amap.has(k)) amap.set(k, []); amap.get(k).push(a); });
   const keys = [...map.keys()].sort((a, b) => a - b);
   // number periods from the first one with data (Week 1, Week 2…), counting empty periods in between
   const first = new Date(keys[0] || 0);
@@ -399,7 +475,8 @@ function groupSessions(type){
     if(type === 'month') return (d.getFullYear() - first.getFullYear()) * 12 + d.getMonth() - first.getMonth() + 1;
     if(type === 'year') return d.getFullYear() - first.getFullYear() + 1;
     return Math.round((k - keys[0]) / ((type === 'week' ? 7 : 1) * 86400000)) + 1; };
-  return keys.map(k => ({start:k, end:periodEnd(k, type), n:nth(k), list:map.get(k).sort((a, b) => a.at - b.at), agg:aggregate(map.get(k))}));
+  return keys.map(k => { const anas = (amap.get(k) || []).sort((a, b) => a.at - b.at);
+    return {start:k, end:periodEnd(k, type), n:nth(k), list:map.get(k).sort((a, b) => a.at - b.at), anas, agg:aggregate(map.get(k), anas)}; });
 }
 function periodLabel(g, type){
   const name = {day:'Day', week:'Week', month:'Month', year:'Year'}[type];
@@ -418,13 +495,14 @@ function metricVal(k, v){
   return fmtN(v, 1);
 }
 function compareTable(prev, cur, prevTitle, curTitle){
-  const rows = METRICS.map(([k, label, unit]) => {
+  const rows = METRICS.filter(([k]) => prev[k] != null || cur[k] != null).map(([k, label, unit]) => {
     const vd = verdict(k, prev[k], cur[k]);
     return `<tr><td><b>${label}</b>${unit ? `<br><span class="small">${unit}</span>` : ''}</td><td>${metricVal(k, prev[k])}</td><td>${metricVal(k, cur[k])}</td>
       <td>${vd.t ? `<span class="verdict ${vd.cls}" style="padding:2px 8px;display:inline-block">${vd.t}</span>` : '–'}</td></tr>`;
   }).join('');
   return `<table class="rep-t"><tr><th>Measure</th><th>${prevTitle}</th><th>${curTitle}</th><th>Change</th></tr>
-    <tr><td><b>Sessions</b></td><td>${prev.n}</td><td>${cur.n}</td><td></td></tr>${rows}</table>`;
+    <tr><td><b>Sessions</b></td><td>${prev.n}</td><td>${cur.n}</td><td></td></tr>
+    <tr><td><b>AI skin analyses</b></td><td>${prev.na || 0}</td><td>${cur.na || 0}</td><td></td></tr>${rows}</table>`;
 }
 // sentences comparing one session with the previous calendar week
 function weekCompareNotes(s){
@@ -625,7 +703,8 @@ function openSession(id){
 function viewRecord(){
   const type = ui.recPeriod || 'week';
   const groups = groupSessions(type);
-  const photos = sessions.list.reduce((n, s) => n + s.checks.filter(c => c.photo).length, 0);
+  const photos = sessions.list.reduce((n, s) => n + s.checks.filter(c => c.photo).length, 0) + analyses.list.filter(a => a.thumb).length;
+  const any = sessions.list.length + analyses.list.length;
   const latest = groups[groups.length - 1], prev = groups[groups.length - 2];
   let cmp = '';
   if(latest && prev){
@@ -637,15 +716,22 @@ function viewRecord(){
       <div style="overflow-x:auto">${compareTable(prev.agg, latest.agg, a.title, b.title)}</div>
     </div>`;
   } else if(latest){
-    cmp = `<div class="card"><span class="eyebrow">Automatic comparison</span><p class="sub">Comparisons appear once you have sessions in two different periods.</p></div>`;
+    cmp = `<div class="card"><span class="eyebrow">Automatic comparison</span><p class="sub">Comparisons appear once you have records in two different periods.</p></div>`;
   }
   const list = groups.slice().reverse().map((g, i, arr) => {
     const lab = periodLabel(g, type), before = arr[i + 1];
     const changes = before ? METRICS.filter(m => m[3] != null).map(([k, label]) => { const vd = verdict(k, before.agg[k], g.agg[k]); return vd.t && vd.t !== 'about the same' ? `<li>${label}: <b class="${vd.cls}">${vd.t}</b> (${metricVal(k, before.agg[k])} → ${metricVal(k, g.agg[k])})</li>` : ''; }).join('') : '';
     return `<div class="card">
-      <span class="eyebrow">${lab.title} · ${g.n === 1 ? 'first period · ' : ''}${g.list.length} sessions</span>
+      <span class="eyebrow">${lab.title} · ${g.n === 1 ? 'first period · ' : ''}${g.list.length} sessions · ${g.anas.length} analyses</span>
       <p class="small" style="margin:4px 0 8px">${lab.dates}</p>
-      <p class="small" style="margin:0">Average fade ${metricVal('avgFade', g.agg.avgFade)}% per hour · forehead shine rise ${metricVal('shineRise', g.agg.shineRise)} · side difference ${metricVal('asym', g.agg.asym)} · texture ${metricVal('tex', g.agg.tex)}</p>
+      ${g.list.length ? `<p class="small" style="margin:0">Average fade ${metricVal('avgFade', g.agg.avgFade)}% per hour · forehead shine rise ${metricVal('shineRise', g.agg.shineRise)} · side difference ${metricVal('asym', g.agg.asym)} · texture ${metricVal('tex', g.agg.tex)}</p>` : ''}
+      ${g.anas.slice().reverse().map(a => `
+        <button class="rep" data-act="anaOpen" data-id="${esc(a.id)}">
+          ${a.thumb ? `<img class="rep-thumb" src="${a.thumb}" alt="">` : `<span class="ring" style="--p:100;--c:var(--rose)"><b>${ic('sparkle', 'width:16px;height:16px')}</b></span>`}
+          <span class="rep-body"><b>AI skin analysis · ${dGreg(a.at, {weekday:'short', day:'numeric', month:'short'})} · <span data-noi18n>${dTime(a.at)}</span></b>
+            <span><span data-noi18n>${dHijri(a.at, {day:'numeric', month:'long', year:'numeric'})}</span> · ${analysisLine(a)}</span></span>
+          ${ic('chevron', 'color:var(--muted)')}
+        </button>`).join('')}
       ${changes ? `<p class="small" style="margin:8px 0 0"><b>Compared with ${periodLabel(before, type).title}:</b></p><ul class="list small">${changes}</ul>` : ''}
       ${g.list.slice().reverse().map(s => { const st = sessionStats(s), m = minHold(s.checks[s.checks.length - 1]); return `
         <button class="rep" data-act="monOpen" data-id="${esc(s.id)}">
@@ -660,18 +746,18 @@ function viewRecord(){
     <div class="card">
       <span class="eyebrow">Skin health record</span>
       <h2>Your sunscreen follow-up file</h2>
-      <p class="sub">Every monitoring session is filed here by day, week, month and year, with Gregorian and Hijri dates, and compared automatically with the period before.</p>
-      <p class="small">${sessions.list.length} sessions · ${photos ? `${photos} face photos saved on this device` : 'no face photos saved'}. Everything stays on this device.</p>
+      <p class="sub">Every monitoring session and AI skin analysis (pores, dark circles, pigmentation) is filed here by day, week, month and year, with Gregorian and Hijri dates, and compared automatically with the period before.</p>
+      <p class="small">${sessions.list.length} sessions · ${analyses.list.length} analyses · ${photos ? `${photos} face photos saved on this device` : 'no face photos saved'}. Everything stays on this device.</p>
       <div class="chips" style="margin-top:10px">${PERIODS.map(([k, t]) => `<button class="chip${type === k ? ' on' : ''}" data-act="recPeriod" data-v="${k}">${t}</button>`).join('')}</div>
       <div class="btn-row">
-        ${sessions.list.length ? `<button class="btn btn-primary" data-act="recExport">Export the record</button><button class="btn btn-outline" data-act="recBackup">Save backup file</button>` : ''}
+        ${any ? `<button class="btn btn-primary" data-act="recExport">Export the record</button><button class="btn btn-outline" data-act="recBackup">Save backup file</button>` : ''}
         <button class="btn btn-outline" data-act="recRestore">Restore from file</button>
       </div>
       ${photos ? `<button class="link-btn" data-act="recPhotos">Delete all face photos</button>` : ''}
       <input type="file" id="recFile" accept=".json,application/json" hidden>
     </div>
-    ${sessions.list.length ? cmp + list : `<div class="card"><p class="sub">No sessions yet. Start a monitoring session right after you apply sunscreen.</p>
-      <div class="btn-row"><button class="btn btn-primary" data-act="go" data-v="monitor">Start a session</button></div></div>`}`;
+    ${any ? cmp + list : `<div class="card"><p class="sub">Nothing recorded yet. Start a monitoring session right after you apply sunscreen, or take an AI skin analysis.</p>
+      <div class="btn-row"><button class="btn btn-primary" data-act="go" data-v="monitor">Start a session</button><button class="btn btn-outline" data-act="go" data-v="pore">AI skin analysis</button></div></div>`}`;
 }
 
 /* ---------------- export ---------------- */
@@ -700,23 +786,26 @@ function exportRecord(){
       return `<h4 style="margin:12px 0 4px">${b.title} vs ${a.title}</h4><div style="overflow-x:auto">${compareTable(g[i].agg, cur.agg, a.title, b.title)}</div>`; }).join('');
     parts.push(`<div class="card"><span class="eyebrow">${t}</span>${rows}</div>`);
   });
-  sessions.list.slice().sort((a, b) => a.at - b.at).forEach(s => parts.push(
-    `<div class="card"><span class="eyebrow">Daily sunscreen follow-up report</span><h2>${dGreg(s.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h2>${sessionReportHtml(s, true)}</div>`));
+  [...sessions.list.map(s => ({at:s.at, html:
+    `<div class="card"><span class="eyebrow">Daily sunscreen follow-up report</span><h2>${dGreg(s.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h2>${sessionReportHtml(s, true)}</div>`})),
+   ...analyses.list.map(a => ({at:a.at, html:analysisDoc(a)}))].sort((a, b) => a.at - b.at).forEach(x => parts.push(x.html));
   saveFile(`my-skin-health-record-${stamp(Date.now())}.html`, docHtml('Skin health record', parts.join('')), 'text/html');
 }
 function backupSessions(){
-  saveFile(`my-skin-sessions-${stamp(Date.now())}.json`, JSON.stringify({app:'my-skin', kind:'sessions', v:1, sessions:sessions.list}), 'application/json');
+  saveFile(`my-skin-health-record-${stamp(Date.now())}.json`, JSON.stringify({app:'my-skin', kind:'sessions', v:2, sessions:sessions.list, analyses:analyses.list}), 'application/json');
 }
 async function restoreSessions(file){
   if(!file) return;
   try{
     const d = JSON.parse(await file.text());
     const list = (Array.isArray(d) ? d : d.sessions || []).filter(r => r && typeof r.id === 'string' && r.at && Array.isArray(r.checks) && r.ctx);
-    if(!list.length) throw new Error('empty');
-    const known = new Set(sessions.list.map(r => r.id));
+    const alist = (d.analyses || []).filter(r => r && typeof r.id === 'string' && r.at && r.report);
+    if(!list.length && !alist.length) throw new Error('empty');
+    const known = new Set(sessions.list.map(r => r.id)), aknown = new Set(analyses.list.map(r => r.id));
     let added = 0;
     for(const r of list) if(!known.has(r.id)){ await putSession({...r, status:r.status === 'active' ? 'done' : r.status}); added++; }
-    toast(`Restored ${added} sessions`);
+    for(const r of alist) if(!aknown.has(r.id)){ await putAnalysis(r); added++; }
+    toast(`Restored ${added} records`);
     rerenderKeepScroll();
   }catch(e){ toast('That file is not a My skin sessions backup.'); }
 }
@@ -773,9 +862,19 @@ Object.assign(ACTIONS, {
   recBackup: backupSessions,
   recRestore: () => { const f = $('#recFile'); if(f){ f.value = ''; f.click(); } },
   recPhotos: deletePhotos,
+  anaOpen: d => openAnalysis(d.id),
+  anaDownload: d => { const a = analyses.list.find(x => x.id === d.id); if(a) saveFile(`my-skin-skin-analysis-${stamp(a.at)}.html`, docHtml('AI skin analysis', analysisDoc(a)), 'text/html'); },
+  anaDelete: d => { if(confirm('Delete this analysis? This cannot be undone.')){ closeModal(); deleteAnalysis(d.id).then(rerenderKeepScroll); } },
 });
 const _reset = ACTIONS.reset;
-ACTIONS.reset = () => { const before = state; _reset(); if(state !== before){ clearTimeout(monTimer); monForm = null; clearSessions(); } };
+ACTIONS.reset = () => {
+  const before = state; _reset();
+  if(state !== before){
+    clearTimeout(monTimer); monForm = null; clearSessions();
+    analyses.list = []; try{ localStorage.removeItem(ANA_KEY); }catch(e){}
+    idbDo('readwrite', s => s.clear(), 'analyses').catch(() => {});
+  }
+};
 document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.mon; if(k && monForm) monForm[k] = e.target.value; });
 document.addEventListener('change', e => { if(e.target.id === 'recFile') restoreSessions(e.target.files && e.target.files[0]); });
 
@@ -786,8 +885,11 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .mon-photos figcaption{font-size:11px;color:var(--muted)}
 b.good{color:var(--good)} b.bad{color:var(--bad)}
 .list ul{margin:4px 0 6px;padding-inline-start:18px}
+.rep-thumb{width:46px;height:46px;border-radius:12px;object-fit:cover;flex:none}
+.modal .ai-card{box-shadow:none;border:0;padding:0;margin:0}
 </style>`);
 
 loadSessions();
+loadAnalyses();
 armMonitor();
 if(view === 'home') render();

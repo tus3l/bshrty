@@ -249,6 +249,9 @@ table.rep-t{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
 .modal h3{margin:2px 0 8px;font-size:17px;color:var(--brown-deep)}
 .modal p{margin:0;font-size:13.5px;line-height:1.8;color:var(--muted)}
 .modal .btn{margin-top:10px}
+.ai-glance{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}
+.ai-glance div{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center}
+.ai-glance span{font-size:11.5px;color:var(--muted);font-weight:700}
 .toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:60;background:var(--brown-deep);color:#fff;padding:10px 16px;border-radius:12px;font-size:13.5px;max-width:calc(100% - 32px);box-shadow:var(--shadow)}
 </style>
 </head>
@@ -894,8 +897,8 @@ function viewPore(){
   return `
     <div class="card">
       <span class="eyebrow">Step 3 of 5</span>
-      <h2>AI pore analysis</h2>
-      <p class="sub">Take or upload a photo of your face. My skin analyses it together with your medical profile and skin type and writes you a detailed report.</p>
+      <h2>AI skin analysis</h2>
+      <p class="sub">Take or upload a photo of your face. In one analysis My skin checks your pores, under-eye dark circles and pigmentation, together with your medical profile and skin type, writes you a detailed report and files it in your skin health record.</p>
       <ul class="list small" style="margin-top:6px">
         <li>No makeup or filters, at least an hour after washing your face.</li>
         <li>Daylight from the front, no flash.</li>
@@ -913,6 +916,7 @@ function viewPore(){
       <div class="progress" id="poreProg"><div class="bar"><i id="poreFill"></i></div><span id="poreTxt"></span></div>
       <div id="poreActions">${poreActionsHtml('idle')}</div>
       <input type="file" id="poreFile" accept="image/*" hidden>
+      <button class="chip${state.anPhoto ? ' on' : ''}" data-act="anPhoto" style="margin-top:10px">${state.anPhoto ? '✓ ' : ''}Keep the photo with this analysis in my skin health record</button>
       <button class="link-btn" id="poreBtn" data-act="startPore">Or try the live shine scan (no AI)</button>
     </div>
     <div id="poreResult">${state.poreAI ? aiResultHtml() : ''}${state.pore ? poreResultHtml() : ''}</div>`;
@@ -969,7 +973,7 @@ function encodeImage(src, w, h, maxEdge, quality){
 /* ---------------- My skin: analysing screen ---------------- */
 const AI_CAPTIONS = [
   'Looking at your pores…', 'Checking forehead and nose…', 'Measuring pore size…',
-  'Looking for blackheads and congestion…', 'Analysing your skin…', 'Identifying your pore type…',
+  'Looking for blackheads and congestion…', 'Checking under-eye dark circles…', 'Looking for pigmentation and dark spots…', 'Identifying your pore type…',
   'Comparing results with your medical profile…'
 ];
 const AI_STEPS = ['First analysis', 'Second analysis', 'Third analysis', 'Merging results and writing the report'];
@@ -1035,7 +1039,7 @@ function setupAiSteps(runs){
   }
   if(ul.dataset.mode === 'single') return; // already set up
   ul.dataset.mode = 'single';
-  ul.innerHTML = ['Checking the photo and analysing pores', 'Writing the report'].map((s, i) =>
+  ul.innerHTML = ['Checking the photo: pores, dark circles and pigmentation', 'Writing the report'].map((s, i) =>
     `<li data-i="${i}" class="${i === 0 ? 'active' : ''}"><span class="st"></span>${s}</li>`).join('');
   let ticks = 0;
   ai.creep = setInterval(() => {
@@ -1105,6 +1109,7 @@ async function runAI(src, w, h){
     await new Promise(r => setTimeout(r, 600));
     state.poreAI = {report: result.report, runs: result.runs, thumb, at: Date.now()};
     save(); closeAnalyzing(); renderChrome();
+    if(typeof saveAnalysis === 'function') saveAnalysis(state.poreAI, !!state.anPhoto);
     const box = $('#poreResult');
     if(box){ box.innerHTML = aiResultHtml() + (state.pore ? poreResultHtml() : ''); box.scrollIntoView({behavior:'smooth', block:'start'}); }
   }catch(e){
@@ -1121,9 +1126,36 @@ const ZONE_STATUS = {good:{cls:'good', label:'Good', color:'#5E8F58'}, watch:{cl
 const LEVEL_AR = {low:'Low', moderate:'Moderate', high:'High'};
 const AGREE_AR = {high:'Strong agreement between analyses', medium:'Moderate agreement between analyses', low:'The analyses disagreed'};
 const CONF_AR = {high:'High confidence', medium:'Medium confidence', low:'Low confidence'};
+const SEV = {none:{label:'None seen', cls:'good', n:0}, mild:{label:'Mild', cls:'good', n:1}, moderate:{label:'Moderate', cls:'warn', n:2}, marked:{label:'Marked', cls:'bad', n:3}};
+const DC_TYPE = {pigmented:'Pigmented (brownish)', vascular:'Vascular (bluish)', shadow:'Shadow from hollowing', mixed:'Mixed'};
+// pores: 0 = fine … 2 = needs care, averaged over the 4 zones
+const poreScore = r => r.zones && r.zones.length ? r.zones.reduce((s, z) => s + ({good:0, watch:1, concern:2}[z.status] ?? 1), 0) / r.zones.length : null;
+function poreLevel(r){ const v = poreScore(r); return v == null ? null : v < .5 ? {label:'Fine', cls:'good'} : v < 1.25 ? {label:'Visible', cls:'warn'} : {label:'Enlarged', cls:'bad'}; }
+function extrasHtml(r){
+  const dc = r.dark_circles || {level:'none'}, pg = r.pigmentation || {level:'none', kinds:[]};
+  const pl = poreLevel(r), d = SEV[dc.level] || SEV.none, p = SEV[pg.level] || SEV.none;
+  return `
+      <div class="ai-glance">
+        <div><span>Pores</span><b class="pill ${pl ? pl.cls : 'muted'}">${pl ? pl.label : '–'}</b></div>
+        <div><span>Dark circles</span><b class="pill ${d.cls}">${d.label}</b></div>
+        <div><span>Pigmentation</span><b class="pill ${p.cls}">${p.label}</b></div>
+      </div>
+      <div class="ai-type">
+        <span class="eyebrow">Dark circles</span>
+        <b>${d.label}${dc.level !== 'none' && DC_TYPE[dc.type] ? ' · ' + DC_TYPE[dc.type] : ''}</b>
+        ${dc.note ? `<p>${esc(dc.note)}</p>` : ''}
+      </div>
+      <div class="ai-type">
+        <span class="eyebrow">Pigmentation</span>
+        <b>${p.label}</b>
+        ${pg.kinds && pg.kinds.length && pg.level !== 'none' ? `<div class="chips" style="margin-top:6px">${pg.kinds.map(k => `<span class="pill muted">${esc(k)}</span>`).join('')}</div>` : ''}
+        ${pg.areas ? `<p><span>Areas:</span> ${esc(pg.areas)}</p>` : ''}
+        ${pg.note ? `<p>${esc(pg.note)}</p>` : ''}
+      </div>`;
+}
 
-function aiResultHtml(){
-  const a = state.poreAI, r = a.report;
+function aiResultHtml(a = state.poreAI, inRecord = false){
+  const r = a.report;
   const head = `
     <div class="ai-head">
       <div class="ai-logo">${ic('sparkle', 'width:20px;height:20px')}</div>
@@ -1148,6 +1180,7 @@ function aiResultHtml(){
         <p>${esc(r.pore_type_explainer)}</p>
         <span class="pill muted">Oil production: ${LEVEL_AR[r.oiliness] || ''}</span>
       </div>
+      ${extrasHtml(r)}
 
       <h3 class="ai-h">Face zones</h3>
       ${r.zones.map(z => { const s = ZONE_STATUS[z.status] || ZONE_STATUS.watch; return `
@@ -1167,10 +1200,11 @@ function aiResultHtml(){
       ${r.see_doctor ? `<div class="verdict bad" style="margin-top:12px">🩺 We recommend seeing a dermatologist: ${esc(r.doctor_reason)}</div>` : ''}
 
       <p class="small" style="margin-top:12px">${(a.runs > 1 ? AGREE_AR : CONF_AR)[r.agreement] || ''} · ${esc(r.confidence_note)}<br>AI guidance only — not a medical diagnosis.</p>
+      ${inRecord ? '' : `<p class="small">Saved to your skin health record. <button class="link-btn" data-act="go" data-v="record">Open the record</button></p>
       <div class="btn-row">
         <button class="btn btn-dark" data-act="go" data-v="ingredient">Next: ingredient check</button>
         <button class="btn btn-outline" data-act="openCam" style="flex:.6">New analysis</button>
-      </div>
+      </div>`}
     </div>`;
 }
 function poreResultHtml(){
@@ -1998,11 +2032,12 @@ const reports = {list:[], persisted:null, all:false};
 let idbPromise = null;
 function idb(){
   if(!idbPromise) idbPromise = new Promise((res, rej) => {
-    const r = indexedDB.open('myskin', 2);
+    const r = indexedDB.open('myskin', 3);
     r.onupgradeneeded = () => {
       const db = r.result;
       if(!db.objectStoreNames.contains('spfReports')) db.createObjectStore('spfReports', {keyPath:'id'});
       if(!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions', {keyPath:'id'});
+      if(!db.objectStoreNames.contains('analyses')) db.createObjectStore('analyses', {keyPath:'id'});
     };
     r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
   }).catch(e => { idbPromise = null; throw e; });
@@ -2616,6 +2651,7 @@ const ACTIONS = {
   repBackup: backupReports,
   repRestore: () => { const f = $('#repFile'); if(f){ f.value = ''; f.click(); } },
   closeModal: () => closeModal(),
+  anPhoto: () => { state.anPhoto = !state.anPhoto; save(); rerenderKeepScroll(); },
   cancelReminder,
   langMenu: () => toggleLangMenu(),
   setLang: d => { toggleLangMenu(false); I18N.setLang(d.v); },
