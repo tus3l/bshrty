@@ -605,6 +605,7 @@ function viewHome(){
   return `
     ${weatherCard()}
     ${reminderCard()}
+    ${typeof monitorHomeCard === 'function' ? monitorHomeCard() : ''}
     <div class="card">
       <span class="eyebrow">Your skin summary</span>
       <h2>At a glance</h2>
@@ -1527,6 +1528,7 @@ function viewSpf(){
       <p class="sub">Start the smart check <b>before</b> you apply sunscreen: we capture your bare skin first, then you apply each zone while the camera tracks your hand and the change in shine and colour. Then we draw a live protection map on your face, based on your city’s UV index and your SPF.</p>
       ${w.status === 'ready' ? `<div class="notice" style="background:var(--cream-deep);color:var(--brown)">UV index now ${w.uv} (${uvLevel(w.uv).label}).</div>` : ''}
     </div>
+    ${typeof monitorHomeCard === 'function' ? monitorHomeCard() : ''}
     <div class="card" id="smartCard">
       <span class="eyebrow">${ic('sparkle', 'width:14px;height:14px;vertical-align:-2px')} Smart camera check</span>
       <div class="cam mirror" id="spfCam">
@@ -1795,7 +1797,10 @@ function measureFrame(img, ptsByZone, rad, gain){
     let spec = 0;
     for(let k = 0; k < Ys.length; k++) if(Ys[k] > med * 1.6 && Ss[k] < .3) spec++;
     const ok = cells.filter(Boolean);
-    out[z.key] = {cells, spec: Ys.length ? spec / Ys.length : 0, gloss: med ? p95 / med : 1, L: mean(ok.map(c => c[0]))};
+    let tn = 0, ts = 0, ts2 = 0;
+    for(let k = 0; k < Ys.length; k++) if(Ys[k] <= med * 1.6){ tn++; ts += Ys[k]; ts2 += Ys[k] * Ys[k]; }
+    const tm = tn ? ts / tn : 0, tex = tm ? Math.sqrt(Math.max(0, ts2 / tn - tm * tm)) / tm : 0;
+    out[z.key] = {cells, spec: Ys.length ? spec / Ys.length : 0, gloss: med ? p95 / med : 1, L: mean(ok.map(c => c[0])), tex};
   }
   out.clip = tot ? clip / tot : 0;
   return out;
@@ -1911,6 +1916,7 @@ function smartStepsHtml(){
   return rows.join('');
 }
 function smartCtlHtml(mode){
+  if(view === 'monitor') return monitorCtlHtml(mode);
   if(mode === 'busy') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Cancel</button></div>`;
   if(mode === 'check') return `<div class="btn-row"><button class="btn btn-dark" data-act="spfManual" id="spfManualBtn" ${smart.zi < 0 ? 'disabled' : ''}>Applied on this area ✓</button><button class="btn btn-outline" data-act="spfStop">Stop</button></div>`;
   if(mode === 'ar') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Close camera</button></div>`;
@@ -1992,16 +1998,20 @@ const reports = {list:[], persisted:null, all:false};
 let idbPromise = null;
 function idb(){
   if(!idbPromise) idbPromise = new Promise((res, rej) => {
-    const r = indexedDB.open('myskin', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('spfReports', {keyPath:'id'});
+    const r = indexedDB.open('myskin', 2);
+    r.onupgradeneeded = () => {
+      const db = r.result;
+      if(!db.objectStoreNames.contains('spfReports')) db.createObjectStore('spfReports', {keyPath:'id'});
+      if(!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions', {keyPath:'id'});
+    };
     r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
   }).catch(e => { idbPromise = null; throw e; });
   return idbPromise;
 }
-async function idbDo(mode, fn){
+async function idbDo(mode, fn, store = 'spfReports'){
   const db = await idb();
   return new Promise((res, rej) => {
-    const tx = db.transaction('spfReports', mode), q = fn(tx.objectStore('spfReports'));
+    const tx = db.transaction(store, mode), q = fn(tx.objectStore(store));
     tx.oncomplete = () => res(q && q.result); tx.onerror = () => rej(tx.error);
   });
 }
@@ -2181,7 +2191,7 @@ async function runSpfCam(mode){
   const token = session.token;
   const cam = $('#spfCam'), video = $('#spfVideo'), canvas = $('#spfCanvas'), hint = $('#spfHint'), ph = $('#spfPh span');
   smart.mode = 'busy'; setSmartCtl('busy');
-  if(mode === 'check' && ui.weather.status === 'idle') fetchWeather();
+  if((mode === 'check' || mode === 'monitor') && ui.weather.status === 'idle') fetchWeather();
   ph.textContent = 'Starting camera…';
   let stream;
   try{ stream = await startCamera(video, 'user'); }
@@ -2219,8 +2229,8 @@ async function runSpfCam(mode){
   });
   if(hands) hands.onResults(r => { if(token === session.token){ F.hands = r.multiHandLandmarks || []; F.handT = performance.now(); } });
 
-  let S = mode === 'ar' ? arStepper() : checkStepper();
-  let cells = mode === 'ar' && state.spfLive && state.spfLive.cells || (fm ? null : 'fallback');
+  let S = mode === 'ar' ? arStepper() : mode === 'monitor' ? monitorStepper(monRun.kind) : checkStepper();
+  let cells = mode === 'ar' && state.spfLive && state.spfLive.cells || mode === 'monitor' && monRun.kind === 'check' && state.monitor && state.monitor.cells || (fm ? null : 'fallback');
   if(!fm) cells = 'fallback';
   let last = performance.now(), seen = 0, tick = 0, grab = 0, busy = false, prevMeas = null, prevPose = null, fr = null, qualT = 0;
 
@@ -2643,5 +2653,6 @@ render();
 armReminder();
 loadReports();
 </script>
+<script src="monitor.js"></script>
 </body>
 </html>
