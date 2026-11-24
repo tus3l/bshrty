@@ -781,6 +781,8 @@ const D = [
 ['Areas', 'المناطق', '부위'],
 ['Saved to your skin health record.', 'تم الحفظ في سجلك الطبي.', '피부 건강 기록에 저장되었습니다.'],
 ['Open the record', 'فتح السجل', '기록 열기'],
+['Your last analysis is saved in your skin health record:', 'آخر تحليل لك محفوظ في سجلك الطبي:', '마지막 분석은 피부 건강 기록에 저장되어 있습니다:'],
+['Open the last report', 'فتح آخر تقرير', '마지막 리포트 열기'],
 ['Pores: {}', 'المسام: {0}', '모공: {0}'],
 ['Dark circles: {}', 'الهالات: {0}', '다크서클: {0}'],
 ['Pigmentation: {}', 'التصبغات: {0}', '색소침착: {0}'],

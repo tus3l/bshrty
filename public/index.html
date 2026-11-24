@@ -213,6 +213,8 @@ ul.list{margin:6px 0 0;padding:0 0 0 18px;font-size:13.5px;line-height:1.9}
 .ai-head b{display:block;font-size:17px;font-weight:800;color:var(--brown-deep)}
 .ai-head span{font-size:12px;color:var(--muted)}
 .ai-head>div:nth-child(2){flex:1}
+.ai-photo{display:block;width:100%;max-height:420px;object-fit:cover;border-radius:14px;margin:12px 0 4px}
+.ai-photo.mirror{transform:scaleX(-1)}
 .ai-thumb{width:46px;height:46px;border-radius:12px;object-fit:cover;border:2px solid #fff;box-shadow:var(--shadow)}
 .ai-intro{margin:0 0 6px;font-size:13.5px;font-weight:700;color:var(--rose-deep)}
 .ai-summary{margin:0;font-size:14.5px;line-height:1.85}
@@ -370,6 +372,7 @@ function isDone(key){
 function goTo(v){
   stopCamera();
   closeModal();
+  if(view === 'pore' && v !== 'pore') ui.poreView = null;   // come back to a clean pore screen
   view = v;
   render();
   window.scrollTo({top:0, behavior:'instant'});
@@ -937,7 +940,17 @@ function viewPore(){
       <button class="chip${state.anPhoto ? ' on' : ''}" data-act="anPhoto" style="margin-top:10px">${state.anPhoto ? '✓ ' : ''}Keep the photo with this analysis in my skin health record</button>
       <button class="link-btn" id="poreBtn" data-act="startPore">Or try the live shine scan (no AI)</button>
     </div>
-    <div id="poreResult">${state.poreAI ? aiResultHtml() : ''}${state.pore ? poreResultHtml() : ''}</div>`;
+    <div id="poreResult">${poreResultArea()}</div>`;
+}
+// the pore screen shows a result (with the face) only right after it was taken; otherwise it is clean,
+// with a pointer to the saved report in the skin health record
+function poreResultArea(){
+  const a = state.poreAI;
+  if(a && ui.poreView && ui.poreView.at === a.at) return aiResultHtml() + (state.pore ? poreResultHtml() : '');
+  const last = a ? `<div class="card"><span class="eyebrow">Skin health record</span>
+      <p class="sub" style="margin:4px 0 0">Your last analysis is saved in your skin health record: <span data-noi18n>${new Date(a.at).toLocaleString(I18N.locale, {weekday:'long', day:'numeric', month:'long', hour:'numeric', minute:'2-digit'})}</span>.</p>
+      <div class="btn-row"><button class="btn btn-outline" data-act="anaOpen" data-id="ana-${a.at}">Open the last report</button><button class="btn btn-outline" data-act="go" data-v="record">Open the record</button></div></div>` : '';
+  return last + (state.pore ? poreResultHtml() : '');
 }
 function poreActionsHtml(mode){
   if(mode === 'live') return `<div class="btn-row">
@@ -951,6 +964,7 @@ function poreActionsHtml(mode){
 /* ---------------- My skin: capture / upload ---------------- */
 async function openCaptureCam(){
   stopCamera();
+  clearPoreView();
   const token = session.token;
   const ph = $('#porePh span');
   ph.textContent = 'Starting camera…';
@@ -969,7 +983,13 @@ function snapPhoto(){
   c.getContext('2d').drawImage(video, 0, 0);
   stopCamera();
   clearCapture();
-  runAI(c, c.width, c.height);
+  runAI(c, c.width, c.height, true);
+}
+// a new scan starts on a clean screen: drop the face and result shown from the previous one
+function clearPoreView(){
+  if(!ui.poreView) return;
+  ui.poreView = null;
+  const box = $('#poreResult'); if(box) box.innerHTML = poreResultArea();
 }
 // empty the pore camera box: no frozen frame, no drawn overlay, no chosen file, default placeholder text
 function clearCapture(){
@@ -1091,7 +1111,7 @@ function aiFail(msg){
   $('#aiCancel').dataset.act = 'closeAI';
 }
 
-async function runAI(src, w, h){
+async function runAI(src, w, h, mirror){
   const full = encodeImage(src, w, h, 1568, 0.88);
   const thumb = encodeImage(src, w, h, 220, 0.7);
   showAnalyzing(full, w / h);
@@ -1137,8 +1157,10 @@ async function runAI(src, w, h){
     state.poreAI = {report: result.report, runs: result.runs, thumb, at: Date.now()};
     save(); closeAnalyzing(); renderChrome();
     if(typeof saveAnalysis === 'function') saveAnalysis(state.poreAI, !!state.anPhoto);
-    // the report is filed in the skin health record: clear the photo from the pore screen
+    // the face is shown with this result only while the user stays here (memory only, never saved with the page);
+    // leaving the screen or starting a new scan clears it, and the report stays in the skin health record
     state.poreAI.thumb = null; save();
+    ui.poreView = {at:state.poreAI.at, photo:encodeImage(src, w, h, 720, 0.82), mirror:!!mirror};
     clearCapture();
     const box = $('#poreResult');
     if(box){ box.innerHTML = aiResultHtml() + (state.pore ? poreResultHtml() : ''); box.scrollIntoView({behavior:'smooth', block:'start'}); }
@@ -1191,7 +1213,8 @@ function aiResultHtml(a = state.poreAI, inRecord = false){
       <div class="ai-logo">${ic('sparkle', 'width:20px;height:20px')}</div>
       <div><b>My skin</b><span>${new Date(a.at).toLocaleDateString(I18N.locale, {day:'numeric', month:'long'})} · ${a.runs > 1 ? a.runs + ' independent analyses' : 'AI analysis'}</span></div>
       ${a.thumb ? `<img class="ai-thumb" src="${a.thumb}" alt="">` : ''}
-    </div>`;
+    </div>
+    ${!inRecord && ui.poreView && ui.poreView.at === a.at ? `<img class="ai-photo${ui.poreView.mirror ? ' mirror' : ''}" src="${ui.poreView.photo}" alt="">` : ''}`;
   if(!r.image_ok){
     return `<div class="card ai-card">${head}
       <p class="ai-intro">As your personal assistant from My skin, I couldn’t analyse this photo accurately:</p>
@@ -2667,7 +2690,7 @@ const ACTIONS = {
   openCam: () => { if(view !== 'pore') goTo('pore'); window.scrollTo({top:0, behavior:'smooth'}); openCaptureCam(); },
   cancelCam: () => stopCamera(),
   snap: snapPhoto,
-  upload: () => { const f = $('#poreFile'); if(f){ f.value = ''; f.click(); } },
+  upload: () => { clearPoreView(); const f = $('#poreFile'); if(f){ f.value = ''; f.click(); } },
   cancelAI: () => { if(ai.ctl) ai.ctl.abort(); closeAnalyzing(); },
   closeAI: () => closeAnalyzing(),
   // ingredient
