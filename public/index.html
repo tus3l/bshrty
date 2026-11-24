@@ -968,14 +968,23 @@ function snapPhoto(){
   c.width = video.videoWidth; c.height = video.videoHeight;
   c.getContext('2d').drawImage(video, 0, 0);
   stopCamera();
+  clearCapture();
   runAI(c, c.width, c.height);
+}
+// empty the pore camera box: no frozen frame, no drawn overlay, no chosen file, default placeholder text
+function clearCapture(){
+  const v = $('#poreVideo'); if(v){ try{ v.pause(); v.srcObject = null; v.removeAttribute('src'); v.load(); }catch(e){} }
+  const cv = $('#poreCanvas'); if(cv){ const x = cv.getContext('2d'); if(x) x.clearRect(0, 0, cv.width, cv.height); }
+  const f = $('#poreFile'); if(f) f.value = '';
+  const ph = $('#porePh span'); if(ph) ph.textContent = 'Open the camera and take a photo, or upload one from your device.';
+  const h = $('#poreHint'); if(h) h.textContent = '';
 }
 function onPoreFile(file){
   if(!file) return;
   if(!file.type.startsWith('image/')){ toast('Choose an image file.'); return; }
   const url = URL.createObjectURL(file);
   const img = new Image();
-  img.onload = () => { runAI(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); };
+  img.onload = () => { clearCapture(); runAI(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); };
   img.onerror = () => { toast('Could not read the image. Try a JPG or PNG.'); URL.revokeObjectURL(url); };
   img.src = url;
 }
@@ -1128,6 +1137,9 @@ async function runAI(src, w, h){
     state.poreAI = {report: result.report, runs: result.runs, thumb, at: Date.now()};
     save(); closeAnalyzing(); renderChrome();
     if(typeof saveAnalysis === 'function') saveAnalysis(state.poreAI, !!state.anPhoto);
+    // the report is filed in the skin health record: clear the photo from the pore screen
+    state.poreAI.thumb = null; save();
+    clearCapture();
     const box = $('#poreResult');
     if(box){ box.innerHTML = aiResultHtml() + (state.pore ? poreResultHtml() : ''); box.scrollIntoView({behavior:'smooth', block:'start'}); }
   }catch(e){
@@ -1217,8 +1229,8 @@ function aiResultHtml(a = state.poreAI, inRecord = false){
 
       ${r.see_doctor ? `<div class="verdict bad" style="margin-top:12px">🩺 We recommend seeing a dermatologist: ${esc(r.doctor_reason)}</div>` : ''}
 
-      <p class="small" style="margin-top:12px">${(a.runs > 1 ? AGREE_AR : CONF_AR)[r.agreement] || ''} · ${esc(r.confidence_note)}<br>AI guidance only — not a medical diagnosis.</p>
-      ${inRecord ? '' : `<p class="small">Saved to your skin health record. <button class="link-btn" data-act="go" data-v="record">Open the record</button></p>
+      <p class="small" style="margin-top:12px">${(a.runs > 1 ? AGREE_AR : CONF_AR)[r.agreement] || ''}${r.confidence_note ? ' · ' + esc(r.confidence_note) : ''}<br>AI guidance only — not a medical diagnosis.</p>
+      ${inRecord ? '' : `<p class="small">Saved to your skin health record.${typeof dBoth === 'function' ? ` ${dBoth(a.at)} · <span data-noi18n>${dTime(a.at)}</span>` : ''} <button class="link-btn" data-act="go" data-v="record">Open the record</button></p>
       <div class="btn-row">
         <button class="btn btn-dark" data-act="go" data-v="ingredient">Next: ingredient check</button>
         <button class="btn btn-outline" data-act="openCam" style="flex:.6">New analysis</button>

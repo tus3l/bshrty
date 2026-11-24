@@ -85,6 +85,8 @@ async function loadAnalyses(){
   const a = state.poreAI;
   if(a && a.report && !byId.has('ana-' + a.at)) byId.set('ana-' + a.at, {id:'ana-' + a.at, at:a.at, runs:a.runs, report:a.report});
   analyses.list = [...byId.values()].sort((x, y) => y.at - x.at);
+  // older versions kept the photo on the pore screen; it now lives only in the record (when the user chose to keep it)
+  if(a && a.thumb){ a.thumb = null; save(); if(view === 'pore') rerenderKeepScroll(); }
   const inDb = new Set(db.map(r => r.id));
   analyses.list.filter(r => !inDb.has(r.id)).forEach(r => idbDo('readwrite', s => s.put(r), 'analyses').catch(() => {}));
   mirrorAnalyses();
