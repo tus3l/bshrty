@@ -373,6 +373,7 @@ function goTo(v){
   stopCamera();
   closeModal();
   if(view === 'pore' && v !== 'pore') ui.poreView = null;   // come back to a clean pore screen
+  if(view === 'spf' && v !== 'spf') ui.spfView = null;      // …and a clean sunscreen screen
   view = v;
   render();
   window.scrollTo({top:0, behavior:'instant'});
@@ -1650,7 +1651,6 @@ function viewSpf(){
     </div>
     <div id="spfResult">${state.spf ? spfResultHtml() : ''}</div>
     ${liveBoxHtml()}
-    ${reportsCardHtml()}
     ${reminderCard()}`;
 }
 function spfResultHtml(){
@@ -2007,15 +2007,15 @@ function smartCtlHtml(mode){
   if(mode === 'busy') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Cancel</button></div>`;
   if(mode === 'check') return `<div class="btn-row"><button class="btn btn-dark" data-act="spfManual" id="spfManualBtn" ${smart.zi < 0 ? 'disabled' : ''}>Applied on this area ✓</button><button class="btn btn-outline" data-act="spfStop">Stop</button></div>`;
   if(mode === 'ar') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Close camera</button></div>`;
-  return `<div class="btn-row"><button class="btn btn-primary" data-act="spfCheck">${state.spfLive ? 'Check again (after reapplying)' : 'Start smart check'}</button>
-    ${state.spfLive ? `<button class="btn btn-outline" data-act="spfAR">Show protection on my face</button>` : ''}</div>`;
+  return `<div class="btn-row"><button class="btn btn-primary" data-act="spfCheck">${state.spfLive && ui.spfView === state.spfLive.at ? 'Check again (after reapplying)' : 'Start smart check'}</button>
+    ${state.spfLive && ui.spfView === state.spfLive.at ? `<button class="btn btn-outline" data-act="spfAR">Show protection on my face</button>` : ''}</div>`;
 }
 function renderSmartSteps(){ const el = $('#spfSteps'); if(el) el.innerHTML = smartStepsHtml(); }
 function setSmartCtl(mode){ const el = $('#spfCtl'); if(el) el.innerHTML = smartCtlHtml(mode); }
 
 function liveBoxHtml(){
   const L = state.spfLive;
-  if(!L) return '<div id="spfLiveBox"></div>';
+  if(!L || ui.spfView !== L.at) return '<div id="spfLiveBox"></div>';
   const now = Date.now(), at = now + smart.preview * 60000;
   const prot = SPF_AR_ZONES.map(z => ({z, p:zoneProtection(L, z.key, at)}));
   const rows = prot.map(({z, p}) => {
@@ -2214,17 +2214,21 @@ function reportsCardHtml(){
     </div>`;
 }
 function refreshReports(){ const el = $('#spfReports'); if(el) el.outerHTML = reportsCardHtml(); }
+// every report is filed in the medical file as soon as it exists: the footer says so; a copy on the
+// device is optional, and deleting is a small link, not a main action
+function savedFooter(dl, del, id){
+  return `<div class="verdict good" style="margin-top:12px">✓ Saved in your medical file · Registered reports</div>
+    <div class="btn-row"><button class="btn btn-primary" data-act="closeModal">Close</button></div>
+    <p class="small" style="text-align:center;margin:6px 0 0"><button class="link-btn" data-act="${dl}" data-id="${esc(id)}">Download a copy to this device</button>${del ? ` · <button class="link-btn" data-act="${del}" data-id="${esc(id)}">Delete</button>` : ''}</p>`;
+}
 function openReport(id){
   const r = reports.list.find(x => x.id === id); if(!r) return;
   modal(`
     <span class="eyebrow">Sunscreen check report</span>
     <h3>${fmtWhen(r.at)}</h3>
+    ${typeof dBoth === 'function' ? `<p class="small">${dBoth(r.at)}</p>` : ''}
     ${reportBodyHtml(r)}
-    <button class="btn btn-primary" data-act="repDownload" data-id="${esc(r.id)}">Download report</button>
-    <div class="btn-row" style="margin-top:0">
-      <button class="btn btn-outline" data-act="repDelete" data-id="${esc(r.id)}">Delete</button>
-      <button class="btn btn-outline" data-act="closeModal">Close</button>
-    </div>`);
+    ${savedFooter('repDownload', 'repDelete', r.id)}`);
 }
 function saveFile(name, text, type){
   const url = URL.createObjectURL(new Blob([text], {type}));
@@ -2586,7 +2590,8 @@ function finishSmart(zones){
     buzz([100, 60, 100]);
     return monitorStepper('start');
   }
-  toast('✅ Measured — report saved. Here is your live protection map');
+  ui.spfView = L.at; refreshLive(); setSmartCtl('ar');
+  toast('✅ Saved in your medical file — here is your live protection map');
   buzz([100, 60, 100, 60, 220]);
   return arStepper();
 }

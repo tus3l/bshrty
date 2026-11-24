@@ -129,11 +129,7 @@ function openAnalysis(id){
     <h3>${dGreg(a.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h3>
     <p class="small">${dBoth(a.at)} · <span data-noi18n>${dTime(a.at)}</span></p>
     ${aiResultHtml(a, true)}
-    <div class="btn-row">
-      <button class="btn btn-primary" data-act="anaDownload" data-id="${esc(a.id)}">Download report</button>
-      <button class="btn btn-outline" data-act="closeModal">Close</button>
-    </div>
-    <button class="link-btn" data-act="anaDelete" data-id="${esc(a.id)}">Delete this analysis</button>`);
+    ${savedFooter('anaDownload', 'anaDelete', a.id)}`);
 }
 const analysisDoc = a => `<div class="card"><span class="eyebrow">AI skin analysis</span><h2>${dGreg(a.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h2>
   <p class="small">${dBoth(a.at)} · <span data-noi18n>${dTime(a.at)}</span></p>${aiResultHtml(a, true)}</div>`;
@@ -565,9 +561,10 @@ function periodEnd(start, type){
   return d.getTime() - 1;
 }
 function groupSessions(type){
-  const map = new Map(), amap = new Map();
+  const map = new Map(), amap = new Map(), rmap = new Map();
   sessions.list.forEach(s => { const k = periodStart(s.at, type); if(!map.has(k)) map.set(k, []); map.get(k).push(s); });
   analyses.list.forEach(a => { const k = periodStart(a.at, type); if(!map.has(k)) map.set(k, []); if(!amap.has(k)) amap.set(k, []); amap.get(k).push(a); });
+  spfReports().forEach(r => { const k = periodStart(r.at, type); if(!map.has(k)) map.set(k, []); if(!rmap.has(k)) rmap.set(k, []); rmap.get(k).push(r); });
   const keys = [...map.keys()].sort((a, b) => a - b);
   // number periods from the first one with data (Week 1, Week 2…), counting empty periods in between
   const first = new Date(keys[0] || 0);
@@ -576,7 +573,33 @@ function groupSessions(type){
     if(type === 'year') return d.getFullYear() - first.getFullYear() + 1;
     return Math.round((k - keys[0]) / ((type === 'week' ? 7 : 1) * 86400000)) + 1; };
   return keys.map(k => { const anas = (amap.get(k) || []).sort((a, b) => a.at - b.at);
-    return {start:k, end:periodEnd(k, type), n:nth(k), list:map.get(k).sort((a, b) => a.at - b.at), anas, agg:aggregate(map.get(k), anas)}; });
+    return {start:k, end:periodEnd(k, type), n:nth(k), list:map.get(k).sort((a, b) => a.at - b.at), anas, reps:rmap.get(k) || [], agg:aggregate(map.get(k), anas)}; });
+}
+// sunscreen smart-check reports (kept by the main script) are part of the medical file too
+const spfReports = () => typeof reports !== 'undefined' ? reports.list : [];
+// one row in "Registered reports": what it is, when (Gregorian, Hijri, time) and the key result
+function recItemHtml(it){
+  const when = `${dGreg(it.at, {weekday:'short', day:'numeric', month:'short'})} · <span data-noi18n>${dTime(it.at)}</span>`;
+  const hijri = `<span data-noi18n>${dHijri(it.at, {day:'numeric', month:'long', year:'numeric'})}</span>`;
+  if(it.kind === 'ana'){ const a = it.d; return `
+        <button class="rep" data-act="anaOpen" data-id="${esc(a.id)}">
+          ${a.thumb ? `<img class="rep-thumb" src="${a.thumb}" alt="">` : `<span class="ring" style="--p:100;--c:var(--rose)"><b>${ic('sparkle', 'width:16px;height:16px')}</b></span>`}
+          <span class="rep-body"><b>AI skin analysis · ${when}</b><span>${hijri} · ${analysisLine(a)}</span></span>
+          ${ic('chevron', 'color:var(--muted)')}
+        </button>`; }
+  if(it.kind === 'spf'){ const r = it.d, c = protCls(r.avg); return `
+        <button class="rep" data-act="repOpen" data-id="${esc(r.id)}">
+          <span class="ring" style="--p:${r.avg};--c:${c.color}"><b>${r.avg}%</b></span>
+          <span class="rep-body"><b>Sunscreen check report · ${when}</b><span>${hijri} · SPF ${r.spf} · UV ${r.uv} · weakest ${esc(r.weakest)}</span></span>
+          ${ic('chevron', 'color:var(--muted)')}
+        </button>`; }
+  const s = it.d, st = sessionStats(s), m = minHold(s.checks[s.checks.length - 1]);
+  return `
+        <button class="rep" data-act="monOpen" data-id="${esc(s.id)}">
+          <span class="ring" style="--p:${m ?? 0};--c:${holdCls(m).color}"><b>${m == null ? '–' : m + '%'}</b></span>
+          <span class="rep-body"><b>Sunscreen monitoring session · ${when}</b><span>${hijri} · ${fmtMins(st.dur)} · ${st.checks} checks${s.status === 'active' ? ' · in progress' : ''}</span></span>
+          ${ic('chevron', 'color:var(--muted)')}
+        </button>`;
 }
 function periodLabel(g, type){
   const name = {day:'Day', week:'Week', month:'Month', year:'Year'}[type];
@@ -728,10 +751,8 @@ function activeCardHtml(M){
       <div class="field"><span class="field-label">I reapplied sunscreen on</span>
         <div class="chips">${Object.entries(MON.SIDES).map(([k, t]) => `<button class="chip${M.pending === k ? ' on' : ''}" data-act="monReapply" data-v="${k}">${t}</button>`).join('')}</div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-outline" data-act="monOpen" data-id="${M.id}">Today’s report</button>
-        <button class="btn btn-dark" data-act="monEnd">End session</button>
-      </div>
+      <p class="small" style="margin-top:10px">✓ Every check is saved in your medical file under Registered reports.</p>
+      <p class="small" style="text-align:center;margin:4px 0 0"><button class="link-btn" data-act="monEnd">End session</button></p>
     </div>`;
 }
 function ctxLine(s){
@@ -799,18 +820,14 @@ function openSession(id){
     <span class="eyebrow">Daily sunscreen follow-up report</span>
     <h3>${dGreg(s.at, {weekday:'long', day:'numeric', month:'long'})}</h3>
     ${sessionReportHtml(s)}
-    <div class="btn-row">
-      <button class="btn btn-primary" data-act="monDownload" data-id="${esc(s.id)}">Download report</button>
-      <button class="btn btn-outline" data-act="closeModal">Close</button>
-    </div>
-    ${s.status === 'done' ? `<button class="link-btn" data-act="monDelete" data-id="${esc(s.id)}">Delete this session</button>` : ''}`);
+    ${savedFooter('monDownload', s.status === 'done' ? 'monDelete' : null, s.id)}`);
 }
 
 function viewRecord(){
   const type = ui.recPeriod || 'week';
   const groups = groupSessions(type);
   const photos = sessions.list.reduce((n, s) => n + s.checks.filter(c => c.photo).length, 0) + analyses.list.filter(a => a.thumb).length;
-  const any = sessions.list.length + analyses.list.length;
+  const any = sessions.list.length + analyses.list.length + spfReports().length;
   const latest = groups[groups.length - 1], prev = groups[groups.length - 2];
   let cmp = '';
   if(latest && prev){
@@ -828,32 +845,20 @@ function viewRecord(){
     const lab = periodLabel(g, type), before = arr[i + 1];
     const changes = before ? METRICS.filter(m => m[3] != null).map(([k, label]) => { const vd = verdict(k, before.agg[k], g.agg[k]); return vd.t && vd.t !== 'about the same' ? `<li>${label}: <b class="${vd.cls}">${vd.t}</b> (${metricVal(k, before.agg[k])} → ${metricVal(k, g.agg[k])})</li>` : ''; }).join('') : '';
     return `<div class="card">
-      <span class="eyebrow">${lab.title} · ${g.n === 1 ? 'first period · ' : ''}${g.list.length} sessions · ${g.anas.length} analyses</span>
+      <span class="eyebrow">${lab.title}${g.n === 1 ? ' · first period' : ''} · ${g.anas.length + g.reps.length + g.list.length} reports</span>
       <p class="small" style="margin:4px 0 8px">${lab.dates}</p>
       ${g.list.length ? `<p class="small" style="margin:0">Average fade ${metricVal('avgFade', g.agg.avgFade)}% per hour · forehead shine rise ${metricVal('shineRise', g.agg.shineRise)} · side difference ${metricVal('asym', g.agg.asym)} · texture ${metricVal('tex', g.agg.tex)}</p>` : ''}
-      ${g.anas.slice().reverse().map(a => `
-        <button class="rep" data-act="anaOpen" data-id="${esc(a.id)}">
-          ${a.thumb ? `<img class="rep-thumb" src="${a.thumb}" alt="">` : `<span class="ring" style="--p:100;--c:var(--rose)"><b>${ic('sparkle', 'width:16px;height:16px')}</b></span>`}
-          <span class="rep-body"><b>AI skin analysis · ${dGreg(a.at, {weekday:'short', day:'numeric', month:'short'})} · <span data-noi18n>${dTime(a.at)}</span></b>
-            <span><span data-noi18n>${dHijri(a.at, {day:'numeric', month:'long', year:'numeric'})}</span> · ${analysisLine(a)}</span></span>
-          ${ic('chevron', 'color:var(--muted)')}
-        </button>`).join('')}
       ${changes ? `<p class="small" style="margin:8px 0 0"><b>Compared with ${periodLabel(before, type).title}:</b></p><ul class="list small">${changes}</ul>` : ''}
-      ${g.list.slice().reverse().map(s => { const st = sessionStats(s), m = minHold(s.checks[s.checks.length - 1]); return `
-        <button class="rep" data-act="monOpen" data-id="${esc(s.id)}">
-          <span class="ring" style="--p:${m ?? 0};--c:${holdCls(m).color}"><b>${m == null ? '–' : m + '%'}</b></span>
-          <span class="rep-body"><b>${dGreg(s.at, {weekday:'short', day:'numeric', month:'short'})} · <span data-noi18n>${dTime(s.at)}</span></b>
-            <span><span data-noi18n>${dHijri(s.at, {day:'numeric', month:'long', year:'numeric'})}</span> · ${fmtMins(st.dur)} · ${st.checks} checks${s.status === 'active' ? ' · in progress' : ''}</span></span>
-          ${ic('chevron', 'color:var(--muted)')}
-        </button>`; }).join('')}
+      ${[...g.anas.map(d => ({kind:'ana', at:d.at, d})), ...g.reps.map(d => ({kind:'spf', at:d.at, d})), ...g.list.map(d => ({kind:'ses', at:d.at, d}))]
+          .sort((a, b) => b.at - a.at).map(recItemHtml).join('')}
     </div>`;
   }).join('');
   return `
     <div class="card">
       <span class="eyebrow">Skin health record</span>
-      <h2>Your sunscreen follow-up file</h2>
-      <p class="sub">Every monitoring session and AI skin analysis (pores, dark circles, pigmentation) is filed here by day, week, month and year, with Gregorian and Hijri dates, and compared automatically with the period before.</p>
-      <p class="small">${sessions.list.length} sessions · ${analyses.list.length} analyses · ${photos ? `${photos} face photos saved on this device` : 'no face photos saved'}. Everything stays on this device.</p>
+      <h2>Your medical file</h2>
+      <p class="sub">Every report — AI skin analysis (pores, dark circles, pigmentation), sunscreen smart check and monitoring session — is saved here automatically the moment it is ready, with the day, Gregorian and Hijri date and time. You don’t need to download anything.</p>
+      <p class="small">${analyses.list.length} analyses · ${spfReports().length} sunscreen checks · ${sessions.list.length} sessions · ${photos ? `${photos} face photos saved on this device` : 'no face photos saved'}. Everything stays on this device.</p>
       <div class="chips" style="margin-top:10px">${PERIODS.map(([k, t]) => `<button class="chip${type === k ? ' on' : ''}" data-act="recPeriod" data-v="${k}">${t}</button>`).join('')}</div>
       <div class="btn-row">
         ${any ? `<button class="btn btn-primary" data-act="recExport">Export the record</button><button class="btn btn-outline" data-act="recBackup">Save backup file</button>` : ''}
@@ -862,7 +867,7 @@ function viewRecord(){
       ${photos ? `<button class="link-btn" data-act="recPhotos">Delete all face photos</button>` : ''}
       <input type="file" id="recFile" accept=".json,application/json" hidden>
     </div>
-    ${any ? cmp + list : `<div class="card"><p class="sub">Nothing recorded yet. Start a monitoring session right after you apply sunscreen, or take an AI skin analysis.</p>
+    ${any ? cmp + `<h3 class="rec-h">${ic('check', 'width:18px;height:18px;vertical-align:-3px')} Registered reports</h3>` + list : `<div class="card"><p class="sub">Nothing recorded yet. Start a monitoring session right after you apply sunscreen, or take an AI skin analysis.</p>
       <div class="btn-row"><button class="btn btn-primary" data-act="go" data-v="monitor">Start a session</button><button class="btn btn-outline" data-act="go" data-v="pore">AI skin analysis</button></div></div>`}`;
 }
 
@@ -894,11 +899,13 @@ function exportRecord(){
   });
   [...sessions.list.map(s => ({at:s.at, html:
     `<div class="card"><span class="eyebrow">Daily sunscreen follow-up report</span><h2>${dGreg(s.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h2>${sessionReportHtml(s, true)}</div>`})),
-   ...analyses.list.map(a => ({at:a.at, html:analysisDoc(a)}))].sort((a, b) => a.at - b.at).forEach(x => parts.push(x.html));
+   ...analyses.list.map(a => ({at:a.at, html:analysisDoc(a)})),
+   ...spfReports().map(r => ({at:r.at, html:`<div class="card"><span class="eyebrow">Sunscreen check report</span><h2>${dGreg(r.at, {weekday:'long', day:'numeric', month:'long', year:'numeric'})}</h2>
+     <p class="small">${dBoth(r.at)} · <span data-noi18n>${dTime(r.at)}</span></p>${reportBodyHtml(r)}</div>`}))].sort((a, b) => a.at - b.at).forEach(x => parts.push(x.html));
   saveFile(`my-skin-health-record-${stamp(Date.now())}.html`, docHtml('Skin health record', parts.join('')), 'text/html');
 }
 function backupSessions(){
-  saveFile(`my-skin-health-record-${stamp(Date.now())}.json`, JSON.stringify({app:'my-skin', kind:'sessions', v:2, sessions:sessions.list, analyses:analyses.list}), 'application/json');
+  saveFile(`my-skin-health-record-${stamp(Date.now())}.json`, JSON.stringify({app:'my-skin', kind:'sessions', v:3, sessions:sessions.list, analyses:analyses.list, reports:spfReports()}), 'application/json');
 }
 async function restoreSessions(file){
   if(!file) return;
@@ -906,7 +913,9 @@ async function restoreSessions(file){
     const d = JSON.parse(await file.text());
     const list = (Array.isArray(d) ? d : d.sessions || []).filter(r => r && typeof r.id === 'string' && r.at && Array.isArray(r.checks) && r.ctx);
     const alist = (d.analyses || []).filter(r => r && typeof r.id === 'string' && r.at && r.report);
-    if(!list.length && !alist.length) throw new Error('empty');
+    const rlist = (d.reports || []).filter(r => r && typeof r.id === 'string' && r.at && Array.isArray(r.zones));
+    if(!list.length && !alist.length && !rlist.length) throw new Error('empty');
+    if(rlist.length) await storeReports(rlist);
     const known = new Set(sessions.list.map(r => r.id)), aknown = new Set(analyses.list.map(r => r.id));
     let added = 0;
     for(const r of list) if(!known.has(r.id)){ await putSession({...r, status:r.status === 'active' ? 'done' : r.status}); added++; }
@@ -1000,6 +1009,9 @@ ACTIONS.reset = () => {
   }
 };
 // when location and weather arrive, refresh the automatic part of the session form
+// sunscreen check reports load (and arrive) through the main script: keep the medical file view in step
+const _refreshReports = refreshReports;
+refreshReports = function(){ _refreshReports(); if(view === 'record' && smart.mode === 'idle') rerenderKeepScroll(); };
 const _spfStop = ACTIONS.spfStop;
 ACTIONS.spfStop = () => { _spfStop(); if(view === 'monitor') rerenderKeepScroll(); };
 const _refreshWeather = refreshWeather;
@@ -1017,6 +1029,7 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .mon-photos figcaption{font-size:11px;color:var(--muted)}
 b.good{color:var(--good)} b.bad{color:var(--bad)}
 .list ul{margin:4px 0 6px;padding-inline-start:18px}
+.rec-h{margin:18px 4px 4px;font-size:16px;color:var(--brown-deep)}
 .rep-thumb{width:46px;height:46px;border-radius:12px;object-fit:cover;flex:none}
 .modal .ai-card{box-shadow:none;border:0;padding:0;margin:0}
 </style>`);

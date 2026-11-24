@@ -520,6 +520,7 @@ const D = [
 ['not given', 'غير محددة', '입력 안 함'],
 ['amount {}', 'الكمية {0}', '사용량 {0}'],
 ['(estimated)', '(تقديري)', '(추정)'],
+['estimated', 'تقديري', '추정'],
 ['reapply after ≈ {} outdoors', 'جدّدي بعد ≈ {0} في الخارج¦جدّد بعد ≈ {0} في الخارج', '실외에서 약 {0} 후 덧바르기'],
 ['Face tracking on', 'تتبع الوجه مفعّل', '얼굴 추적 켜짐'],
 ['No face tracking', 'بدون تتبع الوجه', '얼굴 추적 없음'],
@@ -783,6 +784,15 @@ const D = [
 ['Open the record', 'فتح السجل', '기록 열기'],
 ['Your last analysis is saved in your skin health record:', 'آخر تحليل لك محفوظ في سجلك الطبي:', '마지막 분석은 피부 건강 기록에 저장되어 있습니다:'],
 ['Open the last report', 'فتح آخر تقرير', '마지막 리포트 열기'],
+['Saved in your medical file', 'محفوظ في ملفك الطبي', '의료 파일에 저장됨'],
+['Registered reports', 'التقارير المسجلة', '저장된 리포트'],
+['Download a copy to this device', 'تنزيل نسخة على هذا الجهاز', '이 기기에 사본 다운로드'],
+['{} reports', '{0} تقارير', '리포트 {0}개'],
+['{} sunscreen checks', '{0} فحوصات واقي', '선크림 체크 {0}회'],
+['Your medical file', 'ملفك الطبي', '나의 의료 파일'],
+['Every report — AI skin analysis (pores, dark circles, pigmentation), sunscreen smart check and monitoring session — is saved here automatically the moment it is ready, with the day, Gregorian and Hijri date and time. You don’t need to download anything.', 'كل تقرير — تحليل البشرة بالذكاء الاصطناعي (المسام، الهالات، التصبغات)، والفحص الذكي للواقي، وجلسات المتابعة — يُحفظ هنا تلقائيًا لحظة جاهزيته، باليوم والتاريخ الميلادي والهجري والوقت. لا تحتاجين إلى تنزيل أي شيء.¦كل تقرير — تحليل البشرة بالذكاء الاصطناعي (المسام، الهالات، التصبغات)، والفحص الذكي للواقي، وجلسات المتابعة — يُحفظ هنا تلقائيًا لحظة جاهزيته، باليوم والتاريخ الميلادي والهجري والوقت. لا تحتاج إلى تنزيل أي شيء.', '모든 리포트(AI 피부 분석 — 모공·다크서클·색소침착, 선크림 스마트 체크, 모니터링 세션)는 준비되는 순간 요일, 양력·이슬람력 날짜, 시간과 함께 여기에 자동 저장됩니다. 따로 다운로드할 필요가 없습니다.'],
+['Every check is saved in your medical file under Registered reports.', 'كل فحص يُحفظ في ملفك الطبي ضمن التقارير المسجلة.', '모든 체크는 의료 파일의 저장된 리포트에 저장됩니다.'],
+['Saved in your medical file — here is your live protection map', 'تم الحفظ في ملفك الطبي — هذه خريطة حمايتك المباشرة', '의료 파일에 저장되었습니다 — 실시간 보호 지도입니다'],
 ['Pores: {}', 'المسام: {0}', '모공: {0}'],
 ['Dark circles: {}', 'الهالات: {0}', '다크서클: {0}'],
 ['Pigmentation: {}', 'التصبغات: {0}', '색소침착: {0}'],
@@ -881,6 +891,9 @@ function lookup(s, depth){
     cands.push(r);              // keep it, but let a sentence split compete
     break;
   }
+  // leading symbols ("✅ text", "· shine") with a fully known remainder win over splitting
+  const lead = s.match(/^([^\p{L}\p{N}]+?)\s*(\p{L}.*)$/u);
+  if(lead){ const t = lookup(lead[2], depth + 1); if(t != null && !/[A-Za-z]{3,}/.test(t)) return lead[1] + ' ' + t; }
   // split into pieces (separators, sentences) and keep the split that leaves the least English
   const parts = (list, sep) => { let hit = false; const out = list.map(x => { const t = lookup(x.trim(), depth + 1); if(t != null){ hit = true; return t; } return x.trim(); }); return hit ? out.join(sep) : null; };
   const left = r => (r.match(/[A-Za-z]{3,}/g) || []).length;
