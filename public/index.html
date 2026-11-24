@@ -422,6 +422,21 @@ function uvLevel(uv){
   return {label:'Extreme', cls:'bad', advice:`Stay in the shade as much as you can — skin can burn within minutes.`};
 }
 
+// OpenStreetMap reverse-geocoding result -> {kind: university | home | work | outdoors, name}
+function classifyPlace(n){
+  if(!n) return null;
+  const t = n.type || '', c = n.category || '', a = n.address || {};
+  const txt = `${n.name || ''} ${n.display_name || ''}`;
+  if(['university', 'college', 'school'].includes(t) || a.university || a.college || /university|جامعة|college|كلية|대학/i.test(txt))
+    return {kind:'university', name:n.name || a.university || a.college || ''};
+  if(['park', 'beach', 'pitch', 'stadium', 'garden', 'playground', 'track', 'sports_centre', 'golf_course'].includes(t) || c === 'highway' || c === 'natural' || c === 'leisure')
+    return {kind:'outdoors', name:n.name || ''};
+  if(['house', 'residential', 'apartments', 'detached', 'dormitory', 'terrace'].includes(t) || (c === 'building' && a.house_number))
+    return {kind:'home', name:''};
+  if(['office', 'commercial'].includes(t) || c === 'office') return {kind:'work', name:n.name || ''};
+  if(['retail', 'mall', 'hospital', 'clinic', 'supermarket'].includes(t) || c === 'shop' || c === 'amenity') return {kind:'indoor', name:n.name || ''};
+  return null;
+}
 function fetchWeather(){
   if(!navigator.geolocation){ ui.weather = {status:'error', msg:'This browser does not support location.'}; return refreshWeather(); }
   ui.weather = {status:'loading'}; refreshWeather();
@@ -430,9 +445,12 @@ function fetchWeather(){
       const {latitude:la, longitude:lo} = pos.coords;
       const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,uv_index&hourly=uv_index&daily=uv_index_max&timezone=auto&forecast_days=1`;
       const gUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=${I18N.lang}`;
-      const [w, g] = await Promise.all([
+      // what kind of place this is (university, home, park…), from OpenStreetMap, to guess indoors / outdoors
+      const pUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${lo}&zoom=18&accept-language=${I18N.lang}`;
+      const [w, g, p] = await Promise.all([
         fetch(wUrl).then(r => { if(!r.ok) throw new Error('weather'); return r.json(); }),
-        fetch(gUrl).then(r => r.ok ? r.json() : null).catch(() => null)
+        fetch(gUrl).then(r => r.ok ? r.json() : null).catch(() => null),
+        withTimeout(fetch(pUrl).then(r => r.ok ? r.json() : null), 6000).catch(() => null)
       ]);
       let uv = w.current && w.current.uv_index;
       if(uv == null && w.hourly){
@@ -446,7 +464,8 @@ function fetchWeather(){
         temp: Math.round(w.current.temperature_2m),
         max: w.daily && w.daily.uv_index_max ? Math.round(w.daily.uv_index_max[0] * 10) / 10 : null,
         hourly: w.hourly ? {time:w.hourly.time, uv:w.hourly.uv_index} : null,
-        place: g ? (g.city || g.locality || g.principalSubdivision || '') : ''
+        place: g ? (g.city || g.locality || g.principalSubdivision || '') : '',
+        poi: classifyPlace(p)
       };
     }catch(e){
       ui.weather = {status:'error', msg:'Could not load weather data, please try again.'};
@@ -2411,6 +2430,11 @@ function checkStepper(){
     }
 
     // ---------- 2) guided application ----------
+    // any order: when the hand starts working on another uncovered area, follow it
+    if(isNew && face && zones[smart.zi] && zones[smart.zi].rubMs < 300){
+      const other = zones.find(o => !o.status && o !== zones[smart.zi] && fr.handZones.has(o.key));
+      if(other){ resetRub(zones[smart.zi]); smart.zi = zones.indexOf(other); renderSmartSteps(); setSmartCtl('check'); }
+    }
     const z = zones[smart.zi];
     if(smart.manual){ smart.manual = false; z.status = 'manual'; z.res = null; }
     if(isNew){
@@ -2465,14 +2489,15 @@ function checkStepper(){
     // ---------- draw ----------
     if(face){
       zones.forEach(o => {
-        if(!o.status) return;
-        paintZone(ctx, fr.geo[o.key], W, H, '94,143,88', .26, 2);
+        // not covered yet = yellow, covered = green
+        if(!o.status){ if(o !== z) paintZone(ctx, fr.geo[o.key], W, H, '217,169,59', .1, 1.5); return; }
+        paintZone(ctx, fr.geo[o.key], W, H, '94,143,88', .3, 2);
         if(o.res && o.res.cov && o.status === 'verified') dots(ctx, fr.norm[o.key].filter((_, i) => !o.res.cov[i]), W, H, 'rgba(200,60,50,.9)', Math.max(2.5, W / 220));
       });
       if(!z.status){
         const g = fr.geo[z.key];
-        const a = phase === 'rub' ? .3 : phase === 'measure' ? .22 : .1 + .08 * Math.sin(now / 220);
-        paintZone(ctx, g, W, H, phase === 'measure' ? '217,169,59' : '232,134,140', a, 3);
+        const a = phase === 'rub' ? .32 : phase === 'measure' ? .26 : .16 + .08 * Math.sin(now / 220);
+        paintZone(ctx, g, W, H, '217,169,59', a, 3);
         drawPulse(ctx, g.cx * W, g.cy * H, Math.max(14, g.r * W * 1.6), now);
         if(z.retried && z.prevCov){
           const pts = fr.norm[z.key];
@@ -2487,8 +2512,9 @@ function checkStepper(){
     txt.textContent = `Zone ${Math.min(smart.zi + 1, zones.length)} of ${zones.length}: ${z.name}${smart.tracked ? '' : ' (no tracking)'}`;
 
     if(z.status){
-      smart.zi++; renderSmartSteps(); setSmartCtl('check');
-      if(smart.zi >= zones.length) return finishSmart(zones);
+      const next = zones.findIndex(o => !o.status);
+      if(next < 0){ smart.zi = zones.length; renderSmartSteps(); return finishSmart(zones); }
+      smart.zi = next; renderSmartSteps(); setSmartCtl('check');
     }
   }};
 }
@@ -2513,6 +2539,18 @@ function finishSmart(zones){
   smart.preview = 0;
   save(); refreshSpfForm(); refreshLive();
   $('#spfProg').classList.remove('show');
+  // monitoring session: the covered face becomes the session reference, compared with the bare skin just read
+  if(view === 'monitor' && typeof monRun !== 'undefined' && monRun.apply){
+    monRun.apply = false;
+    monRun.bare = {}; monRun.applied = {};
+    zones.forEach(z => {
+      monRun.bare[z.key] = z.base.cells;
+      monRun.applied[z.key] = {status:z.status, coverage:z.status === 'verified' && z.res ? Math.round(z.res.coverage * 100) : null};
+    });
+    toast('✅ All areas are green — hold still for a moment');
+    buzz([100, 60, 100]);
+    return monitorStepper('start');
+  }
   toast('✅ Measured — report saved. Here is your live protection map');
   buzz([100, 60, 100, 60, 220]);
   return arStepper();

@@ -202,8 +202,10 @@ function monitorStepper(kind){
     const photo = wantPhoto ? grabPhoto() : null;
     if(kind === 'start') monStartDone(meas, lastLm, poses.length ? avgPose(poses) : null, photo);
     else monCheckDone(meas, photo, lightShift);
-    setTimeout(() => { stopCamera(); rerenderKeepScroll(); }, 0);
-    return true;
+    // keep the camera running as a live mirror that shows the result on the face
+    const a = $('#monActive'); if(a && state.monitor) a.outerHTML = activeCardHtml(state.monitor);
+    const f = $('#monForm'); if(f && state.monitor) f.outerHTML = activeCardHtml(state.monitor);
+    return monitorResultStepper();
   };
 
   return {step({dt, now, fr, isNew, ctx, W, H, hint}){
@@ -244,36 +246,117 @@ function monitorStepper(kind){
   }};
 }
 
+// what the camera sees in an area: still on the surface, partly absorbed, or fully absorbed / worn off
+function zoneState(v){
+  if(v == null) return {t:'not measured', rgb:'160,160,160'};
+  if(v >= 75) return {t:'still on the skin', rgb:'94,143,88'};
+  if(v >= 40) return {t:'partly absorbed', rgb:'217,169,59'};
+  return {t:'fully absorbed', rgb:'200,70,60'};
+}
+// live mirror after a capture: each area coloured by the latest result, with its percentage
+function monitorResultStepper(){
+  smart.mode = 'monResult'; setSmartCtl('monResult');
+  $('#spfProg').classList.remove('show');
+  const M = state.monitor, c = M && M.checks[M.checks.length - 1];
+  return {step({fr, ctx, W, H, hint}){
+    if(!c) return;
+    if(!fr || !fr.face){ hint.textContent = `Place your face inside the frame`; return; }
+    SPF_AR_ZONES.forEach(z => {
+      const v = c.hold[z.key], s = zoneState(v), g = fr.geo[z.key];
+      paintZone(ctx, g, W, H, s.rgb, .34, 2.5);
+      // the canvas is mirrored on screen, so flip the text back
+      ctx.save(); ctx.translate(g.cx * W, g.cy * H); ctx.scale(-1, 1);
+      ctx.font = `700 ${Math.max(13, W / 26)}px Cairo, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.fillStyle = '#fff';
+      const txt = v == null ? '–' : v + '%';
+      ctx.strokeText(txt, 0, 0); ctx.fillText(txt, 0, 0); ctx.restore();
+    });
+    hint.textContent = c.kind === 'start' ? '🟢 All areas covered — this is your reference. Close the camera until the next check.'
+      : '🟢 still on the skin · 🟡 partly absorbed · 🔴 fully absorbed';
+  }};
+}
+
 function monStartDone(meas, lm, pose, photo){
-  const at = Date.now(), f = monForm, w = ui.weather.status === 'ready' ? ui.weather : null;
-  const side = {}, base = {};
+  const at = Date.now(), f = monForm, A = autoCtx();
+  const side = {}, base = {}, refCells = {};
+  const bare = monRun.bare; monRun.bare = null;
   SPF_AR_ZONES.forEach(z => {
     side[z.key] = smart.cells[z.key].map(i => lm && lm[i].x < lm[1].x ? 'R' : 'L');   // image left = the person's right
     base[z.key] = meas[z.key].cells;
+    // how strongly the film changed each point: covered colour vs the bare skin read just before
+    if(bare && bare[z.key]) refCells[z.key] = base[z.key].map((c, i) => {
+      const b = bare[z.key][i]; return c && b ? Math.round(Math.max(1.5, labDist(c.mean, b.mean)) * 100) / 100 : null;
+    });
   });
-  // how strongly the film changed each zone: from a smart check done just before, otherwise a typical value
+  const measured = !!bare;
   const L = state.spfLive, recent = L && at - L.at < 45 * 60000;
   const ref = {};
-  SPF_AR_ZONES.forEach(z => { const m = recent && L.zones[z.key] && L.zones[z.key].m; ref[z.key] = m && m.dE > 1.5 ? Math.round(m.dE * 100) / 100 : MON.FILM_DE; });
+  SPF_AR_ZONES.forEach(z => {
+    const v = refCells[z.key] ? median(refCells[z.key].filter(x => x != null)) : null;
+    const m = recent && L.zones[z.key] && L.zones[z.key].m;
+    ref[z.key] = v ? Math.round(v * 100) / 100 : m && m.dE > 1.5 ? Math.round(m.dE * 100) / 100 : MON.FILM_DE;
+  });
   const points = SPF_AR_ZONES.reduce((s, z) => s + base[z.key].filter(Boolean).length, 0);
   const hold = {}, spec = {}, tex = {};
   SPF_AR_ZONES.forEach(z => { hold[z.key] = 100; spec[z.key] = +(meas[z.key].spec * 100).toFixed(2); tex[z.key] = +(meas[z.key].tex * 100).toFixed(2); });
+  const name = (f.sunscreen || '').trim();
+  if(name){ state.sunscreens = [name, ...(state.sunscreens || []).filter(x => x !== name)].slice(0, 8); }
   const M = {
-    id:'ses-' + at, v:1, at, status:'active',
-    ctx:{temp:f.temp === '' || f.temp == null ? null : +f.temp, skin:f.skin, place:f.place, placeOther:(f.placeOther || '').trim(), exposure:f.exposure,
-         spf:f.spf, interval:f.interval, uv:w ? w.uv : null, uvMax:w ? w.max : null, city:w ? w.place : ''},
-    photos:f.photos === 'yes', refSource:recent ? 'measured' : 'typical', ref, tracked:smart.tracked,
-    checks:[{at, n:0, kind:'start', points, hold, sideHold:{R:100, L:100}, spec, tex}],
+    id:'ses-' + at, v:2, at, status:'active',
+    ctx:{sunscreen:name, spf:f.spf, skin:f.skin, setting:A.setting, placeKind:A.placeKind, placeName:A.placeName, city:A.city,
+         temp:A.temp, uv:A.uv, uvMax:A.uvMax, exposure:A.exposure, interval:A.interval, auto:true},
+    photos:f.photos === 'yes', refSource:measured || recent ? 'measured' : 'typical', ref, tracked:smart.tracked,
+    checks:[{at, n:0, kind:'start', points, hold, sideHold:{R:100, L:100}, spec, tex, applied:monRun.applied || null, next:A.interval}],
     reapplies:[],
     // working data for the next checks (not part of the saved record)
-    base, cells:smart.cells, side, pose, bg:smart.bgBase, baseL:mean(SPF_AR_ZONES.map(z => meas[z.key].L)),
-    nextAt:at + f.interval * 60000, pending:null
+    base, refCells:measured ? refCells : null, cells:smart.cells, side, pose, bg:smart.bgBase, baseL:mean(SPF_AR_ZONES.map(z => meas[z.key].L)),
+    nextAt:at + A.interval * 60000, pending:null
   };
+  monRun.applied = null;
   state.monitor = M; save();
   saveActive(M, photo);
   armMonitor();
   buzz([60, 50, 60]);
-  toast(`Session started — next check in ${f.interval} min`);
+  toast(`Session started — next check in ${A.interval} min`);
+}
+
+/* ---------------- automatic context: location, place, weather → check interval ---------------- */
+const PLACE_KIND = {university:'University', home:'At home', work:'Work', outdoors:'Outdoors', indoor:'Indoor place'};
+const SETTING = {out:'Outdoors in the sun', in:'Indoors or in the shade'};
+// how often to check: strong sun and heat wear sunscreen off faster
+function autoInterval(setting, uv, temp){
+  if(setting !== 'out') return 30;
+  const u = uv == null ? 6 : uv;
+  if(u >= 8 || (temp != null && temp >= 40)) return 15;
+  if(u >= 3 || (temp != null && temp >= 34)) return 20;
+  return 30;
+}
+function autoCtx(prev){
+  const w = ui.weather.status === 'ready' ? ui.weather : null, poi = w && w.poi;
+  const setting = prev ? prev.setting : (monForm && monForm.setting)
+    || (poi ? (poi.kind === 'outdoors' ? 'out' : 'in') : w && w.uv >= 3 ? 'out' : 'in');
+  const uv = w ? w.uv : prev ? prev.uv : null, temp = w ? w.temp : prev ? prev.temp : null;
+  const exposure = setting === 'out' ? ((uv ?? 6) >= 8 || (temp ?? 0) >= 40 ? 'high' : (uv ?? 6) >= 3 ? 'moderate' : 'low') : 'low';
+  return {setting, uv, temp, uvMax:w ? w.max : prev ? prev.uvMax : null, city:w ? w.place : prev ? prev.city : '',
+    placeKind:poi ? poi.kind : prev ? prev.placeKind : null, placeName:poi ? poi.name : prev ? prev.placeName : '',
+    exposure, interval:autoInterval(setting, uv, temp)};
+}
+function placeText(c){
+  const kind = c.placeKind ? PLACE_KIND[c.placeKind] : c.place ? (MON.PLACES.find(p => p[0] === c.place) || [0, ''])[1] : '';
+  return [c.placeName || (c.place === 'other' ? c.placeOther : '') || (kind ? I18N.tr(kind) : ''), c.city].filter(Boolean).join(' · ');
+}
+function autoCtxHtml(){
+  const w = ui.weather, A = autoCtx();
+  let body;
+  if(w.status === 'loading') body = `<p class="small" style="margin:0">Finding your location and UV index…</p>`;
+  else if(w.status !== 'ready') body = `<p class="small" style="margin:0">${w.msg ? esc(w.msg) + ' ' : ''}Turn on location so My skin can read where you are and the weather, and set the checks by itself.</p>
+    <div class="btn-row"><button class="btn btn-outline" data-act="locate">Use my current location</button></div>`;
+  else body = `<p class="small" style="margin:0">📍 <span data-noi18n>${esc(placeText(A) || '–')}</span> · 🌡 ${w.temp}° · UV ${w.uv} (${uvLevel(w.uv).label})</p>`;
+  return `<div class="notice" id="monAuto" style="background:var(--cream-deep);color:var(--brown)">
+      <b>Detected automatically</b>${body}
+      <div class="chips" style="margin-top:8px">${Object.entries(SETTING).map(([k, t]) => `<button class="chip${A.setting === k ? ' on' : ''}" data-act="monSetting" data-v="${k}">${k === 'out' ? '☀️' : '🏠'} ${t}</button>`).join('')}</div>
+      <p class="small" style="margin:8px 0 0">Checks every ${A.interval} min — set automatically from your location, UV and temperature.</p>
+    </div>`;
 }
 
 function monCheckDone(meas, photo, lightShift){
@@ -292,7 +375,8 @@ function monCheckDone(meas, photo, lightShift){
     b.forEach((bc, i) => {
       if(!bc || !cur[i]) return;
       const drift = Math.max(0, labDist(cur[i].mean, bc.mean) - (2 * bc.sd + .6));
-      const v = clamp(1 - drift / M.ref[z.key], 0, 1);
+      const ref = (M.refCells && M.refCells[z.key] && M.refCells[z.key][i]) || M.ref[z.key];
+      const v = clamp(1 - drift / ref, 0, 1);
       r.push(v); perSide[M.side[z.key][i]].push(v);
     });
     hold[z.key] = r.length ? Math.round(100 * median(r)) : null;
@@ -311,7 +395,11 @@ function monCheckDone(meas, photo, lightShift){
   if(rebased) c.rebased = rebased;
   M.pending = null;
   M.checks.push(c);
-  M.nextAt = at + M.ctx.interval * 60000;
+  // the interval follows the current place and weather; an area that needs reapplying is checked again sooner
+  if(M.ctx.auto){ const A = autoCtx(M.ctx); Object.assign(M.ctx, {uv:A.uv, temp:A.temp, exposure:A.exposure, interval:A.interval}); }
+  const next = weak.length ? Math.min(10, M.ctx.interval) : M.ctx.interval;
+  c.next = next;
+  M.nextAt = at + next * 60000;
   delete M.notified;
   save();
   saveActive(M, photo);
@@ -355,11 +443,20 @@ function alertText(a, c){
 function checkNotes(s, i){
   const c = s.checks[i], start = s.checks[0], prev = s.checks[i - 1], out = [];
   if(c.kind === 'start'){
+    if(c.applied){
+      out.push('Sunscreen was applied in front of the camera: every area turned from yellow to green once it was covered.');
+      SPF_AR_ZONES.forEach(z => { const a = c.applied[z.key]; if(!a) return;
+        out.push(a.coverage != null ? `${z.name}: covered — ${a.coverage}% of the measured points changed colour.` : `${z.name}: covered — ${SPF_STATUS[a.status] || ''}.`); });
+    }
     out.push(`Session started right after applying sunscreen. Reference recorded on ${c.points} points across 5 face areas.`);
-    out.push(s.refSource === 'measured' ? 'The strength of the sunscreen film was taken from the smart check done just before.' : 'No smart check was done just before, so a typical sunscreen film strength was used.');
+    out.push(s.refSource === 'measured' ? (c.applied ? 'The strength of the sunscreen film was measured point by point against your bare skin.' : 'The strength of the sunscreen film was taken from the smart check done just before.') : 'No smart check was done just before, so a typical sunscreen film strength was used.');
+    if(c.next) out.push(`Next check scheduled in ${c.next} min.`);
     return out;
   }
   if(c.rebased) out.push(`Measured fresh after reapplying on the ${MON.SIDES[c.rebased]}.`);
+  // what the camera saw in each area
+  SPF_AR_ZONES.forEach(z => { const v = c.hold[z.key]; if(v == null) return;
+    out.push(`${z.name}: ${zoneState(v).t} — ${v}% of the sunscreen film is still visible.`); });
   const R = c.sideHold.R, L = c.sideHold.L;
   if(c.alert && c.alert.type === 'side'){
     out.push(c.alert.side === 'R'
@@ -390,6 +487,7 @@ function checkNotes(s, i){
                                         : `Pores look more visible on the left cheek than on the right (texture ${fmtN(c.tex.cheekL)} vs ${fmtN(c.tex.cheekR)}).`);
   }
   if(c.light) out.push('The light was different from the first capture, so this reading is less certain.');
+  if(c.next) out.push(`Next check scheduled in ${c.next} min.`);
   return out;
 }
 
@@ -551,59 +649,59 @@ function monitorHomeCard(){
     </div>`;
 }
 function camCardHtml(){
+  const M = state.monitor;
   return `
     <div class="card" id="smartCard">
+      <span class="eyebrow">${ic('camera', 'width:14px;height:14px;vertical-align:-2px')} Live mirror</span>
       <div class="cam mirror" id="spfCam">
         <video id="spfVideo" playsinline muted></video>
         <canvas id="spfCanvas"></canvas>
-        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>${state.monitor ? 'Hold the phone like in the first capture, in the same light.' : 'Fill in the details below, then start — the video is analysed on your device only.'}</span></div>
+        <div class="cam-ph" id="spfPh">${ic('camera', 'width:34px;height:34px')}<span>${M ? 'Hold the phone like in the first capture, in the same light.' : 'The camera works as a live mirror: it reads your bare skin first, then each area is yellow until you cover it with sunscreen and turns green.'}</span></div>
         <div class="cam-hint" id="spfHint"></div>
       </div>
       <div class="qual" id="spfQual"></div>
       <div class="progress" id="spfProg"><div class="bar"><i id="spfFill"></i></div><span id="spfTxt"></span></div>
+      ${M ? '' : `<ul class="zsteps" id="spfSteps">${smartStepsHtml()}</ul>`}
       <div id="spfCtl">${monitorCtlHtml(smart.mode)}</div>
     </div>`;
 }
 function monitorCtlHtml(mode){
+  if(mode === 'check') return `<div class="btn-row"><button class="btn btn-dark" data-act="spfManual" ${smart.zi < 0 ? 'disabled' : ''}>Applied on this area ✓</button><button class="btn btn-outline" data-act="spfStop">Stop</button></div>`;
   if(mode === 'busy' || mode === 'monitor') return `<div class="btn-row"><button class="btn btn-outline" data-act="spfStop">Cancel</button></div>`;
-  return state.monitor ? `<div class="btn-row"><button class="btn btn-primary" data-act="monCheck">Check now</button></div>` : '';
+  if(mode === 'monResult') return `<div class="btn-row"><button class="btn btn-primary" data-act="spfStop">Close camera</button></div>`;
+  return state.monitor ? `<div class="btn-row"><button class="btn btn-primary" data-act="monCheck">${ic('camera', 'width:18px;height:18px')} Check now</button></div>` : '';
 }
 function chipRow(act, opts, cur){
   return `<div class="chips">${opts.map(([v, t]) => `<button class="chip${String(cur) === String(v) ? ' on' : ''}" data-act="${act}" data-v="${v}">${t}</button>`).join('')}</div>`;
 }
 function startFormHtml(){
   if(!monForm){
-    const w = ui.weather.status === 'ready' ? ui.weather : null;
-    monForm = {temp:w ? w.temp : '', skin:state.skinType ? state.skinType.raw : null, place:null, placeOther:'',
-      exposure:w ? (w.uv < 3 ? 'low' : w.uv < 8 ? 'moderate' : 'high') : null,
-      spf:(ui.spf && ui.spf.spf) || (state.spf && state.spf.spf) || null, interval:15, photos:null};
+    monForm = {sunscreen:(state.sunscreens || [])[0] || '', skin:state.skinType ? state.skinType.raw : null,
+      spf:(ui.spf && ui.spf.spf) || (state.spf && state.spf.spf) || null, setting:null, photos:null};
   }
   const f = monForm;
-  const recent = state.spfLive && Date.now() - state.spfLive.at < 45 * 60000;
   return `
     <div class="card" id="monForm">
       <span class="eyebrow">Session details</span>
-      ${recent ? '' : `<div class="notice">Tip: do the smart check on the sunscreen page while applying — the session then knows exactly how strong your film is.</div>`}
-      <div class="field"><label for="monTemp">Temperature (°C)</label>
-        <input class="input" id="monTemp" type="number" inputmode="numeric" value="${esc(f.temp ?? '')}" data-mon="temp"></div>
-      <div class="field"><span class="field-label">Skin type</span>${chipRow('monSet', Object.keys(TYPE_INFO).map(k => ['skin:' + k, TYPE_INFO[k].label]), 'skin:' + f.skin)}</div>
-      <div class="field"><span class="field-label">Where are you?</span>${chipRow('monSet', MON.PLACES.map(([v, t]) => ['place:' + v, t]), 'place:' + f.place)}
-        ${f.place === 'other' ? `<input class="input" style="margin-top:8px" placeholder="Name the place" value="${esc(f.placeOther)}" data-mon="placeOther">` : ''}</div>
-      <div class="field"><span class="field-label">Expected sun exposure / likely sun damage</span>${chipRow('monSet', MON.EXPOSURE.map(([v, t]) => ['exposure:' + v, t]), 'exposure:' + f.exposure)}</div>
+      ${autoCtxHtml()}
+      <div class="field"><label for="monSun">Your sunscreen</label>
+        <input class="input" id="monSun" list="monSunList" placeholder="Sunscreen name, e.g. the brand and product" value="${esc(f.sunscreen)}" data-mon="sunscreen">
+        <datalist id="monSunList">${(state.sunscreens || []).map(n => `<option value="${esc(n)}">`).join('')}</datalist></div>
       <div class="field"><span class="field-label">Your product’s SPF</span>${chipRow('monSet', ['15', '30', '50+', 'Not sure'].map(v => ['spf:' + v, v === 'Not sure' ? v : 'SPF ' + v]), 'spf:' + f.spf)}</div>
-      <div class="field"><span class="field-label">Check every</span>${chipRow('monSet', MON.INTERVALS.map(m => ['interval:' + m, m + ' min']), 'interval:' + f.interval)}</div>
+      <div class="field"><span class="field-label">Skin type</span>${chipRow('monSet', Object.keys(TYPE_INFO).map(k => ['skin:' + k, TYPE_INFO[k].label]), 'skin:' + f.skin)}</div>
       <div class="field"><span class="field-label">Face photos</span>
         <button class="opt${f.photos === 'yes' ? ' on' : ''}" data-act="monSet" data-v="photos:yes"><b>Save a small face photo with each check</b><span>Kept only on this device, inside your skin health record. You can delete the photos at any time.</span></button>
         <button class="opt${f.photos === 'no' ? ' on' : ''}" data-act="monSet" data-v="photos:no"><b>Notes and numbers only — no photos</b><span>Only the measurements and written notes are saved.</span></button>
       </div>
       <div class="err" id="monErr"></div>
-      <div class="btn-row"><button class="btn btn-primary" data-act="monStart">Start session — I have applied sunscreen</button></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act="monStart">${ic('camera', 'width:18px;height:18px')} Start — apply sunscreen in front of the camera</button></div>
+      <p class="small">Don’t apply sunscreen yet: the camera reads your bare skin first, then guides you area by area.</p>
     </div>`;
 }
 function zoneBars(c){
   return SPF_AR_ZONES.map(z => {
     const v = c.hold[z.key], k = holdCls(v);
-    return `<div class="prot-row"><span>${z.name}</span><div class="prot-bar"><i style="width:${v ?? 0}%;background:${k.color}"></i></div><b style="color:${k.color}">${v == null ? '–' : v + '%'}</b></div>`;
+    return `<div class="prot-row"><span>${z.name}${c.kind === 'check' ? `<br><small style="color:${k.color}">${zoneState(v).t}</small>` : ''}</span><div class="prot-bar"><i style="width:${v ?? 0}%;background:${k.color}"></i></div><b style="color:${k.color}">${v == null ? '–' : v + '%'}</b></div>`;
   }).join('');
 }
 function activeCardHtml(M){
@@ -616,6 +714,9 @@ function activeCardHtml(M){
       <p class="small" style="margin:4px 0 0">${dBoth(M.at)} · <span data-noi18n>${dTime(M.at)}</span> · ${fmtMins(elapsed)} ago</p>
       <p class="small" style="margin:4px 0 0">${ctxLine(M)}</p>
       <div class="verdict ${due ? 'warn' : ''}" style="margin-top:10px">${due ? 'Check due now — tap "Check now".' : `Next check in ${fmtRemaining(M.nextAt - Date.now())}`}</div>
+      ${M.ctx.auto ? `<div class="field"><span class="field-label">Right now you are</span>
+        <div class="chips">${Object.entries(SETTING).map(([k, t]) => `<button class="chip${M.ctx.setting === k ? ' on' : ''}" data-act="monSetting" data-v="${k}">${k === 'out' ? '☀️' : '🏠'} ${t}</button>`).join('')}</div>
+        <p class="small" style="margin:6px 0 0">Checks every ${M.ctx.interval} min — set automatically from your location, UV and temperature.</p></div>` : ''}
       <h4 style="margin:14px 0 4px">${last.kind === 'start' ? 'Reference (fresh sunscreen)' : `Check ${last.n} · ${fmtMins(Math.round((last.at - M.at) / 60000))} after application`}</h4>
       <div class="prot">${zoneBars(last)}</div>
       <div class="prot" style="margin-top:6px">
@@ -633,25 +734,28 @@ function activeCardHtml(M){
 }
 function ctxLine(s){
   const c = s.ctx, parts = [];
-  const place = c.place === 'other' ? (c.placeOther || 'Other') : (MON.PLACES.find(p => p[0] === c.place) || [0, ''])[1];
-  if(place) parts.push(`Place: ${place}`);
+  if(c.sunscreen) parts.push(`Sunscreen: ${c.sunscreen}`);
+  parts.push(c.spf && c.spf !== 'Not sure' ? `SPF ${c.spf}` : 'SPF not given');
+  const place = placeText(c);
+  if(place) parts.push({html:`${esc(I18N.tr('Place:'))} <span data-noi18n>${esc(place)}</span>`});
+  if(c.setting) parts.push(SETTING[c.setting]);
   if(c.temp != null) parts.push(`Temperature: ${c.temp}°`);
   if(c.uv != null) parts.push(`UV at start: ${c.uv}`);
   if(c.skin && TYPE_INFO[c.skin]) parts.push(`Skin type: ${TYPE_INFO[c.skin].label}`);
   if(c.exposure) parts.push(`Sun exposure: ${(MON.EXPOSURE.find(e => e[0] === c.exposure) || [0, ''])[1]}`);
-  parts.push(c.spf && c.spf !== 'Not sure' ? `SPF ${c.spf}` : 'SPF not given');
-  parts.push(`Checks every ${c.interval} min`);
+  parts.push(c.auto ? `Checks every ${c.interval} min (automatic)` : `Checks every ${c.interval} min`);
   parts.push(s.photos ? 'Face photos: saved' : 'Face photos: not saved');
-  return parts.map(p => esc(p)).join(' · ');
+  return parts.map(p => p.html || esc(p)).join(' · ');
 }
 function viewMonitor(){
   const M = state.monitor;
+  if(ui.weather.status === 'idle') setTimeout(fetchWeather, 0);   // read location and weather without asking for them in the form
   return `
     <div class="card">
       <span class="eyebrow">Sunscreen monitoring session</span>
       <h2>${M ? 'Session in progress' : 'Start a monitoring session'}</h2>
-      <p class="sub">Start right after you apply sunscreen. Every few minutes you take a short camera check; My skin compares each area of your face with the moment you applied it, finds which side is fading faster and tells you exactly where to reapply. Everything is written into your skin health record.</p>
-      <p class="small">Checks run while this page is open: you get a reminder when one is due, then a 10-second scan.</p>
+      <p class="sub">Apply your sunscreen in front of the camera: each area of your face is yellow until it is covered and turns green. After that My skin reminds you to come back for a short check, measures where the sunscreen has been absorbed and where it is still on the skin, and writes it all into your skin health record.</p>
+      <p class="small">Your location, the place type, temperature and UV are read automatically and set how often you are checked. Checks run while this page is open.</p>
     </div>
     ${camCardHtml()}
     ${M ? activeCardHtml(M) : startFormHtml()}
@@ -813,15 +917,17 @@ async function restoreSessions(file){
 /* ---------------- actions ---------------- */
 async function monStart(){
   const f = monForm, err = $('#monErr');
-  const t = $('#monTemp'); if(t) f.temp = t.value;
-  const miss = !f.skin ? 'Choose your skin type.' : !f.place ? 'Choose where you are.' : f.place === 'other' && !f.placeOther.trim() ? 'Name the place.'
-    : !f.exposure ? 'Choose your expected sun exposure.' : !f.photos ? 'Choose whether to save face photos.' : '';
+  const sun = $('#monSun'); if(sun) f.sunscreen = sun.value;
+  const miss = !f.sunscreen.trim() ? 'Write the name of your sunscreen.' : !f.skin ? 'Choose your skin type.' : !f.photos ? 'Choose whether to save face photos.' : '';
   if(miss){ err.textContent = miss; err.scrollIntoView({block:'center', behavior:'smooth'}); return; }
   err.textContent = '';
   if('Notification' in window && Notification.permission === 'default'){ try{ await Notification.requestPermission(); }catch(e){} }
-  monRun.kind = 'start';
+  // step 1 is the guided application (bare skin, then each area yellow → green); it hands over to the reference capture
+  if(!ui.spf) ui.spf = {zones:[], spf:null, amount:null};
+  ui.spf.spf = f.spf; ui.spf.amount = null;
+  monRun.kind = 'start'; monRun.apply = true;
   window.scrollTo({top:0, behavior:'smooth'});
-  runSpfCam('monitor');
+  runSpfCam('check');
 }
 function monCheck(){
   if(!state.monitor) return;
@@ -843,9 +949,25 @@ Object.assign(VIEWS, {monitor:viewMonitor, record:viewRecord});
 Object.assign(ACTIONS, {
   monSet: d => {
     const [k, v] = d.v.split(':');
-    const t = $('#monTemp'); if(t) monForm.temp = t.value;
-    monForm[k] = k === 'interval' ? +v : v;
+    const sun = $('#monSun'); if(sun) monForm.sunscreen = sun.value;
+    monForm[k] = v;
     const el = $('#monForm'); if(el) el.outerHTML = startFormHtml();
+  },
+  // indoors / outdoors: picked automatically from the place, corrected here when it is wrong
+  monSetting: d => {
+    const M = state.monitor;
+    if(M){
+      M.ctx.setting = d.v;
+      const A = autoCtx(M.ctx);
+      Object.assign(M.ctx, {exposure:A.exposure, interval:A.interval});
+      const last = M.checks[M.checks.length - 1];
+      M.nextAt = Math.max(Date.now() + 60000, last.at + A.interval * 60000); delete M.notified;
+      save(); saveActive(M); armMonitor(); refreshMonitor();
+    } else if(monForm){
+      const sun = $('#monSun'); if(sun) monForm.sunscreen = sun.value;
+      monForm.setting = d.v;
+      const el = $('#monAuto'); if(el) el.outerHTML = autoCtxHtml();
+    }
   },
   monStart, monCheck, monEnd,
   monReapply: d => {
@@ -874,6 +996,14 @@ ACTIONS.reset = () => {
     analyses.list = []; try{ localStorage.removeItem(ANA_KEY); }catch(e){}
     idbDo('readwrite', s => s.clear(), 'analyses').catch(() => {});
   }
+};
+// when location and weather arrive, refresh the automatic part of the session form
+const _spfStop = ACTIONS.spfStop;
+ACTIONS.spfStop = () => { _spfStop(); if(view === 'monitor') rerenderKeepScroll(); };
+const _refreshWeather = refreshWeather;
+refreshWeather = function(){
+  _refreshWeather();
+  if(view === 'monitor'){ const el = $('#monAuto'); if(el) el.outerHTML = autoCtxHtml(); }
 };
 document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.mon; if(k && monForm) monForm[k] = e.target.value; });
 document.addEventListener('change', e => { if(e.target.id === 'recFile') restoreSessions(e.target.files && e.target.files[0]); });
